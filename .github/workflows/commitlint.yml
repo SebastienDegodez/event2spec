@@ -1,0 +1,46 @@
+name: Lint Commit Messages
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  commitlint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: lts/*
+      - name: Install dependencies
+        run: npm ci
+      - name: Validate conventional commits
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+          else
+            npx commitlint --from HEAD~1 --to HEAD --verbose
+          fi
+      - name: Check commits are signed off
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            COMMITS=$(git log --format="%H" ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
+          else
+            COMMITS=$(git log --format="%H" -1)
+          fi
+          for commit in $COMMITS; do
+            if ! git log --format="%B" -n 1 "$commit" | grep -q "^Signed-off-by:"; then
+              echo "ERROR: Commit $commit is missing a Signed-off-by trailer."
+              echo "Use 'git commit --signoff' to add it."
+              exit 1
+            fi
+          done
+
