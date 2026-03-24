@@ -59,5 +59,6 @@ Signed-off-by: Carol Simon <carol@example.com>
 ### Enforcement
 
 - A **local git hook** (via Husky) runs `commitlint` on every commit to validate the message format.
-- A **GitHub Actions workflow** (`.github/workflows/commitlint.yml`) validates all commit messages on every push and pull request targeting `main`.
+- A **GitHub Actions workflow** (`.github/workflows/commitlint.yml`) validates all commit messages on every push and pull request targeting `main`, using `npx commitlint` with `--from`/`--to` SHA ranges and checking for a `Signed-off-by` trailer.
+- GitHub Actions are pinned to their full commit SHA for supply-chain security.
 - Always run `git commit --signoff` to add the `Signed-off-by` line automatically.
