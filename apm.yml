@@ -1,20 +1,19 @@
 name: event2spec
 version: 1.0.0
 description: event2spec - Converts events to specifications
-
 dependencies:
   apm:
-    - obra/superpowers/skills/brainstorming#8ea39819eed74fe2a0338e71789f06b30e953041
-    - obra/superpowers/skills/dispatching-parallel-agents#8ea39819eed74fe2a0338e71789f06b30e953041
-    - obra/superpowers/skills/executing-plans#8ea39819eed74fe2a0338e71789f06b30e953041
-    - obra/superpowers/skills/finishing-a-development-branch#8ea39819eed74fe2a0338e71789f06b30e953041
-    - obra/superpowers/skills/receiving-code-review#8ea39819eed74fe2a0338e71789f06b30e953041
-    - obra/superpowers/skills/requesting-code-review#8ea39819eed74fe2a0338e71789f06b30e953041
-    - obra/superpowers/skills/subagent-driven-development#8ea39819eed74fe2a0338e71789f06b30e953041
-    - obra/superpowers/skills/systematic-debugging#8ea39819eed74fe2a0338e71789f06b30e953041
-    - obra/superpowers/skills/test-driven-development#8ea39819eed74fe2a0338e71789f06b30e953041
-    - obra/superpowers/skills/using-git-worktrees#8ea39819eed74fe2a0338e71789f06b30e953041
-    - obra/superpowers/skills/using-superpowers#8ea39819eed74fe2a0338e71789f06b30e953041
-    - obra/superpowers/skills/verification-before-completion#8ea39819eed74fe2a0338e71789f06b30e953041
-    - obra/superpowers/skills/writing-plans#8ea39819eed74fe2a0338e71789f06b30e953041
-    - obra/superpowers/skills/writing-skills#8ea39819eed74fe2a0338e71789f06b30e953041
+  - obra/superpowers/skills/brainstorming
+  - obra/superpowers/skills/dispatching-parallel-agents
+  - obra/superpowers/skills/executing-plans
+  - obra/superpowers/skills/finishing-a-development-branch
+  - obra/superpowers/skills/receiving-code-review
+  - obra/superpowers/skills/requesting-code-review
+  - obra/superpowers/skills/subagent-driven-development
+  - obra/superpowers/skills/systematic-debugging
+  - obra/superpowers/skills/test-driven-development
+  - obra/superpowers/skills/using-git-worktrees
+  - obra/superpowers/skills/using-superpowers
+  - obra/superpowers/skills/verification-before-completion
+  - obra/superpowers/skills/writing-plans
+  - obra/superpowers/skills/writing-skills
