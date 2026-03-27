@@ -1,0 +1,6 @@
+name: event2spec
+version: 1.0.0
+description: event2spec - Converts events to specifications
+dependencies:
+  apm:
+  - obra/superpowers

@@ -1,0 +1,12 @@
+lockfile_version: '1'
+generated_at: '2026-03-27T00:27:10.079741+00:00'
+apm_version: 0.8.5
+dependencies:
+- repo_url: obra/superpowers
+  host: github.com
+  resolved_commit: eafe962b18f6c5dc70fb7c8cc7e83e61f4cdde06
+  package_type: hook_package
+  deployed_files:
+  - .github/hooks/superpowers-hooks-cursor.json
+  - .github/hooks/superpowers-hooks.json
+  content_hash: sha256:694654de32468a3673c3f619304faee762d70e8f5f396dbdb05301a5d812c778
