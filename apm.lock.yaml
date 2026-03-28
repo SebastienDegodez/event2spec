@@ -2,6 +2,54 @@ lockfile_version: '1'
 generated_at: '2026-03-27T00:27:10.079741+00:00'
 apm_version: 0.8.5
 dependencies:
+- repo_url: SebastienDegodez/copilot-instructions
+  host: github.com
+  resolved_commit: 4a43ac9775c62672c238bf4df833784b1cc5ed92
+  virtual_path: plugins/csharp-clean-architecture-development
+  is_virtual: true
+  package_type: apm_package
+  deployed_files:
+  - .github/skills/clean-architecture-dotnet
+  content_hash: sha256:c3daa00bb8b14d42ef18127391797d8cee9ac2ba94c4b21de7b288a5c234b229
+- repo_url: SebastienDegodez/copilot-instructions
+  host: github.com
+  resolved_commit: 4a43ac9775c62672c238bf4df833784b1cc5ed92
+  virtual_path: plugins/minimal-context-tools
+  is_virtual: true
+  package_type: apm_package
+  deployed_files:
+  - .github/skills/analyzing-code
+  - .github/skills/analyzing-code-structure
+  - .github/skills/extracting-code-structure
+  - .github/skills/finding-files
+  - .github/skills/fuzzy-selecting
+  - .github/skills/querying-json
+  - .github/skills/querying-yaml
+  - .github/skills/replacing-text
+  - .github/skills/searching-text
+  - .github/skills/setup-snip-hooks
+  - .github/skills/viewing-files
+  content_hash: sha256:e9f28674807391f779ad65f4955401671cba43ae7b983ce80aba6d8dbda8ceed
+- repo_url: SebastienDegodez/copilot-instructions
+  host: github.com
+  resolved_commit: 4a43ac9775c62672c238bf4df833784b1cc5ed92
+  virtual_path: plugins/superpowers-whetstone
+  is_virtual: true
+  package_type: apm_package
+  deployed_files:
+  - .github/skills/gherkin-gate
+  - .github/skills/mutation-testing
+  - .github/skills/outside-in-tdd
+  content_hash: sha256:2c7fbe3dd6fe4764899aa9c73173591fbcd957bf05b0a7efd6ee27d3b5e39625
+- repo_url: anthropics/claude-code
+  host: github.com
+  resolved_commit: 2923bc87d10da4fda57570313f2abbc5b457fed1
+  virtual_path: plugins/frontend-design
+  is_virtual: true
+  package_type: apm_package
+  deployed_files:
+  - .github/skills/frontend-design
+  content_hash: sha256:880dd1dbc720f598083e2bc099fc66d8bd195c6b2bfc92381c73fed07ec6c0e4
 - repo_url: obra/superpowers
   host: github.com
   resolved_commit: eafe962b18f6c5dc70fb7c8cc7e83e61f4cdde06
