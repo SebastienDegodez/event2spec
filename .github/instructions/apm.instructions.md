@@ -24,22 +24,6 @@ GITHUB_TOKEN="" apm install SebastienDegodez/copilot-instructions/plugins/minima
 GITHUB_TOKEN="" apm install SebastienDegodez/copilot-instructions/plugins/superpowers-whetstone
 ```
 
-### Setting up snip token-reduction hooks
-
-The `setup-snip-hooks` skill (from `minimal-context-tools`) scaffolds a `snip` preToolUse hook:
-
-```bash
-mkdir -p .github/hooks
-cp .github/skills/setup-snip-hooks/templates/snip-rewrite.sh .github/hooks/snip-rewrite.sh
-cp .github/skills/setup-snip-hooks/templates/hooks.json      .github/hooks/hooks.json
-chmod +x .github/hooks/snip-rewrite.sh
-
-# Optional: .NET-specific snip filters
-mkdir -p ~/.config/snip/filters
-cp .github/skills/setup-snip-hooks/filters/dotnet-build.yaml ~/.config/snip/filters/dotnet-build.yaml
-cp .github/skills/setup-snip-hooks/filters/dotnet-test.yaml  ~/.config/snip/filters/dotnet-test.yaml
-```
-
 ### Regenerating AGENTS.md
 
 ```bash
