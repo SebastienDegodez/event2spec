@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import {
   ReactFlow,
   Background,
@@ -7,6 +7,7 @@ import {
   MiniMap,
   useNodesState,
   useEdgesState,
+  useReactFlow,
   ReactFlowProvider,
   type Node,
   type OnNodeDrag,
@@ -19,35 +20,37 @@ import { GRID_SIZE, NOTE_SIZE, gridToPixel, pixelToGrid } from './gridConstants'
 
 const nodeTypes = { domainEvent: DomainEventNode };
 
-function GridCanvasInner() {
-  const { nodes: storeNodes, addNode, moveNode } = useBoardStore();
-  const reactFlowWrapper = useRef<HTMLDivElement>(null);
+let _nextId = 1;
 
-  // Map Zustand grid nodes → React Flow nodes (col/row → x/y pixels)
+function GridCanvasInner() {
+  const { board, addNode, moveNode } = useBoardStore();
+  const { screenToFlowPosition } = useReactFlow();
+
+  // Map domain nodes → React Flow nodes (col/row → x/y pixels)
   const rfNodes = useMemo<Node<DomainEventNodeData>[]>(
     () =>
-      storeNodes.map((n) => {
-        const pos = gridToPixel(n.col, n.row);
+      board.toArray().map((n) => {
+        const pos = gridToPixel(n.position.col, n.position.row);
         return {
           id: n.id,
           type: 'domainEvent',
           position: pos,
-          data: { label: n.label },
+          data: { label: n.label, col: n.position.col, row: n.position.row },
           style: { width: NOTE_SIZE, height: NOTE_SIZE },
         };
       }),
-    [storeNodes]
+    [board]
   );
 
   const [nodes, setNodes, onNodesChange] = useNodesState(rfNodes);
   const [edges, , onEdgesChange] = useEdgesState([]);
 
-  // Keep React Flow nodes in sync whenever the Zustand store changes
+  // Keep React Flow nodes in sync whenever the board state changes
   useEffect(() => {
     setNodes(rfNodes);
   }, [rfNodes, setNodes]);
 
-  // On drag stop: convert pixel position back to grid coordinates and update store
+  // On drag stop: convert pixel position back to grid coordinates and dispatch
   const onNodeDragStop: OnNodeDrag<Node<DomainEventNodeData>> = useCallback(
     (_event, node) => {
       const { col, row } = pixelToGrid(node.position.x, node.position.y);
@@ -59,28 +62,18 @@ function GridCanvasInner() {
   // Double-click on the pane: create a new Domain Event at the clicked grid cell
   const onPaneDoubleClick = useCallback(
     (event: React.MouseEvent) => {
-      const wrapper = reactFlowWrapper.current;
-      if (!wrapper) return;
-
-      const bounds = wrapper.getBoundingClientRect();
-      const rawX = event.clientX - bounds.left;
-      const rawY = event.clientY - bounds.top;
-
-      // Translate screen coordinates into React Flow world coordinates
-      const flowEl = wrapper.querySelector('.react-flow__viewport') as HTMLElement | null;
-      if (!flowEl) return;
-      const matrix = new DOMMatrixReadOnly(window.getComputedStyle(flowEl).transform);
-      const worldX = (rawX - matrix.m41) / matrix.m11;
-      const worldY = (rawY - matrix.m42) / matrix.m11;
-
-      const { col, row } = pixelToGrid(worldX, worldY);
-      addNode({ label: 'Domain Event', col, row });
+      const flowPos = screenToFlowPosition({ x: event.clientX, y: event.clientY });
+      const { col, row } = pixelToGrid(flowPos.x, flowPos.y);
+      addNode(`event-${_nextId++}`, 'Domain Event', col, row);
     },
-    [addNode]
+    [addNode, screenToFlowPosition]
   );
 
   return (
-    <div ref={reactFlowWrapper} style={{ width: '100%', height: '100%' }}>
+    <div
+      style={{ width: '100%', height: '100%' }}
+      data-testid="grid-canvas"
+    >
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -91,6 +84,7 @@ function GridCanvasInner() {
         nodeTypes={nodeTypes}
         snapToGrid
         snapGrid={[GRID_SIZE, GRID_SIZE]}
+        zoomOnDoubleClick={false}
         fitView={false}
         minZoom={0.3}
         maxZoom={2}

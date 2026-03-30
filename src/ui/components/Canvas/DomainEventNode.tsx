@@ -4,20 +4,23 @@ import { useBoardStore } from '../../../core/store/useBoardStore';
 
 export type DomainEventNodeData = {
   label: string;
+  col: number;
+  row: number;
 };
 
 export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
+  const nodeData = data as DomainEventNodeData;
   const { updateLabel, removeNode } = useBoardStore();
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState((data as DomainEventNodeData).label);
+  const [draft, setDraft] = useState(nodeData.label);
   const { deleteElements } = useReactFlow();
 
   const commitEdit = useCallback(() => {
     const trimmed = draft.trim();
     if (trimmed) updateLabel(id, trimmed);
-    else setDraft((data as DomainEventNodeData).label);
+    else setDraft(nodeData.label);
     setEditing(false);
-  }, [draft, id, updateLabel, data]);
+  }, [draft, id, updateLabel, nodeData.label]);
 
   const handleDelete = useCallback(() => {
     removeNode(id);
@@ -27,8 +30,11 @@ export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
   return (
     <div
       className={`domain-event-node${selected ? ' selected' : ''}`}
+      data-id={id}
+      data-col={nodeData.col}
+      data-row={nodeData.row}
       onDoubleClick={() => {
-        setDraft((data as DomainEventNodeData).label);
+        setDraft(nodeData.label);
         setEditing(true);
       }}
     >
@@ -50,13 +56,13 @@ export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
                 commitEdit();
               }
               if (e.key === 'Escape') {
-                setDraft((data as DomainEventNodeData).label);
+                setDraft(nodeData.label);
                 setEditing(false);
               }
             }}
           />
         ) : (
-          <span className="note-label">{(data as DomainEventNodeData).label}</span>
+          <span className="note-label">{nodeData.label}</span>
         )}
       </div>
 

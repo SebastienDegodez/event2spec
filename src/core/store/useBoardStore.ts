@@ -1,10 +1,15 @@
 import { create } from 'zustand';
-import type { GridNode, BoardState } from '../domain/GridBoard';
-import { insertNodeAt } from '../usecases/insertNodeAt';
+import { GridBoard } from '../domain/GridBoard';
+import { DomainEventNode } from '../domain/DomainEventNode';
+import { GridPosition } from '../domain/GridPosition';
+
+interface BoardStoreState {
+  board: GridBoard;
+}
 
 interface BoardActions {
-  /** Add a new node at the given grid position (collision resolution applied). */
-  addNode: (node: Omit<GridNode, 'id'>) => void;
+  /** Add a new domain event node at the given grid position. */
+  addNode: (id: string, label: string, col: number, row: number) => void;
   /** Move an existing node to a new grid position (collision resolution applied). */
   moveNode: (id: string, col: number, row: number) => void;
   /** Update the label of an existing node. */
@@ -13,32 +18,28 @@ interface BoardActions {
   removeNode: (id: string) => void;
 }
 
-let _nextId = 1;
+export const useBoardStore = create<BoardStoreState & BoardActions>((set) => ({
+  board: GridBoard.empty(),
 
-export const useBoardStore = create<BoardState & BoardActions>((set) => ({
-  nodes: [],
-
-  addNode: (nodeData) =>
-    set((state) => {
-      const node: GridNode = { ...nodeData, id: `event-${_nextId++}` };
-      return { nodes: insertNodeAt(state.nodes, node) };
-    }),
+  addNode: (id, label, col, row) =>
+    set((state) => ({
+      board: state.board.insertNode(
+        new DomainEventNode(id, label, new GridPosition(col, row))
+      ),
+    })),
 
   moveNode: (id, col, row) =>
-    set((state) => {
-      const existing = state.nodes.find((n) => n.id === id);
-      if (!existing) return state;
-      const boardWithoutMoved = state.nodes.filter((n) => n.id !== id);
-      return { nodes: insertNodeAt(boardWithoutMoved, { ...existing, col, row }) };
-    }),
+    set((state) => ({
+      board: state.board.moveNode(id, new GridPosition(col, row)),
+    })),
 
   updateLabel: (id, label) =>
     set((state) => ({
-      nodes: state.nodes.map((n) => (n.id === id ? { ...n, label } : n)),
+      board: state.board.updateLabel(id, label),
     })),
 
   removeNode: (id) =>
     set((state) => ({
-      nodes: state.nodes.filter((n) => n.id !== id),
+      board: state.board.removeNode(id),
     })),
 }));
