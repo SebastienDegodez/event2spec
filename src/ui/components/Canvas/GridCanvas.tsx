@@ -30,16 +30,17 @@ function GridCanvasInner() {
   const rfNodes = useMemo<Node<DomainEventNodeData>[]>(
     () =>
       board.toArray().map((domainNode) => {
-        const viewData = domainNode.toViewData();
-        const pos = gridToPixel(viewData.column, viewData.row);
+        const column = domainNode.column();
+        const row = domainNode.row();
+        const pos = gridToPixel(column, row);
         return {
-          id: viewData.id,
+          id: domainNode.id,
           type: 'domainEvent',
           position: pos,
           data: {
-            label: viewData.label,
-            column: viewData.column,
-            row: viewData.row,
+            label: domainNode.label,
+            column,
+            row,
           },
           style: { width: NOTE_SIZE, height: NOTE_SIZE },
         };

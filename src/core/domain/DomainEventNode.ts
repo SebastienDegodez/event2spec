@@ -1,12 +1,5 @@
 import { GridPosition } from './GridPosition';
 
-export type DomainEventViewData = {
-  readonly id: string;
-  readonly label: string;
-  readonly column: number;
-  readonly row: number;
-};
-
 export class DomainEventNode {
   readonly id: string;
   readonly label: string;
@@ -26,13 +19,12 @@ export class DomainEventNode {
     return this.position.isSameRowAndAtOrBeyond(incoming.position);
   }
 
-  toViewData(): DomainEventViewData {
-    return {
-      id: this.id,
-      label: this.label,
-      column: this.position.column,
-      row: this.position.row,
-    };
+  column(): number {
+    return this.position.column;
+  }
+
+  row(): number {
+    return this.position.row;
   }
 
   shiftRight(): DomainEventNode {
