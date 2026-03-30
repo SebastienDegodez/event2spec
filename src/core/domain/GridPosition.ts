@@ -7,6 +7,10 @@ export class GridPosition {
     this.row = row;
   }
 
+  equals(other: GridPosition): boolean {
+    return this.column === other.column && this.row === other.row;
+  }
+
   isSameRowAndAtOrBeyond(target: GridPosition): boolean {
     return this.row === target.row && this.column >= target.column;
   }

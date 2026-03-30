@@ -18,10 +18,9 @@ describe('GridBoard', () => {
 
     const nodes = result.toArray();
     const firstNode = nodes[0];
-    const position = firstNode.position;
 
     expect(nodes).toHaveLength(1);
-    expect(position.column).toBe(2);
+    expect(firstNode.isAt(new GridPosition(2, 0))).toBe(true);
   });
 
   it('shifts an occupant right when inserting at its position', () => {
@@ -34,11 +33,9 @@ describe('GridBoard', () => {
     const nodes = result.toArray();
     const shifted = nodes.find((n) => n.id === 'existing');
     const inserted = nodes.find((n) => n.id === 'new');
-    const shiftedPosition = shifted?.position;
-    const insertedPosition = inserted?.position;
 
-    expect(shiftedPosition?.column).toBe(3);
-    expect(insertedPosition?.column).toBe(2);
+    expect(shifted?.isAt(new GridPosition(3, 1))).toBe(true);
+    expect(inserted?.isAt(new GridPosition(2, 1))).toBe(true);
     expect(nodes).toHaveLength(2);
   });
 
@@ -56,10 +53,10 @@ describe('GridBoard', () => {
     const nodeC = nodes.find((n) => n.id === 'c');
     const nodeNew = nodes.find((n) => n.id === 'new');
 
-    expect(nodeA?.position.column).toBe(3);
-    expect(nodeB?.position.column).toBe(4);
-    expect(nodeC?.position.column).toBe(5);
-    expect(nodeNew?.position.column).toBe(2);
+    expect(nodeA?.isAt(new GridPosition(3, 1))).toBe(true);
+    expect(nodeB?.isAt(new GridPosition(4, 1))).toBe(true);
+    expect(nodeC?.isAt(new GridPosition(5, 1))).toBe(true);
+    expect(nodeNew?.isAt(new GridPosition(2, 1))).toBe(true);
   });
 
   it('does NOT shift nodes in a different row', () => {
@@ -73,8 +70,8 @@ describe('GridBoard', () => {
     const other = nodes.find((n) => n.id === 'other');
     const same = nodes.find((n) => n.id === 'same');
 
-    expect(other?.position.column).toBe(2);
-    expect(same?.position.column).toBe(3);
+    expect(other?.isAt(new GridPosition(2, 2))).toBe(true);
+    expect(same?.isAt(new GridPosition(3, 1))).toBe(true);
   });
 
   it('does not mutate the original board', () => {
@@ -110,8 +107,8 @@ describe('GridBoard', () => {
     const nodeA = nodes.find((n) => n.id === 'a');
     const nodeB = nodes.find((n) => n.id === 'b');
 
-    expect(nodeA?.position.column).toBe(1);
-    expect(nodeB?.position.column).toBe(2);
+    expect(nodeA?.isAt(new GridPosition(1, 0))).toBe(true);
+    expect(nodeB?.isAt(new GridPosition(2, 0))).toBe(true);
   });
 
   it('updates the label of a node', () => {

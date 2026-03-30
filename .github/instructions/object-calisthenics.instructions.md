@@ -19,7 +19,9 @@ Every primitive value (number, string, boolean) used in the domain must be wrapp
 Any class that holds a collection of objects must wrap it in a dedicated class. No raw arrays or maps in domain classes.
 
 ## Rule 5 — One dot per line (Law of Demeter)
-Do not chain more than one method call per statement. `a.b()` is ok; `a.b().c()` is not.
+Never chain method or property accesses across object boundaries: `a.b()` is ok; `a.b().c()` is not.
+All domain entity fields must be declared `private` so that external code cannot navigate through them.
+Only talk to your immediate collaborators — never to strangers reached through another object's internals.
 
 ## Rule 6 — Don't abbreviate
 Use full, descriptive names: `column` or `col` is acceptable when it is a well-known domain term, but never single-letter variables outside loops.
@@ -30,5 +32,7 @@ No class longer than 50 lines. No method longer than 10 lines.
 ## Rule 8 — No classes with more than two instance variables
 Each domain class holds at most two fields.
 
-## Rule 9 — No getters/setters
-Use behaviour-revealing methods. Domain objects expose operations, not data accessors.
+## Rule 9 — No getters/setters / No public fields
+All instance variables must be declared `private`. Never expose a raw field value through a public accessor.
+Instead, define behaviour-revealing methods that express domain intent (e.g. `isAt(position)`, `shouldShiftWhenInserted(node)`, `toViewData()`).
+A method that merely returns a field value is a getter in disguise — name and implement it as a domain operation instead.

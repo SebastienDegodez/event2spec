@@ -1,13 +1,6 @@
 import { DomainEventNode } from './DomainEventNode';
 import { GridPosition } from './GridPosition';
 
-export interface GridNode {
-  id: string;
-  label: string;
-  column: number;
-  row: number;
-}
-
 export class GridBoard {
   private readonly nodes: ReadonlyArray<DomainEventNode>;
 
@@ -21,7 +14,7 @@ export class GridBoard {
 
   insertNode(node: DomainEventNode): GridBoard {
     const shifted = this.nodes.map((existing) =>
-      this.shouldShift(existing, node.position)
+      this.shouldShift(existing, node)
         ? existing.shiftRight()
         : existing
     );
@@ -49,7 +42,7 @@ export class GridBoard {
     return this.nodes;
   }
 
-  private shouldShift(existing: DomainEventNode, target: GridPosition): boolean {
-    return existing.position.isSameRowAndAtOrBeyond(target);
+  private shouldShift(existing: DomainEventNode, incoming: DomainEventNode): boolean {
+    return existing.shouldShiftWhenInserted(incoming);
   }
 }

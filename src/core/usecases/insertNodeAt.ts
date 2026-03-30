@@ -1,4 +1,4 @@
-import type { GridNode } from '../domain/GridBoard';
+import { DomainEventNode } from '../domain/DomainEventNode';
 
 /**
  * Pure function — inserts a node at the target cell on the board.
@@ -7,13 +7,9 @@ import type { GridNode } from '../domain/GridBoard';
  * at `column >= targetColumn`, those nodes are shifted one column to the right
  * before the new node is placed. The original array is never mutated.
  */
-export function insertNodeAt(board: readonly GridNode[], node: GridNode): GridNode[] {
-  const shifted = board.map((existing) => {
-    if (existing.row === node.row && existing.column >= node.column) {
-      return { ...existing, column: existing.column + 1 };
-    }
-    return existing;
-  });
-
+export function insertNodeAt(board: readonly DomainEventNode[], node: DomainEventNode): DomainEventNode[] {
+  const shifted = board.map((existing) =>
+    existing.shouldShiftWhenInserted(node) ? existing.shiftRight() : existing
+  );
   return [...shifted, node];
 }
