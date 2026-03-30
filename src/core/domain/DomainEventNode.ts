@@ -11,20 +11,20 @@ export class DomainEventNode {
     this.position = position;
   }
 
+  static create(id: string, label: string, column: number, row: number): DomainEventNode {
+    return new DomainEventNode(id, label, new GridPosition(column, row));
+  }
+
   isAt(position: GridPosition): boolean {
     return this.position.equals(position);
   }
 
+  gridPosition(): GridPosition {
+    return this.position;
+  }
+
   shouldShiftWhenInserted(incoming: DomainEventNode): boolean {
-    return this.position.isSameRowAndAtOrBeyond(incoming.position);
-  }
-
-  column(): number {
-    return this.position.column;
-  }
-
-  row(): number {
-    return this.position.row;
+    return this.position.isSameRowAndAtOrBeyond(incoming.gridPosition());
   }
 
   shiftRight(): DomainEventNode {

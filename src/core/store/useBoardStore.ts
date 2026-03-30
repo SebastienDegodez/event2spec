@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { GridBoard } from '../domain/GridBoard';
 import { DomainEventNode } from '../domain/DomainEventNode';
-import { GridPosition } from '../domain/GridPosition';
 
 interface BoardStoreState {
   board: GridBoard;
@@ -23,14 +22,12 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set) => ({
 
   addNode: (id, label, column, row) =>
     set((state) => ({
-      board: state.board.insertNode(
-        new DomainEventNode(id, label, new GridPosition(column, row))
-      ),
+      board: state.board.insertNode(DomainEventNode.create(id, label, column, row)),
     })),
 
   moveNode: (id, column, row) =>
     set((state) => ({
-      board: state.board.moveNode(id, new GridPosition(column, row)),
+      board: state.board.moveNode(id, column, row),
     })),
 
   updateLabel: (id, label) =>
@@ -43,3 +40,9 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set) => ({
       board: state.board.removeNode(id),
     })),
 }));
+
+export const useBoardState = () => useBoardStore((s) => s.board);
+export const useAddNode = () => useBoardStore((s) => s.addNode);
+export const useMoveNode = () => useBoardStore((s) => s.moveNode);
+export const useUpdateLabel = () => useBoardStore((s) => s.updateLabel);
+export const useRemoveNode = () => useBoardStore((s) => s.removeNode);

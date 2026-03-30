@@ -14,33 +14,32 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { useBoardStore } from '../../../core/store/useBoardStore';
+import { useBoardState, useAddNode, useMoveNode } from '../../../core/store/useBoardStore';
 import { DomainEventNode, type DomainEventNodeData } from './DomainEventNode';
 import { GRID_SIZE, NOTE_SIZE, gridToPixel, pixelToGrid } from './gridConstants';
 
 const nodeTypes = { domainEvent: DomainEventNode };
 
-let _nextId = 1;
-
 function GridCanvasInner() {
-  const { board, addNode, moveNode } = useBoardStore();
+  const board = useBoardState();
+  const addNode = useAddNode();
+  const moveNode = useMoveNode();
   const { screenToFlowPosition } = useReactFlow();
 
   // Map domain nodes → React Flow nodes (column/row → x/y pixels)
   const rfNodes = useMemo<Node<DomainEventNodeData>[]>(
     () =>
       board.toArray().map((domainNode) => {
-        const column = domainNode.column();
-        const row = domainNode.row();
-        const pos = gridToPixel(column, row);
+        const gridPos = domainNode.gridPosition();
+        const pos = gridToPixel(gridPos.column, gridPos.row);
         return {
           id: domainNode.id,
           type: 'domainEvent',
           position: pos,
           data: {
             label: domainNode.label,
-            column,
-            row,
+            column: gridPos.column,
+            row: gridPos.row,
           },
           style: { width: NOTE_SIZE, height: NOTE_SIZE },
         };
@@ -70,7 +69,7 @@ function GridCanvasInner() {
     (event: React.MouseEvent) => {
       const flowPos = screenToFlowPosition({ x: event.clientX, y: event.clientY });
       const { column, row } = pixelToGrid(flowPos.x, flowPos.y);
-      addNode(`event-${_nextId++}`, 'Domain Event', column, row);
+      addNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
     },
     [addNode, screenToFlowPosition]
   );

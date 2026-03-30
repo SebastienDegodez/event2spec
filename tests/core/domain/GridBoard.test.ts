@@ -101,7 +101,7 @@ describe('GridBoard', () => {
       .insertNode(new DomainEventNode('a', 'A', new GridPosition(0, 0)))
       .insertNode(new DomainEventNode('b', 'B', new GridPosition(1, 0)));
 
-    const result = board.moveNode('a', new GridPosition(1, 0));
+    const result = board.moveNode('a', 1, 0);
     const nodes = result.toArray();
 
     const nodeA = nodes.find((n) => n.id === 'a');

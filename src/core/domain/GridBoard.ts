@@ -25,11 +25,11 @@ export class GridBoard {
     return new GridBoard(this.nodes.filter((node) => node.id !== id));
   }
 
-  moveNode(id: string, position: GridPosition): GridBoard {
+  moveNode(id: string, column: number, row: number): GridBoard {
     const node = this.nodes.find((existing) => existing.id === id);
     if (!node) return this;
     const withoutMoved = this.removeNode(id);
-    return withoutMoved.insertNode(node.moveTo(position));
+    return withoutMoved.insertNode(node.moveTo(new GridPosition(column, row)));
   }
 
   updateLabel(id: string, label: string): GridBoard {
