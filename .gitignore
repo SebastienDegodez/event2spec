@@ -25,3 +25,4 @@ apm_modules/
 *.njsproj
 *.sln
 *.sw?
+test-results/
