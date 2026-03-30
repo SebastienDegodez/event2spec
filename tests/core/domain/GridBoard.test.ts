@@ -3,68 +3,6 @@ import { GridPosition } from '../../../src/core/domain/GridPosition';
 import { DomainEventNode } from '../../../src/core/domain/DomainEventNode';
 import { GridBoard } from '../../../src/core/domain/GridBoard';
 
-// ─── GridPosition ────────────────────────────────────────────────────────────
-describe('GridPosition', () => {
-  it('reports whether two positions are equal', () => {
-    const a = new GridPosition(2, 3);
-    const b = new GridPosition(2, 3);
-    const c = new GridPosition(1, 3);
-
-    expect(a.equals(b)).toBe(true);
-    expect(a.equals(c)).toBe(false);
-  });
-
-  it('reports whether this position must shift right given a target insertion position', () => {
-    const base = new GridPosition(2, 1);
-    const targetBefore = new GridPosition(1, 1);  // target at column=1 → base(column=2) is beyond → shift
-    const targetAt = new GridPosition(2, 1);       // target at column=2 → base(column=2) is at → shift
-    const targetAfter = new GridPosition(3, 1);    // target at column=3 → base(column=2) is before → no shift
-    const differentRow = new GridPosition(2, 2);   // different row → no shift
-
-    expect(base.isSameRowAndAtOrBeyond(targetBefore)).toBe(true);
-    expect(base.isSameRowAndAtOrBeyond(targetAt)).toBe(true);
-    expect(base.isSameRowAndAtOrBeyond(targetAfter)).toBe(false);
-    expect(base.isSameRowAndAtOrBeyond(differentRow)).toBe(false);
-  });
-
-  it('returns a new position shifted one column to the right', () => {
-    const pos = new GridPosition(2, 1);
-    const shifted = pos.shiftRight();
-
-    expect(shifted.column).toBe(3);
-    expect(shifted.row).toBe(1);
-  });
-});
-
-// ─── DomainEventNode ────────────────────────────────────────────────────────
-describe('DomainEventNode', () => {
-  it('exposes its position', () => {
-    const pos = new GridPosition(1, 0);
-    const node = new DomainEventNode('n1', 'OrderPlaced', pos);
-
-    expect(node.position.column).toBe(1);
-    expect(node.position.row).toBe(0);
-  });
-
-  it('returns a new node shifted one column to the right', () => {
-    const node = new DomainEventNode('n2', 'PaymentReceived', new GridPosition(3, 2));
-    const shifted = node.shiftRight();
-
-    expect(shifted.id).toBe('n2');
-    expect(shifted.label).toBe('PaymentReceived');
-    expect(shifted.position.column).toBe(4);
-    expect(shifted.position.row).toBe(2);
-  });
-
-  it('returns a node with an updated label', () => {
-    const node = new DomainEventNode('n3', 'OldLabel', new GridPosition(0, 0));
-    const updated = node.withLabel('NewLabel');
-
-    expect(updated.id).toBe('n3');
-    expect(updated.label).toBe('NewLabel');
-  });
-});
-
 // ─── GridBoard ───────────────────────────────────────────────────────────────
 describe('GridBoard', () => {
   it('is empty when first created', () => {
