@@ -1,19 +1,19 @@
 /**
  * Value object wrapping a discrete grid position.
- * OC Rule 3: Wraps col/row primitives.
+ * OC Rule 3: Wraps column/row primitives.
  * OC Rule 8: Two instance variables maximum.
  */
 export class GridPosition {
-  readonly col: number;
+  readonly column: number;
   readonly row: number;
 
-  constructor(col: number, row: number) {
-    this.col = col;
+  constructor(column: number, row: number) {
+    this.column = column;
     this.row = row;
   }
 
   equals(other: GridPosition): boolean {
-    return this.col === other.col && this.row === other.row;
+    return this.column === other.column && this.row === other.row;
   }
 
   /**
@@ -22,11 +22,11 @@ export class GridPosition {
    * Shift is needed when we are in the same row AND our column >= target's column.
    */
   isSameRowAndAtOrBeyond(target: GridPosition): boolean {
-    return this.row === target.row && this.col >= target.col;
+    return this.row === target.row && this.column >= target.column;
   }
 
   /** Returns a new GridPosition one column to the right. */
   shiftRight(): GridPosition {
-    return new GridPosition(this.col + 1, this.row);
+    return new GridPosition(this.column + 1, this.row);
   }
 }

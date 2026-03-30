@@ -8,7 +8,7 @@ import { GridPosition } from './GridPosition';
 export interface GridNode {
   id: string;
   label: string;
-  col: number;
+  column: number;
   row: number;
 }
 
@@ -45,12 +45,12 @@ export class GridBoard {
 
   /** Returns a new board with the node removed. */
   removeNode(id: string): GridBoard {
-    return new GridBoard(this.nodes.filter((n) => n.id !== id));
+    return new GridBoard(this.nodes.filter((node) => node.id !== id));
   }
 
   /** Returns a new board with the node moved to a new position, collisions resolved. */
   moveNode(id: string, position: GridPosition): GridBoard {
-    const node = this.nodes.find((n) => n.id === id);
+    const node = this.nodes.find((existing) => existing.id === id);
     if (!node) return this;
     const withoutMoved = this.removeNode(id);
     return withoutMoved.insertNode(node.moveTo(position));
@@ -58,8 +58,8 @@ export class GridBoard {
 
   /** Returns a new board with the label of the identified node updated. */
   updateLabel(id: string, label: string): GridBoard {
-    return new GridBoard(this.nodes.map((n) =>
-      n.id === id ? n.withLabel(label) : n
+    return new GridBoard(this.nodes.map((node) =>
+      node.id === id ? node.withLabel(label) : node
     ));
   }
 

@@ -26,16 +26,20 @@ function GridCanvasInner() {
   const { board, addNode, moveNode } = useBoardStore();
   const { screenToFlowPosition } = useReactFlow();
 
-  // Map domain nodes → React Flow nodes (col/row → x/y pixels)
+  // Map domain nodes → React Flow nodes (column/row → x/y pixels)
   const rfNodes = useMemo<Node<DomainEventNodeData>[]>(
     () =>
-      board.toArray().map((n) => {
-        const pos = gridToPixel(n.position.col, n.position.row);
+      board.toArray().map((domainNode) => {
+        const pos = gridToPixel(domainNode.position.column, domainNode.position.row);
         return {
-          id: n.id,
+          id: domainNode.id,
           type: 'domainEvent',
           position: pos,
-          data: { label: n.label, col: n.position.col, row: n.position.row },
+          data: {
+            label: domainNode.label,
+            column: domainNode.position.column,
+            row: domainNode.position.row,
+          },
           style: { width: NOTE_SIZE, height: NOTE_SIZE },
         };
       }),
@@ -53,8 +57,8 @@ function GridCanvasInner() {
   // On drag stop: convert pixel position back to grid coordinates and dispatch
   const onNodeDragStop: OnNodeDrag<Node<DomainEventNodeData>> = useCallback(
     (_event, node) => {
-      const { col, row } = pixelToGrid(node.position.x, node.position.y);
-      moveNode(node.id, col, row);
+      const { column, row } = pixelToGrid(node.position.x, node.position.y);
+      moveNode(node.id, column, row);
     },
     [moveNode]
   );
@@ -63,8 +67,8 @@ function GridCanvasInner() {
   const onPaneDoubleClick = useCallback(
     (event: React.MouseEvent) => {
       const flowPos = screenToFlowPosition({ x: event.clientX, y: event.clientY });
-      const { col, row } = pixelToGrid(flowPos.x, flowPos.y);
-      addNode(`event-${_nextId++}`, 'Domain Event', col, row);
+      const { column, row } = pixelToGrid(flowPos.x, flowPos.y);
+      addNode(`event-${_nextId++}`, 'Domain Event', column, row);
     },
     [addNode, screenToFlowPosition]
   );

@@ -29,24 +29,24 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
     await pane.dblclick({ position: { x: 350, y: 250 } });
     await expect(page.locator('.domain-event-node')).toHaveCount(1);
 
-    // Read the col of note A
+    // Read the column of note A
     const noteA = page.locator('.domain-event-node').first();
-    const colA = await noteA.getAttribute('data-col');
+    const columnA = await noteA.getAttribute('data-column');
     const idA = await noteA.getAttribute('data-id');
-    expect(colA).not.toBeNull();
+    expect(columnA).not.toBeNull();
 
     // Create note B at a different position (one grid cell to the right of A's click position)
     await pane.dblclick({ position: { x: 350 + 250, y: 250 } });
     await expect(page.locator('.domain-event-node')).toHaveCount(2);
 
-    // Find both notes by their data-id — wait for note B to have a data-col attribute
+    // Find both notes by their data-id — wait for note B to have a data-column attribute
     const noteB = page.locator(`.domain-event-node:not([data-id="${idA}"])`);
-    await expect(noteB).toHaveAttribute('data-col');
-    const colB = await noteB.getAttribute('data-col');
-    expect(colB).not.toBeNull();
+    await expect(noteB).toHaveAttribute('data-column');
+    const columnB = await noteB.getAttribute('data-column');
+    expect(columnB).not.toBeNull();
 
     // Verify A and B are on distinct columns
-    expect(colA).not.toBe(colB);
+    expect(columnA).not.toBe(columnB);
 
     // Drag note B to note A's position
     const sourceBBox = await noteB.boundingBox();
@@ -68,19 +68,19 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
     await page.mouse.move(aCenter.x, aCenter.y, { steps: 10 });
     await page.mouse.up();
 
-    // Wait for A to reflect its new (shifted) col in the DOM
+    // Wait for A to reflect its new (shifted) column in the DOM
     await expect(
       page.locator(`.domain-event-node[data-id="${idA}"]`)
-    ).toHaveAttribute('data-col', String(Number(colA) + 1));
+    ).toHaveAttribute('data-column', String(Number(columnA) + 1));
 
-    // After drop: B should now occupy A's original col, A should have been shifted right
-    const newColA = await page.locator(`.domain-event-node[data-id="${idA}"]`).getAttribute('data-col');
-    const newColB = await noteB.getAttribute('data-col');
+    // After drop: B should now occupy A's original column, A should have been shifted right
+    const newColumnA = await page.locator(`.domain-event-node[data-id="${idA}"]`).getAttribute('data-column');
+    const newColumnB = await noteB.getAttribute('data-column');
 
-    // B was dragged to A's cell, so B's col should equal A's original col
-    expect(newColB).toBe(colA);
-    // A should have been pushed right (col increased by 1)
-    expect(Number(newColA)).toBe(Number(colA) + 1);
+    // B was dragged to A's cell, so B's column should equal A's original column
+    expect(newColumnB).toBe(columnA);
+    // A should have been pushed right (column increased by 1)
+    expect(Number(newColumnA)).toBe(Number(columnA) + 1);
   });
 
   test('inline editing updates the note label', async ({ page }) => {

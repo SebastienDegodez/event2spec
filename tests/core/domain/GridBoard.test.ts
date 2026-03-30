@@ -16,9 +16,9 @@ describe('GridPosition', () => {
 
   it('reports whether this position must shift right given a target insertion position', () => {
     const base = new GridPosition(2, 1);
-    const targetBefore = new GridPosition(1, 1);  // target at col=1 → base(col=2) is beyond → shift
-    const targetAt = new GridPosition(2, 1);       // target at col=2 → base(col=2) is at → shift
-    const targetAfter = new GridPosition(3, 1);    // target at col=3 → base(col=2) is before → no shift
+    const targetBefore = new GridPosition(1, 1);  // target at column=1 → base(column=2) is beyond → shift
+    const targetAt = new GridPosition(2, 1);       // target at column=2 → base(column=2) is at → shift
+    const targetAfter = new GridPosition(3, 1);    // target at column=3 → base(column=2) is before → no shift
     const differentRow = new GridPosition(2, 2);   // different row → no shift
 
     expect(base.isSameRowAndAtOrBeyond(targetBefore)).toBe(true);
@@ -31,7 +31,7 @@ describe('GridPosition', () => {
     const pos = new GridPosition(2, 1);
     const shifted = pos.shiftRight();
 
-    expect(shifted.col).toBe(3);
+    expect(shifted.column).toBe(3);
     expect(shifted.row).toBe(1);
   });
 });
@@ -42,7 +42,7 @@ describe('DomainEventNode', () => {
     const pos = new GridPosition(1, 0);
     const node = new DomainEventNode('n1', 'OrderPlaced', pos);
 
-    expect(node.position.col).toBe(1);
+    expect(node.position.column).toBe(1);
     expect(node.position.row).toBe(0);
   });
 
@@ -52,7 +52,7 @@ describe('DomainEventNode', () => {
 
     expect(shifted.id).toBe('n2');
     expect(shifted.label).toBe('PaymentReceived');
-    expect(shifted.position.col).toBe(4);
+    expect(shifted.position.column).toBe(4);
     expect(shifted.position.row).toBe(2);
   });
 
@@ -79,7 +79,7 @@ describe('GridBoard', () => {
     const result = board.insertNode(node);
 
     expect(result.toArray()).toHaveLength(1);
-    expect(result.toArray()[0].position.col).toBe(2);
+    expect(result.toArray()[0].position.column).toBe(2);
   });
 
   it('shifts an occupant right when inserting at its position', () => {
@@ -92,8 +92,8 @@ describe('GridBoard', () => {
     const shifted = result.toArray().find((n) => n.id === 'existing');
     const inserted = result.toArray().find((n) => n.id === 'new');
 
-    expect(shifted?.position.col).toBe(3);
-    expect(inserted?.position.col).toBe(2);
+    expect(shifted?.position.column).toBe(3);
+    expect(inserted?.position.column).toBe(2);
     expect(result.toArray()).toHaveLength(2);
   });
 
@@ -106,10 +106,10 @@ describe('GridBoard', () => {
     const result = board.insertNode(new DomainEventNode('new', 'New', new GridPosition(2, 1)));
     const nodes = result.toArray();
 
-    expect(nodes.find((n) => n.id === 'a')?.position.col).toBe(3);
-    expect(nodes.find((n) => n.id === 'b')?.position.col).toBe(4);
-    expect(nodes.find((n) => n.id === 'c')?.position.col).toBe(5);
-    expect(nodes.find((n) => n.id === 'new')?.position.col).toBe(2);
+    expect(nodes.find((n) => n.id === 'a')?.position.column).toBe(3);
+    expect(nodes.find((n) => n.id === 'b')?.position.column).toBe(4);
+    expect(nodes.find((n) => n.id === 'c')?.position.column).toBe(5);
+    expect(nodes.find((n) => n.id === 'new')?.position.column).toBe(2);
   });
 
   it('does NOT shift nodes in a different row', () => {
@@ -120,8 +120,8 @@ describe('GridBoard', () => {
     const result = board.insertNode(new DomainEventNode('new', 'New', new GridPosition(2, 1)));
     const nodes = result.toArray();
 
-    expect(nodes.find((n) => n.id === 'other')?.position.col).toBe(2);
-    expect(nodes.find((n) => n.id === 'same')?.position.col).toBe(3);
+    expect(nodes.find((n) => n.id === 'other')?.position.column).toBe(2);
+    expect(nodes.find((n) => n.id === 'same')?.position.column).toBe(3);
   });
 
   it('does not mutate the original board', () => {
@@ -151,8 +151,8 @@ describe('GridBoard', () => {
     const result = board.moveNode('a', new GridPosition(1, 0));
     const nodes = result.toArray();
 
-    expect(nodes.find((n) => n.id === 'a')?.position.col).toBe(1);
-    expect(nodes.find((n) => n.id === 'b')?.position.col).toBe(2);
+    expect(nodes.find((n) => n.id === 'a')?.position.column).toBe(1);
+    expect(nodes.find((n) => n.id === 'b')?.position.column).toBe(2);
   });
 
   it('updates the label of a node', () => {

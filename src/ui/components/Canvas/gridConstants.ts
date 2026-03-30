@@ -8,17 +8,17 @@ export const NOTE_SIZE = 200;
 export const NOTE_MARGIN = (GRID_SIZE - NOTE_SIZE) / 2;
 
 /** Convert discrete grid coordinates to React Flow pixel position (top-left of note). */
-export function gridToPixel(col: number, row: number): { x: number; y: number } {
+export function gridToPixel(column: number, row: number): { x: number; y: number } {
   return {
-    x: col * GRID_SIZE + NOTE_MARGIN,
+    x: column * GRID_SIZE + NOTE_MARGIN,
     y: row * GRID_SIZE + NOTE_MARGIN,
   };
 }
 
 /** Convert a pixel drop position back to the nearest grid cell. */
-export function pixelToGrid(x: number, y: number): { col: number; row: number } {
+export function pixelToGrid(x: number, y: number): { column: number; row: number } {
   return {
-    col: Math.round((x - NOTE_MARGIN) / GRID_SIZE),
+    column: Math.round((x - NOTE_MARGIN) / GRID_SIZE),
     row: Math.round((y - NOTE_MARGIN) / GRID_SIZE),
   };
 }

@@ -4,7 +4,7 @@ import { useBoardStore } from '../../../core/store/useBoardStore';
 
 export type DomainEventNodeData = {
   label: string;
-  col: number;
+  column: number;
   row: number;
 };
 
@@ -31,7 +31,7 @@ export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
     <div
       className={`domain-event-node${selected ? ' selected' : ''}`}
       data-id={id}
-      data-col={nodeData.col}
+      data-column={nodeData.column}
       data-row={nodeData.row}
       onDoubleClick={() => {
         setDraft(nodeData.label);
