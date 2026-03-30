@@ -4,10 +4,10 @@ export const GRID_SIZE = 250;
 /** Visual size of a sticky note (centered inside the cell) */
 export const NOTE_SIZE = 200;
 
-/** Margin on each side of the note inside the cell */
+/** Margin around the note inside its grid cell */
 export const NOTE_MARGIN = (GRID_SIZE - NOTE_SIZE) / 2;
 
-/** Convert grid coordinates to React Flow pixel position (top-left corner of note) */
+/** Convert discrete grid coordinates to React Flow pixel position (top-left of note). */
 export function gridToPixel(col: number, row: number): { x: number; y: number } {
   return {
     x: col * GRID_SIZE + NOTE_MARGIN,
@@ -15,7 +15,7 @@ export function gridToPixel(col: number, row: number): { x: number; y: number } 
   };
 }
 
-/** Convert pixel position to nearest grid cell */
+/** Convert a pixel drop position back to the nearest grid cell. */
 export function pixelToGrid(x: number, y: number): { col: number; row: number } {
   return {
     col: Math.round((x - NOTE_MARGIN) / GRID_SIZE),

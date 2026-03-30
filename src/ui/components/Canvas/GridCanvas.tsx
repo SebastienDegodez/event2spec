@@ -7,51 +7,56 @@ import {
   MiniMap,
   useNodesState,
   useEdgesState,
+  ReactFlowProvider,
   type Node,
   type OnNodeDrag,
-  ReactFlowProvider,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { useBoardStore } from '../store/boardStore';
+import { useBoardStore } from '../../../core/store/useBoardStore';
 import { DomainEventNode, type DomainEventNodeData } from './DomainEventNode';
-import { GRID_SIZE, NOTE_SIZE, gridToPixel, pixelToGrid } from '../constants';
+import { GRID_SIZE, NOTE_SIZE, gridToPixel, pixelToGrid } from './gridConstants';
 
 const nodeTypes = { domainEvent: DomainEventNode };
 
-function BoardInner() {
-  const { events, addEvent, moveEvent } = useBoardStore();
+function GridCanvasInner() {
+  const { nodes: storeNodes, addNode, moveNode } = useBoardStore();
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const rfNodes = useMemo<Node<DomainEventNodeData>[]>(() =>
-    events.map((e) => {
-      const pos = gridToPixel(e.col, e.row);
-      return {
-        id: e.id,
-        type: 'domainEvent',
-        position: pos,
-        data: { label: e.label },
-        style: { width: NOTE_SIZE, height: NOTE_SIZE },
-      };
-    }),
-    [events]
+
+  // Map Zustand grid nodes → React Flow nodes (col/row → x/y pixels)
+  const rfNodes = useMemo<Node<DomainEventNodeData>[]>(
+    () =>
+      storeNodes.map((n) => {
+        const pos = gridToPixel(n.col, n.row);
+        return {
+          id: n.id,
+          type: 'domainEvent',
+          position: pos,
+          data: { label: n.label },
+          style: { width: NOTE_SIZE, height: NOTE_SIZE },
+        };
+      }),
+    [storeNodes]
   );
 
   const [nodes, setNodes, onNodesChange] = useNodesState(rfNodes);
   const [edges, , onEdgesChange] = useEdgesState([]);
 
-  // Keep RF nodes in sync with store when store changes
+  // Keep React Flow nodes in sync whenever the Zustand store changes
   useEffect(() => {
     setNodes(rfNodes);
-  }, [events, setNodes]);
+  }, [rfNodes, setNodes]);
 
+  // On drag stop: convert pixel position back to grid coordinates and update store
   const onNodeDragStop: OnNodeDrag<Node<DomainEventNodeData>> = useCallback(
     (_event, node) => {
       const { col, row } = pixelToGrid(node.position.x, node.position.y);
-      moveEvent(node.id, col, row);
+      moveNode(node.id, col, row);
     },
-    [moveEvent]
+    [moveNode]
   );
 
+  // Double-click on the pane: create a new Domain Event at the clicked grid cell
   const onPaneDoubleClick = useCallback(
     (event: React.MouseEvent) => {
       const wrapper = reactFlowWrapper.current;
@@ -61,22 +66,17 @@ function BoardInner() {
       const rawX = event.clientX - bounds.left;
       const rawY = event.clientY - bounds.top;
 
-      // Account for viewport transform (panning / zoom) via the flow container
+      // Translate screen coordinates into React Flow world coordinates
       const flowEl = wrapper.querySelector('.react-flow__viewport') as HTMLElement | null;
       if (!flowEl) return;
-      const style = window.getComputedStyle(flowEl);
-      const matrix = new DOMMatrixReadOnly(style.transform);
-      const zoom = matrix.m11;
-      const panX = matrix.m41;
-      const panY = matrix.m42;
-
-      const worldX = (rawX - panX) / zoom;
-      const worldY = (rawY - panY) / zoom;
+      const matrix = new DOMMatrixReadOnly(window.getComputedStyle(flowEl).transform);
+      const worldX = (rawX - matrix.m41) / matrix.m11;
+      const worldY = (rawY - matrix.m42) / matrix.m11;
 
       const { col, row } = pixelToGrid(worldX, worldY);
-      addEvent('Domain Event', col, row);
+      addNode({ label: 'Domain Event', col, row });
     },
-    [addEvent]
+    [addNode]
   );
 
   return (
@@ -87,7 +87,6 @@ function BoardInner() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onNodeDragStop={onNodeDragStop}
-        onPaneClick={undefined}
         onDoubleClick={onPaneDoubleClick}
         nodeTypes={nodeTypes}
         snapToGrid
@@ -115,10 +114,10 @@ function BoardInner() {
   );
 }
 
-export function Board() {
+export function GridCanvas() {
   return (
     <ReactFlowProvider>
-      <BoardInner />
+      <GridCanvasInner />
     </ReactFlowProvider>
   );
 }

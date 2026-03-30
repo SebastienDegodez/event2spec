@@ -1,4 +1,4 @@
-import { Board } from './components/Board';
+import { GridCanvas } from './ui/components/Canvas/GridCanvas';
 import './App.css';
 
 export default function App() {
@@ -10,11 +10,11 @@ export default function App() {
           <span className="logo-text">event<strong>2spec</strong></span>
         </div>
         <div className="app-hint">
-          Double-click the canvas to add a Domain Event · Drag to reposition · Shift+click to connect
+          Double-click the canvas to add a Domain Event · Drag to reposition · Delete key to remove
         </div>
       </header>
       <main className="app-canvas">
-        <Board />
+        <GridCanvas />
       </main>
     </div>
   );
