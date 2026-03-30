@@ -16,8 +16,12 @@ describe('GridBoard', () => {
 
     const result = board.insertNode(node);
 
-    expect(result.toArray()).toHaveLength(1);
-    expect(result.toArray()[0].position.column).toBe(2);
+    const nodes = result.toArray();
+    const firstNode = nodes[0];
+    const position = firstNode.position;
+
+    expect(nodes).toHaveLength(1);
+    expect(position.column).toBe(2);
   });
 
   it('shifts an occupant right when inserting at its position', () => {
@@ -27,12 +31,15 @@ describe('GridBoard', () => {
 
     const result = board.insertNode(incoming);
 
-    const shifted = result.toArray().find((n) => n.id === 'existing');
-    const inserted = result.toArray().find((n) => n.id === 'new');
+    const nodes = result.toArray();
+    const shifted = nodes.find((n) => n.id === 'existing');
+    const inserted = nodes.find((n) => n.id === 'new');
+    const shiftedPosition = shifted?.position;
+    const insertedPosition = inserted?.position;
 
-    expect(shifted?.position.column).toBe(3);
-    expect(inserted?.position.column).toBe(2);
-    expect(result.toArray()).toHaveLength(2);
+    expect(shiftedPosition?.column).toBe(3);
+    expect(insertedPosition?.column).toBe(2);
+    expect(nodes).toHaveLength(2);
   });
 
   it('shifts every node in the same row at targetCol or beyond', () => {
@@ -44,10 +51,15 @@ describe('GridBoard', () => {
     const result = board.insertNode(new DomainEventNode('new', 'New', new GridPosition(2, 1)));
     const nodes = result.toArray();
 
-    expect(nodes.find((n) => n.id === 'a')?.position.column).toBe(3);
-    expect(nodes.find((n) => n.id === 'b')?.position.column).toBe(4);
-    expect(nodes.find((n) => n.id === 'c')?.position.column).toBe(5);
-    expect(nodes.find((n) => n.id === 'new')?.position.column).toBe(2);
+    const nodeA = nodes.find((n) => n.id === 'a');
+    const nodeB = nodes.find((n) => n.id === 'b');
+    const nodeC = nodes.find((n) => n.id === 'c');
+    const nodeNew = nodes.find((n) => n.id === 'new');
+
+    expect(nodeA?.position.column).toBe(3);
+    expect(nodeB?.position.column).toBe(4);
+    expect(nodeC?.position.column).toBe(5);
+    expect(nodeNew?.position.column).toBe(2);
   });
 
   it('does NOT shift nodes in a different row', () => {
@@ -58,8 +70,11 @@ describe('GridBoard', () => {
     const result = board.insertNode(new DomainEventNode('new', 'New', new GridPosition(2, 1)));
     const nodes = result.toArray();
 
-    expect(nodes.find((n) => n.id === 'other')?.position.column).toBe(2);
-    expect(nodes.find((n) => n.id === 'same')?.position.column).toBe(3);
+    const other = nodes.find((n) => n.id === 'other');
+    const same = nodes.find((n) => n.id === 'same');
+
+    expect(other?.position.column).toBe(2);
+    expect(same?.position.column).toBe(3);
   });
 
   it('does not mutate the original board', () => {
@@ -77,8 +92,11 @@ describe('GridBoard', () => {
       .insertNode(new DomainEventNode('remove', 'Remove', new GridPosition(1, 0)));
 
     const result = board.removeNode('remove');
-    expect(result.toArray()).toHaveLength(1);
-    expect(result.toArray()[0].id).toBe('keep');
+    const nodes = result.toArray();
+    const keptNode = nodes[0];
+
+    expect(nodes).toHaveLength(1);
+    expect(keptNode.id).toBe('keep');
   });
 
   it('moves a node and resolves collisions', () => {
@@ -89,8 +107,11 @@ describe('GridBoard', () => {
     const result = board.moveNode('a', new GridPosition(1, 0));
     const nodes = result.toArray();
 
-    expect(nodes.find((n) => n.id === 'a')?.position.column).toBe(1);
-    expect(nodes.find((n) => n.id === 'b')?.position.column).toBe(2);
+    const nodeA = nodes.find((n) => n.id === 'a');
+    const nodeB = nodes.find((n) => n.id === 'b');
+
+    expect(nodeA?.position.column).toBe(1);
+    expect(nodeB?.position.column).toBe(2);
   });
 
   it('updates the label of a node', () => {
@@ -98,7 +119,9 @@ describe('GridBoard', () => {
       new DomainEventNode('n1', 'OldLabel', new GridPosition(0, 0))
     );
     const result = board.updateLabel('n1', 'NewLabel');
+    const nodes = result.toArray();
+    const updatedNode = nodes[0];
 
-    expect(result.toArray()[0].label).toBe('NewLabel');
+    expect(updatedNode.label).toBe('NewLabel');
   });
 });

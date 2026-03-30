@@ -42,10 +42,15 @@ describe('insertNodeAt — collision right-shift', () => {
     ];
     const result = insertNodeAt(board, { id: 'new', label: 'New', column: 2, row: 1 });
 
-    expect(result.find((n) => n.id === 'a')?.column).toBe(3);
-    expect(result.find((n) => n.id === 'b')?.column).toBe(4);
-    expect(result.find((n) => n.id === 'c')?.column).toBe(5);
-    expect(result.find((n) => n.id === 'new')?.column).toBe(2);
+    const nodeA = result.find((n) => n.id === 'a');
+    const nodeB = result.find((n) => n.id === 'b');
+    const nodeC = result.find((n) => n.id === 'c');
+    const nodeNew = result.find((n) => n.id === 'new');
+
+    expect(nodeA?.column).toBe(3);
+    expect(nodeB?.column).toBe(4);
+    expect(nodeC?.column).toBe(5);
+    expect(nodeNew?.column).toBe(2);
   });
 
   it('does NOT shift nodes in a different row', () => {
@@ -55,9 +60,13 @@ describe('insertNodeAt — collision right-shift', () => {
     ];
     const result = insertNodeAt(board, { id: 'new', label: 'New', column: 2, row: 1 });
 
-    expect(result.find((n) => n.id === 'other-row')?.column).toBe(2);
-    expect(result.find((n) => n.id === 'same-row')?.column).toBe(3);
-    expect(result.find((n) => n.id === 'new')?.column).toBe(2);
+    const otherRow = result.find((n) => n.id === 'other-row');
+    const sameRow = result.find((n) => n.id === 'same-row');
+    const nodeNew = result.find((n) => n.id === 'new');
+
+    expect(otherRow?.column).toBe(2);
+    expect(sameRow?.column).toBe(3);
+    expect(nodeNew?.column).toBe(2);
   });
 
   it('does NOT shift nodes in the same row that are left of targetCol', () => {
@@ -67,9 +76,13 @@ describe('insertNodeAt — collision right-shift', () => {
     ];
     const result = insertNodeAt(board, { id: 'new', label: 'New', column: 2, row: 0 });
 
-    expect(result.find((n) => n.id === 'left')?.column).toBe(1);
-    expect(result.find((n) => n.id === 'target')?.column).toBe(3);
-    expect(result.find((n) => n.id === 'new')?.column).toBe(2);
+    const left = result.find((n) => n.id === 'left');
+    const target = result.find((n) => n.id === 'target');
+    const nodeNew = result.find((n) => n.id === 'new');
+
+    expect(left?.column).toBe(1);
+    expect(target?.column).toBe(3);
+    expect(nodeNew?.column).toBe(2);
   });
 });
 
