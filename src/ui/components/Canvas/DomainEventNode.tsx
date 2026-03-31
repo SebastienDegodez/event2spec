@@ -1,6 +1,6 @@
 import { memo, useCallback, useState } from 'react';
 import { Handle, Position, useReactFlow, type NodeProps } from '@xyflow/react';
-import { useUpdateLabel, useRemoveNode } from '../../../core/store/useBoardStore';
+import { useBoardActions } from '../../../core/store/useBoardStore';
 
 export type DomainEventNodeData = {
   label: string;
@@ -10,8 +10,7 @@ export type DomainEventNodeData = {
 
 export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
   const nodeData = data as DomainEventNodeData;
-  const updateLabel = useUpdateLabel();
-  const removeNode = useRemoveNode();
+  const { updateLabel, removeNode } = useBoardActions();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(nodeData.label);
   const { deleteElements } = useReactFlow();

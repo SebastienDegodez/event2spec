@@ -121,4 +121,21 @@ describe('GridBoard', () => {
 
     expect(updatedNode.label).toBe('NewLabel');
   });
+
+  it('does NOT shift nodes in the same row that are left of the target column', () => {
+    const board = GridBoard.empty()
+      .insertNode(new DomainEventNode('left', 'Left', new GridPosition(1, 0)))
+      .insertNode(new DomainEventNode('target', 'Target', new GridPosition(2, 0)));
+
+    const result = board.insertNode(new DomainEventNode('new', 'New', new GridPosition(2, 0)));
+    const nodes = result.toArray();
+
+    const left = nodes.find((n) => n.id === 'left');
+    const target = nodes.find((n) => n.id === 'target');
+    const nodeNew = nodes.find((n) => n.id === 'new');
+
+    expect(left?.isAt(new GridPosition(1, 0))).toBe(true);
+    expect(target?.isAt(new GridPosition(3, 0))).toBe(true);
+    expect(nodeNew?.isAt(new GridPosition(2, 0))).toBe(true);
+  });
 });

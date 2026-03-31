@@ -14,16 +14,15 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { useBoardState, useAddNode, useMoveNode } from '../../../core/store/useBoardStore';
+import { useBoard, useBoardActions } from '../../../core/store/useBoardStore';
 import { DomainEventNode, type DomainEventNodeData } from './DomainEventNode';
-import { GRID_SIZE, NOTE_SIZE, gridToPixel, pixelToGrid } from './gridConstants';
+import { GRID_SIZE, NOTE_SIZE, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 
 const nodeTypes = { domainEvent: DomainEventNode };
 
 function GridCanvasInner() {
-  const board = useBoardState();
-  const addNode = useAddNode();
-  const moveNode = useMoveNode();
+  const board = useBoard();
+  const { addNode, moveNode } = useBoardActions();
   const { screenToFlowPosition } = useReactFlow();
 
   // Map domain nodes → React Flow nodes (column/row → x/y pixels)
@@ -31,7 +30,7 @@ function GridCanvasInner() {
     () =>
       board.toArray().map((domainNode) => {
         const gridPos = domainNode.gridPosition();
-        const pos = gridToPixel(gridPos.column, gridPos.row);
+        const pos = domainNodeToPixelPosition(gridPos);
         return {
           id: domainNode.id,
           type: 'domainEvent',

@@ -23,8 +23,12 @@ export class DomainEventNode {
     return this.position;
   }
 
+  occupiesSameRowAtOrBeyond(position: GridPosition): boolean {
+    return this.position.isSameRowAndAtOrBeyond(position);
+  }
+
   shouldShiftWhenInserted(incoming: DomainEventNode): boolean {
-    return this.position.isSameRowAndAtOrBeyond(incoming.gridPosition());
+    return this.occupiesSameRowAtOrBeyond(incoming.gridPosition());
   }
 
   shiftRight(): DomainEventNode {

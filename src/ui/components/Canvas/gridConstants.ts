@@ -22,3 +22,8 @@ export function pixelToGrid(x: number, y: number): { column: number; row: number
     row: Math.round((y - NOTE_MARGIN) / GRID_SIZE),
   };
 }
+
+/** Convert a domain grid position to a React Flow pixel position. */
+export function domainNodeToPixelPosition(gridPos: { column: number; row: number }): { x: number; y: number } {
+  return gridToPixel(gridPos.column, gridPos.row);
+}
