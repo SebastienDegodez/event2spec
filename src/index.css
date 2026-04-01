@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+/* ─── Design Tokens ─────────────────────────────────── */
+:root {
+  --board-bg: #0e0f1a;
+  --board-surface: #13141f;
+  --header-bg: rgba(10, 10, 18, 0.92);
+  --header-border: rgba(255, 255, 255, 0.06);
+
+  --note-amber: #f59e0b;
+  --note-amber-dark: #d97706;
+  --note-amber-light: #fcd34d;
+  --note-text: #1c1007;
+  --note-shadow: 0 4px 24px rgba(0, 0, 0, 0.55), 0 1px 4px rgba(0, 0, 0, 0.4);
+  --note-shadow-selected: 0 0 0 2px #f59e0b, 0 8px 32px rgba(245, 158, 11, 0.35);
+
+  --accent: #f59e0b;
+  --accent-dim: rgba(245, 158, 11, 0.18);
+  --text-muted: rgba(255, 255, 255, 0.38);
+  --text-primary: rgba(255, 255, 255, 0.88);
+
+  --font-display: 'Syne', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Reset ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-display);
+  background: var(--board-bg);
+  color: var(--text-primary);
+  height: 100svh;
+  overflow: hidden;
+}
+
+#root {
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
