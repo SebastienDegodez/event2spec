@@ -32,3 +32,14 @@ npm run dev       # start dev server
 npm test          # run unit tests
 npm run build     # production build
 ```
+
+## Deployment
+
+The application is automatically deployed to **GitHub Pages** on every push to `main` via [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
+
+The workflow builds the project with `npm run build` and publishes the `dist/` folder to the `gh-pages` branch using native `git` commands — no third-party deployment action is used.
+
+### Documentation
+
+- [Deploying to GitHub Pages (GitHub Docs)](https://docs.github.com/fr/actions/guides/deploying-to-github-pages)
+- [Workflow commands for GitHub Actions — using git](https://docs.github.com/fr/actions/using-workflows/workflow-commands-for-github-actions#example-using-git)
