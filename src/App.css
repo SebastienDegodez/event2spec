@@ -1,0 +1,240 @@
+/* ─── App Shell ──────────────────────────────────────── */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  background: var(--board-bg);
+}
+
+/* ─── Header ─────────────────────────────────────────── */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 24px;
+  height: 52px;
+  flex-shrink: 0;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border);
+  backdrop-filter: blur(12px);
+  z-index: 10;
+}
+
+.app-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+.logo-icon {
+  font-size: 20px;
+  filter: drop-shadow(0 0 6px var(--accent));
+}
+
+.logo-text strong {
+  color: var(--accent);
+}
+
+.app-hint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.2px;
+}
+
+/* ─── Canvas ──────────────────────────────────────────── */
+.app-canvas {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ─── React Flow overrides ────────────────────────────── */
+.react-flow {
+  background: var(--board-bg) !important;
+}
+
+.react-flow__background {
+  opacity: 1;
+}
+
+.react-flow__controls {
+  background: rgba(19, 20, 31, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+.react-flow__controls-button {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: var(--text-muted) !important;
+  fill: var(--text-muted) !important;
+  transition: color 0.15s, fill 0.15s;
+}
+
+.react-flow__controls-button:hover {
+  color: var(--accent) !important;
+  fill: var(--accent) !important;
+  background: var(--accent-dim) !important;
+}
+
+.react-flow__minimap {
+  background: rgba(19, 20, 31, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+}
+
+/* ─── Domain Event Node ──────────────────────────────── */
+.domain-event-node {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  background: var(--note-amber);
+  border-radius: 3px 12px 3px 3px;
+  box-shadow: var(--note-shadow);
+  cursor: grab;
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+}
+
+.domain-event-node:hover {
+  transform: translateY(-2px) rotate(0.4deg);
+  box-shadow: var(--note-shadow), 0 0 0 1px rgba(245, 158, 11, 0.3);
+}
+
+.domain-event-node:active {
+  cursor: grabbing;
+}
+
+.domain-event-node.selected {
+  box-shadow: var(--note-shadow-selected);
+  transform: translateY(-2px);
+}
+
+/* Dog-ear fold */
+.note-fold {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 28px;
+  height: 28px;
+  background: var(--note-amber-dark);
+  clip-path: polygon(100% 0, 100% 100%, 0 0);
+  border-radius: 0 12px 0 0;
+  pointer-events: none;
+}
+
+/* Content area */
+.note-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px 8px;
+}
+
+.note-label {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--note-text);
+  text-align: center;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.note-editor {
+  width: 100%;
+  height: 100px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--note-text);
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  text-align: center;
+}
+
+/* Type badge at bottom */
+.note-type-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  color: rgba(28, 16, 7, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  padding: 0 12px 10px;
+  pointer-events: none;
+}
+
+/* Delete button */
+.note-delete {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: rgba(28, 16, 7, 0.18);
+  color: rgba(28, 16, 7, 0.5);
+  border-radius: 50%;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s;
+  padding: 0;
+}
+
+.domain-event-node:hover .note-delete,
+.domain-event-node.selected .note-delete {
+  opacity: 1;
+}
+
+.note-delete:hover {
+  background: rgba(220, 38, 38, 0.8) !important;
+  color: #fff !important;
+  opacity: 1 !important;
+}
+
+/* ─── React Flow handles ──────────────────────────────── */
+.event-handle {
+  width: 10px !important;
+  height: 10px !important;
+  background: var(--note-amber-dark) !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.domain-event-node:hover .event-handle,
+.domain-event-node.selected .event-handle {
+  opacity: 1;
+}
+
+/* ─── Drag overlay hint ───────────────────────────────── */
+.react-flow__pane {
+  cursor: crosshair;
+}
+
+.react-flow__pane:not(.dragging) {
+  cursor: default;
+}
