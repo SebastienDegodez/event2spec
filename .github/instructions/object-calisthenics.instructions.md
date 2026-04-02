@@ -283,6 +283,225 @@ First Class Collections: a class that contains an array as an attribute should n
    }
    ```
 
+   ### Extended Example: Person — Exposing Domain Data to an API
+
+   A common question is: *"Without getters, how does the API get the data it needs to return to the client?"*
+   The answer is to use the **Exporter/Visitor pattern** (the domain object pushes its data out)
+   or a **CQRS Read Model** (the API reads from a dedicated projection, never through the domain object).
+
+   #### ❌ Bad — domain class leaks its internals via public getters
+
+   ```csharp
+   // Violates Rule 9: getters expose internal state
+   // Violates Rule 3: raw primitives (string, int) instead of value objects
+   public class Person {
+       public string FirstName { get; set; }
+       public string LastName  { get; set; }
+       public string Email     { get; set; }
+       public int    Age       { get; set; }
+   }
+
+   // The controller reaches into the domain object — tight coupling
+   [HttpGet("{id}")]
+   public IActionResult GetPerson(Guid id) {
+       var person = _repository.GetById(id);
+       return Ok(new { person.FirstName, person.LastName, person.Email, person.Age });
+   }
+   ```
+
+   #### ✅ Good — Value Objects + Exporter pattern + CQRS Read Model
+
+   **Step 1 — Wrap every primitive in a Value Object (Rule 3)**
+
+   ```csharp
+   public sealed class FirstName {
+       private readonly string value;
+       private FirstName(string value) { this.value = value; }
+       public static FirstName Create(string value) {
+           if (string.IsNullOrWhiteSpace(value))
+               throw new ArgumentException("First name cannot be empty", nameof(value));
+           return new FirstName(value);
+       }
+       public string AsString() => value; // representation, not a getter
+   }
+
+   public sealed class LastName {
+       private readonly string value;
+       private LastName(string value) { this.value = value; }
+       public static LastName Create(string value) {
+           if (string.IsNullOrWhiteSpace(value))
+               throw new ArgumentException("Last name cannot be empty", nameof(value));
+           return new LastName(value);
+       }
+       public string AsString() => value;
+   }
+
+   public sealed class Email {
+       private readonly string value;
+       private Email(string value) { this.value = value; }
+       public static Email Create(string value) {
+           if (!value.Contains('@'))
+               throw new ArgumentException("Invalid email format", nameof(value));
+           return new Email(value);
+       }
+       public string AsString() => value;
+   }
+
+   public sealed class Age {
+       private readonly int value;
+       private Age(int value) { this.value = value; }
+       public static Age Create(int value) {
+           if (value < 0)
+               throw new ArgumentOutOfRangeException(nameof(value), "Age cannot be negative");
+           return new Age(value);
+       }
+       public int AsInt() => value;
+   }
+   ```
+
+   **Step 2 — Compose Value Objects to respect the two-instance-variable limit (Rule 8)**
+
+   ```csharp
+   // PersonName groups FirstName + LastName (exactly 2 instance variables)
+   public sealed class PersonName {
+       private readonly FirstName firstName;
+       private readonly LastName  lastName;
+
+       private PersonName(FirstName firstName, LastName lastName) {
+           this.firstName = firstName;
+           this.lastName  = lastName;
+       }
+
+       public static PersonName Create(string firstName, string lastName) =>
+           new PersonName(FirstName.Create(firstName), LastName.Create(lastName));
+
+       // The object pushes its data to the exporter — "Tell, Don't Ask"
+       public void ExportTo(IPersonNameExporter exporter) {
+           exporter.SetFirstName(firstName.AsString());
+           exporter.SetLastName(lastName.AsString());
+       }
+   }
+
+   // PersonContact groups Email + Age (exactly 2 instance variables)
+   public sealed class PersonContact {
+       private readonly Email email;
+       private readonly Age   age;
+
+       private PersonContact(Email email, Age age) {
+           this.email = email;
+           this.age   = age;
+       }
+
+       public static PersonContact Create(string email, int age) =>
+           new PersonContact(Email.Create(email), Age.Create(age));
+
+       public void ExportTo(IPersonContactExporter exporter) {
+           exporter.SetEmail(email.AsString());
+           exporter.SetAge(age.AsInt());
+       }
+   }
+   ```
+
+   **Step 3 — Domain class with no getters/setters (Rules 8 & 9)**
+
+   ```csharp
+   // Person has exactly 2 instance variables: PersonName + PersonContact
+   public sealed class Person {
+       private readonly PersonName    name;
+       private readonly PersonContact contact;
+
+       private Person(PersonName name, PersonContact contact) {
+           this.name    = name;
+           this.contact = contact;
+       }
+
+       public static Person Create(string firstName, string lastName, string email, int age) =>
+           new Person(
+               PersonName.Create(firstName, lastName),
+               PersonContact.Create(email, age)
+           );
+
+       // Option 1: Exporter/Visitor — Person decides what it exposes and how
+       public void ExportTo(IPersonExporter exporter) {
+           name.ExportTo(exporter);
+           contact.ExportTo(exporter);
+       }
+   }
+   ```
+
+   **Step 4 — Exporter interfaces (domain layer owns these contracts)**
+
+   ```csharp
+   public interface IPersonNameExporter {
+       void SetFirstName(string firstName);
+       void SetLastName(string lastName);
+   }
+
+   public interface IPersonContactExporter {
+       void SetEmail(string email);
+       void SetAge(int age);
+   }
+
+   // IPersonExporter combines both (one interface for full export)
+   public interface IPersonExporter : IPersonNameExporter, IPersonContactExporter { }
+   ```
+
+   **Option A — Exporter/Visitor: infrastructure implements the interface**
+
+   ```csharp
+   // Infrastructure — builds the API response without touching domain internals
+   public sealed class PersonApiExporter : IPersonExporter {
+       public string FirstName { get; private set; } = string.Empty;
+       public string LastName  { get; private set; } = string.Empty;
+       public string Email     { get; private set; } = string.Empty;
+       public int    Age       { get; private set; }
+
+       public void SetFirstName(string firstName) => FirstName = firstName;
+       public void SetLastName(string lastName)   => LastName  = lastName;
+       public void SetEmail(string email)         => Email     = email;
+       public void SetAge(int age)                => Age       = age;
+   }
+
+   // API controller — zero knowledge of Person's internal structure
+   [HttpGet("{id}")]
+   public IActionResult GetPerson(Guid id) {
+       var person   = _repository.GetById(id);
+       var exporter = new PersonApiExporter();
+       person.ExportTo(exporter);
+       return Ok(new PersonResponse(exporter.FirstName, exporter.LastName, exporter.Email, exporter.Age));
+   }
+   ```
+
+   **Option B — CQRS Read Model: bypass the domain object entirely for reads**
+
+   ```csharp
+   // Read Model — a plain DTO built directly from the database projection
+   public sealed record PersonReadModel(string FirstName, string LastName, string Email, int Age);
+
+   public sealed class GetPersonQueryHandler {
+       private readonly IPersonReadRepository readRepository;
+
+       public GetPersonQueryHandler(IPersonReadRepository readRepository) {
+           this.readRepository = readRepository;
+       }
+
+       public PersonReadModel Handle(GetPersonQuery query) =>
+           readRepository.GetById(query.PersonId);
+   }
+
+   // API controller — reads from the projection, never from the domain object
+   [HttpGet("{id}")]
+   public IActionResult GetPerson(Guid id) {
+       var readModel = _queryHandler.Handle(new GetPersonQuery(id));
+       return Ok(new PersonResponse(readModel.FirstName, readModel.LastName, readModel.Email, readModel.Age));
+   }
+   ```
+
+   | Approach | When to use |
+   |---|---|
+   | **Exporter / Visitor** | The domain object must control what it exposes and how it is serialized |
+   | **CQRS Read Model** | Read needs differ greatly from the write model; performance matters |
+
 ## Implementation Guidelines
 - **Domain Classes**:
   - Use private constructors and static factory methods for creating instances.
