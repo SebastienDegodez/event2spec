@@ -11,9 +11,13 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
     await expect(background).toBeVisible();
   });
 
-  test('double-clicking the canvas creates a Domain Event note', async ({ page }) => {
+  test('right-clicking the canvas and selecting "Add domain event" creates a note', async ({ page }) => {
     const pane = page.locator('.react-flow__pane');
-    await pane.dblclick({ position: { x: 350, y: 250 } });
+    await pane.click({ position: { x: 350, y: 250 }, button: 'right' });
+
+    const menuItem = page.locator('.context-menu-item', { hasText: 'Add domain event' });
+    await expect(menuItem).toBeVisible();
+    await menuItem.click();
 
     const note = page.locator('.domain-event-node').first();
     await expect(note).toBeVisible();
@@ -25,8 +29,9 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
   }) => {
     const pane = page.locator('.react-flow__pane');
 
-    // Create note A by double-clicking at position (350, 250) in the pane
-    await pane.dblclick({ position: { x: 350, y: 250 } });
+    // Create note A via right-click context menu
+    await pane.click({ position: { x: 350, y: 250 }, button: 'right' });
+    await page.locator('.context-menu-item', { hasText: 'Add domain event' }).click();
     await expect(page.locator('.domain-event-node')).toHaveCount(1);
 
     // Read the column of note A
@@ -35,8 +40,9 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
     const idA = await noteA.getAttribute('data-id');
     expect(columnA).not.toBeNull();
 
-    // Create note B at a different position (one grid cell to the right of A's click position)
-    await pane.dblclick({ position: { x: 350 + 250, y: 250 } });
+    // Create note B at a different position (one grid cell to the right)
+    await pane.click({ position: { x: 350 + 250, y: 250 }, button: 'right' });
+    await page.locator('.context-menu-item', { hasText: 'Add domain event' }).click();
     await expect(page.locator('.domain-event-node')).toHaveCount(2);
 
     // Find both notes by their data-id — wait for note B to have a data-column attribute
@@ -83,16 +89,19 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
     expect(Number(newColumnA)).toBe(Number(columnA) + 1);
   });
 
-  test('inline editing updates the note label', async ({ page }) => {
+  test('clicking the note label enters edit mode and updates the label', async ({ page }) => {
     const pane = page.locator('.react-flow__pane');
-    await pane.dblclick({ position: { x: 350, y: 250 } });
+
+    // Create a note via right-click context menu
+    await pane.click({ position: { x: 350, y: 250 }, button: 'right' });
+    await page.locator('.context-menu-item', { hasText: 'Add domain event' }).click();
 
     const note = page.locator('.domain-event-node').first();
     await expect(note).toBeVisible();
 
-    // Double-click the note label area to enter edit mode
+    // Click the note label to enter edit mode
     const noteLabel = note.locator('.note-label');
-    await noteLabel.dblclick();
+    await noteLabel.click();
 
     const editor = note.locator('.note-editor');
     await expect(editor).toBeVisible();
@@ -101,5 +110,72 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
     await editor.press('Enter');
 
     await expect(note.locator('.note-label')).toHaveText('OrderPlaced');
+  });
+
+  test('right-clicking a node shows insert before and after options', async ({ page }) => {
+    const pane = page.locator('.react-flow__pane');
+
+    // Create a note via right-click context menu
+    await pane.click({ position: { x: 350, y: 250 }, button: 'right' });
+    await page.locator('.context-menu-item', { hasText: 'Add domain event' }).click();
+    await expect(page.locator('.domain-event-node')).toHaveCount(1);
+
+    // Right-click the note to get the node context menu
+    const note = page.locator('.domain-event-node').first();
+    await note.click({ button: 'right' });
+
+    await expect(page.locator('.context-menu-item', { hasText: 'Insert event before' })).toBeVisible();
+    await expect(page.locator('.context-menu-item', { hasText: 'Insert event after' })).toBeVisible();
+  });
+
+  test('inserting an event before shifts the existing node right', async ({ page }) => {
+    const pane = page.locator('.react-flow__pane');
+
+    // Create a note via right-click context menu
+    await pane.click({ position: { x: 350, y: 250 }, button: 'right' });
+    await page.locator('.context-menu-item', { hasText: 'Add domain event' }).click();
+    await expect(page.locator('.domain-event-node')).toHaveCount(1);
+
+    const originalNote = page.locator('.domain-event-node').first();
+    const originalColumn = await originalNote.getAttribute('data-column');
+    const originalId = await originalNote.getAttribute('data-id');
+
+    // Right-click on the note and insert before
+    await originalNote.click({ button: 'right' });
+    await page.locator('.context-menu-item', { hasText: 'Insert event before' }).click();
+
+    await expect(page.locator('.domain-event-node')).toHaveCount(2);
+
+    // The original note should have shifted right
+    const shiftedColumn = await page.locator(`.domain-event-node[data-id="${originalId}"]`).getAttribute('data-column');
+    expect(Number(shiftedColumn)).toBe(Number(originalColumn) + 1);
+  });
+
+  test('inserting an event after places it in the next column', async ({ page }) => {
+    const pane = page.locator('.react-flow__pane');
+
+    // Create a note via right-click context menu
+    await pane.click({ position: { x: 350, y: 250 }, button: 'right' });
+    await page.locator('.context-menu-item', { hasText: 'Add domain event' }).click();
+    await expect(page.locator('.domain-event-node')).toHaveCount(1);
+
+    const originalNote = page.locator('.domain-event-node').first();
+    const originalColumn = await originalNote.getAttribute('data-column');
+    const originalId = await originalNote.getAttribute('data-id');
+
+    // Right-click on the note and insert after
+    await originalNote.click({ button: 'right' });
+    await page.locator('.context-menu-item', { hasText: 'Insert event after' }).click();
+
+    await expect(page.locator('.domain-event-node')).toHaveCount(2);
+
+    // The original note should NOT have shifted
+    const currentColumn = await page.locator(`.domain-event-node[data-id="${originalId}"]`).getAttribute('data-column');
+    expect(Number(currentColumn)).toBe(Number(originalColumn));
+
+    // The new note should be at originalColumn + 1
+    const newNote = page.locator(`.domain-event-node:not([data-id="${originalId}"])`);
+    const newColumn = await newNote.getAttribute('data-column');
+    expect(Number(newColumn)).toBe(Number(originalColumn) + 1);
   });
 });

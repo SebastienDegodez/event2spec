@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ReactFlow,
   Background,
@@ -16,14 +16,24 @@ import '@xyflow/react/dist/style.css';
 
 import { useBoard, useBoardActions } from '../../../core/store/useBoardStore';
 import { DomainEventNode, type DomainEventNodeData } from './DomainEventNode';
+import { ContextMenu } from './ContextMenu';
 import { GRID_SIZE, NOTE_SIZE, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 
 const nodeTypes = { domainEvent: DomainEventNode };
+
+interface ContextMenuState {
+  readonly x: number;
+  readonly y: number;
+  readonly column: number;
+  readonly row: number;
+  readonly nodeId?: string;
+}
 
 function GridCanvasInner() {
   const board = useBoard();
   const { addNode, moveNode } = useBoardActions();
   const { screenToFlowPosition } = useReactFlow();
+  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
 
   // Map domain nodes → React Flow nodes (column/row → x/y pixels)
   const rfNodes = useMemo<Node<DomainEventNodeData>[]>(
@@ -63,15 +73,66 @@ function GridCanvasInner() {
     [moveNode]
   );
 
-  // Double-click on the pane: create a new Domain Event at the clicked grid cell
-  const onPaneDoubleClick = useCallback(
-    (event: React.MouseEvent) => {
+  const closeContextMenu = useCallback(() => setContextMenu(null), []);
+
+  // Right-click on a node: show insert before / insert after options
+  const onNodeContextMenu = useCallback(
+    (event: React.MouseEvent, node: Node<DomainEventNodeData>) => {
+      event.preventDefault();
+      const nodeData = node.data as DomainEventNodeData;
+      setContextMenu({
+        x: event.clientX,
+        y: event.clientY,
+        column: nodeData.column,
+        row: nodeData.row,
+        nodeId: node.id,
+      });
+    },
+    []
+  );
+
+  // Right-click on the pane: show add domain event option
+  const onPaneContextMenu = useCallback(
+    (event: React.MouseEvent | MouseEvent) => {
+      event.preventDefault();
       const flowPos = screenToFlowPosition({ x: event.clientX, y: event.clientY });
       const { column, row } = pixelToGrid(flowPos.x, flowPos.y);
+      setContextMenu({
+        x: event.clientX,
+        y: event.clientY,
+        column,
+        row,
+      });
+    },
+    [screenToFlowPosition]
+  );
+
+  const insertEventBefore = useCallback(
+    (column: number, row: number) => {
       addNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
     },
-    [addNode, screenToFlowPosition]
+    [addNode]
   );
+
+  const insertEventAfter = useCallback(
+    (column: number, row: number) => {
+      addNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column + 1, row);
+    },
+    [addNode]
+  );
+
+  const contextMenuItems = useMemo(() => {
+    if (!contextMenu) return [];
+    if (contextMenu.nodeId) {
+      return [
+        { label: 'Insert event before', onClick: () => insertEventBefore(contextMenu.column, contextMenu.row) },
+        { label: 'Insert event after', onClick: () => insertEventAfter(contextMenu.column, contextMenu.row) },
+      ];
+    }
+    return [
+      { label: 'Add domain event', onClick: () => insertEventBefore(contextMenu.column, contextMenu.row) },
+    ];
+  }, [contextMenu, insertEventBefore, insertEventAfter]);
 
   return (
     <div
@@ -84,7 +145,10 @@ function GridCanvasInner() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onNodeDragStop={onNodeDragStop}
-        onDoubleClick={onPaneDoubleClick}
+        onNodeContextMenu={onNodeContextMenu}
+        onPaneContextMenu={onPaneContextMenu}
+        onPaneClick={closeContextMenu}
+        onMoveStart={closeContextMenu}
         nodeTypes={nodeTypes}
         snapToGrid
         snapGrid={[GRID_SIZE, GRID_SIZE]}
@@ -108,6 +172,14 @@ function GridCanvasInner() {
           position="bottom-left"
         />
       </ReactFlow>
+      {contextMenu && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          items={contextMenuItems}
+          onClose={closeContextMenu}
+        />
+      )}
     </div>
   );
 }
