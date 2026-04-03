@@ -29,19 +29,19 @@ function GridCanvasInner() {
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
 
   // Map domain nodes → React Flow nodes (column/row → x/y pixels)
-  const rfNodes = useMemo<Node<DomainEventNodeData>[]>(
+  const reactFlowNodes = useMemo<Node<DomainEventNodeData>[]>(
     () =>
       board.toArray().map((domainNode) => {
-        const gridPos = domainNode.gridPosition();
-        const pos = domainNodeToPixelPosition(gridPos);
+        const gridPosition = domainNode.gridPosition();
+        const position = domainNodeToPixelPosition(gridPosition);
         return {
           id: domainNode.id,
           type: 'domainEvent',
-          position: pos,
+          position: position,
           data: {
             label: domainNode.label,
-            column: gridPos.column,
-            row: gridPos.row,
+            column: gridPosition.column,
+            row: gridPosition.row,
           },
           style: { width: NOTE_SIZE, height: NOTE_SIZE },
         };
@@ -49,13 +49,13 @@ function GridCanvasInner() {
     [board]
   );
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(rfNodes);
+  const [nodes, setNodes, onNodesChange] = useNodesState(reactFlowNodes);
   const [edges, , onEdgesChange] = useEdgesState([]);
 
   // Keep React Flow nodes in sync whenever the board state changes
   useEffect(() => {
-    setNodes(rfNodes);
-  }, [rfNodes, setNodes]);
+    setNodes(reactFlowNodes);
+  }, [reactFlowNodes, setNodes]);
 
   // On drag stop: convert pixel position back to grid coordinates and dispatch
   const onNodeDragStop: OnNodeDrag<Node<DomainEventNodeData>> = useCallback(
@@ -67,6 +67,16 @@ function GridCanvasInner() {
   );
 
   const closeContextMenu = useCallback(() => setContextMenu(null), []);
+
+  // Double-click on the pane: create a new Domain Event at the clicked grid cell
+  const onPaneDoubleClick = useCallback(
+    (event: React.MouseEvent) => {
+      const flowPosition = screenToFlowPosition({ x: event.clientX, y: event.clientY });
+      const { column, row } = pixelToGrid(flowPosition.x, flowPosition.y);
+      addNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
+    },
+    [addNode, screenToFlowPosition]
+  );
 
   // Right-click on a node: show insert before / insert after options
   const onNodeContextMenu = useCallback(
@@ -88,8 +98,8 @@ function GridCanvasInner() {
   const onPaneContextMenu = useCallback(
     (event: React.MouseEvent | MouseEvent) => {
       event.preventDefault();
-      const flowPos = screenToFlowPosition({ x: event.clientX, y: event.clientY });
-      const { column, row } = pixelToGrid(flowPos.x, flowPos.y);
+      const flowPosition = screenToFlowPosition({ x: event.clientX, y: event.clientY });
+      const { column, row } = pixelToGrid(flowPosition.x, flowPosition.y);
       setContextMenu({
         x: event.clientX,
         y: event.clientY,
@@ -134,6 +144,7 @@ function GridCanvasInner() {
         onNodeContextMenu={onNodeContextMenu}
         onPaneContextMenu={onPaneContextMenu}
         onPaneClick={closeContextMenu}
+        onDoubleClick={onPaneDoubleClick}
         onMoveStart={closeContextMenu}
         nodeTypes={nodeTypes}
         snapToGrid
