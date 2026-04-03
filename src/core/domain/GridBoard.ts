@@ -28,8 +28,12 @@ export class GridBoard {
   moveNode(id: string, column: number, row: number): GridBoard {
     const node = this.nodes.find((existing) => existing.id === id);
     if (!node) return this;
+    const targetPosition = new GridPosition(column, row);
     const withoutMoved = this.removeNode(id);
-    return withoutMoved.insertNode(node.moveTo(new GridPosition(column, row)));
+    if (!withoutMoved.hasNodeAt(targetPosition)) {
+      return withoutMoved.placeNode(node.moveTo(targetPosition));
+    }
+    return withoutMoved.insertNode(node.moveTo(targetPosition));
   }
 
   updateLabel(id: string, label: string): GridBoard {
@@ -44,5 +48,13 @@ export class GridBoard {
 
   private shouldShift(existing: BoardNode, incoming: BoardNode): boolean {
     return existing.shouldShiftWhenInserted(incoming);
+  }
+
+  private hasNodeAt(position: GridPosition): boolean {
+    return this.nodes.some((node) => node.isAt(position));
+  }
+
+  private placeNode(node: BoardNode): GridBoard {
+    return new GridBoard([...this.nodes, node]);
   }
 }

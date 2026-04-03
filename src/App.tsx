@@ -10,7 +10,7 @@ export default function App() {
           <span className="logo-text">event<strong>2spec</strong></span>
         </div>
         <div className="app-hint">
-          Double-click to add a Domain Event · Click + to add a Command · Drag to reposition · Delete key to remove
+          Right-click to add a Domain Event · Click + to add a Command · Click label to edit · Drag to reposition
         </div>
       </header>
       <main className="app-canvas">

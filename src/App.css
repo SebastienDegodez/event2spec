@@ -123,6 +123,14 @@
   transform: translateY(-2px);
 }
 
+/* Editing state */
+.domain-event-node.editing {
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.6), 0 8px 32px rgba(245, 158, 11, 0.25);
+  transform: translateY(-2px) scale(1.03);
+  z-index: 10;
+  cursor: default;
+}
+
 /* Dog-ear fold */
 .note-fold {
   position: absolute;
@@ -153,20 +161,25 @@
   text-align: center;
   line-height: 1.4;
   word-break: break-word;
+  cursor: pointer;
 }
 
 .note-editor {
   width: 100%;
-  height: 100px;
+  height: 100%;
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--note-text);
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px dashed rgba(28, 16, 7, 0.3);
+  border-radius: 4px;
   outline: none;
   resize: none;
   text-align: center;
+  padding: 8px;
+  line-height: 1.4;
+  caret-color: var(--note-text);
 }
 
 /* Type badge at bottom */
@@ -327,4 +340,38 @@
 
 .react-flow__pane:not(.dragging) {
   cursor: default;
+}
+
+/* ─── Context Menu ────────────────────────────────────── */
+.context-menu {
+  position: fixed;
+  z-index: 1000;
+  min-width: 200px;
+  background: rgba(19, 20, 31, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  padding: 4px;
+  backdrop-filter: blur(12px);
+}
+
+.context-menu-item {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s, color 0.1s;
+}
+
+.context-menu-item:hover {
+  background: var(--accent-dim);
+  color: var(--accent);
 }

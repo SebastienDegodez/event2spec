@@ -27,6 +27,15 @@ export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
     deleteElements({ nodes: [{ id }] });
   }, [id, removeNode, deleteElements]);
 
+  const handleLabelClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setDraft(nodeData.label);
+      setEditing(true);
+    },
+    [nodeData.label]
+  );
+
   const handleAddCommand = useCallback(() => {
     const commandId = `command-${crypto.randomUUID()}`;
     addCommandNode(commandId, 'Command', nodeData.column, nodeData.row - 1, id);
@@ -34,14 +43,10 @@ export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
 
   return (
     <div
-      className={`domain-event-node${selected ? ' selected' : ''}`}
+      className={`domain-event-node${selected ? ' selected' : ''}${editing ? ' editing' : ''}`}
       data-id={id}
       data-column={nodeData.column}
       data-row={nodeData.row}
-      onDoubleClick={() => {
-        setDraft(nodeData.label);
-        setEditing(true);
-      }}
     >
       <Handle type="target" position={Position.Top} className="event-handle" />
 
@@ -67,7 +72,13 @@ export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
             }}
           />
         ) : (
-          <span className="note-label">{nodeData.label}</span>
+          <span
+            className="note-label"
+            onClick={handleLabelClick}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            {nodeData.label}
+          </span>
         )}
       </div>
 
