@@ -36,6 +36,22 @@ describe('MoveNodeCommandHandler', () => {
     expect(nodeB?.isAt(new GridPosition(2, 0))).toBe(true);
   });
 
+  it('does not shift nodes when moving to an unoccupied position on the same row', () => {
+    const board = [
+      new AddNodeCommand('a', 'A', 0, 0),
+      new AddNodeCommand('b', 'B', 2, 0),
+    ].reduce((b, cmd) => addHandler.handle(b, cmd), GridBoard.empty());
+
+    const result = handler.handle(board, new MoveNodeCommand('a', 1, 0));
+    const nodes = result.toArray();
+
+    const nodeA = nodes.find((n) => n.id === 'a');
+    const nodeB = nodes.find((n) => n.id === 'b');
+
+    expect(nodeA?.isAt(new GridPosition(1, 0))).toBe(true);
+    expect(nodeB?.isAt(new GridPosition(2, 0))).toBe(true);
+  });
+
   it('leaves the board unchanged when moving an unknown id', () => {
     const board = addHandler.handle(GridBoard.empty(), new AddNodeCommand('a', 'A', 0, 0));
 
