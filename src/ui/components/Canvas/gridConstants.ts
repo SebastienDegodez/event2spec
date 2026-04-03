@@ -7,6 +7,15 @@ export const NOTE_SIZE = 200;
 /** Margin around the note inside its grid cell */
 export const NOTE_MARGIN = (GRID_SIZE - NOTE_SIZE) / 2;
 
+/** Color used for command nodes on the minimap */
+export const COMMAND_NODE_COLOR = '#3b82f6';
+
+/** Color used for domain event nodes on the minimap */
+export const DOMAIN_EVENT_NODE_COLOR = '#f59e0b';
+
+/** Color used for edges between command and event nodes */
+export const EDGE_COLOR = '#60a5fa';
+
 /** Convert discrete grid coordinates to React Flow pixel position (top-left of note). */
 export function gridToPixel(column: number, row: number): { x: number; y: number } {
   return {

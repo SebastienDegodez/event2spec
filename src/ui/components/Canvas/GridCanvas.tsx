@@ -16,11 +16,10 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import { useBoard, useBoardActions, useLinks } from '../../../core/store/useBoardStore';
-import { DomainEventNode as DomainEventNodeDomain } from '../../../core/domain/DomainEventNode';
 import { CommandNode as CommandNodeDomain } from '../../../core/domain/CommandNode';
 import { DomainEventNode, type DomainEventNodeData } from './DomainEventNode';
 import { CommandNodeComponent, type CommandNodeData } from './CommandNodeComponent';
-import { GRID_SIZE, NOTE_SIZE, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
+import { GRID_SIZE, NOTE_SIZE, COMMAND_NODE_COLOR, DOMAIN_EVENT_NODE_COLOR, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 
 const nodeTypes = {
   domainEvent: DomainEventNode,
@@ -40,10 +39,9 @@ function GridCanvasInner() {
         const gridPos = domainNode.gridPosition();
         const pos = domainNodeToPixelPosition(gridPos);
         const isCommand = domainNode instanceof CommandNodeDomain;
-        const isDomainEvent = domainNode instanceof DomainEventNodeDomain;
         return {
           id: domainNode.id,
-          type: isCommand ? 'command' : isDomainEvent ? 'domainEvent' : 'domainEvent',
+          type: isCommand ? 'command' : 'domainEvent',
           position: pos,
           data: {
             label: domainNode.label,
@@ -67,7 +65,7 @@ function GridCanvasInner() {
         targetHandle: null,
         type: 'default',
         animated: true,
-        style: { stroke: '#60a5fa', strokeWidth: 2 },
+        style: { stroke: EDGE_COLOR, strokeWidth: 2 },
       })),
     [links]
   );
@@ -134,7 +132,7 @@ function GridCanvasInner() {
         />
         <Controls position="bottom-right" />
         <MiniMap
-          nodeColor={(node) => node.type === 'command' ? '#3b82f6' : '#f59e0b'}
+          nodeColor={(node) => node.type === 'command' ? COMMAND_NODE_COLOR : DOMAIN_EVENT_NODE_COLOR}
           maskColor="rgba(15,15,25,0.7)"
           position="bottom-left"
         />
