@@ -243,6 +243,96 @@
   opacity: 1;
 }
 
+/* ─── Command Node ────────────────────────────────────── */
+.command-node {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  background: var(--note-blue);
+  border-radius: 3px 12px 3px 3px;
+  box-shadow: var(--note-shadow);
+  cursor: grab;
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+}
+
+.command-node:hover {
+  transform: translateY(-2px) rotate(0.4deg);
+  box-shadow: var(--note-shadow), 0 0 0 1px rgba(59, 130, 246, 0.3);
+}
+
+.command-node:active {
+  cursor: grabbing;
+}
+
+.command-node.selected {
+  box-shadow: var(--note-shadow-command-selected);
+  transform: translateY(-2px);
+}
+
+.command-fold {
+  background: var(--note-blue-dark) !important;
+}
+
+.command-node:hover .note-delete,
+.command-node.selected .note-delete {
+  opacity: 1;
+}
+
+/* ─── React Flow handles — command ────────────────────── */
+.command-handle {
+  width: 10px !important;
+  height: 10px !important;
+  background: var(--note-blue-dark) !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.command-node:hover .command-handle,
+.command-node.selected .command-handle {
+  opacity: 1;
+}
+
+/* ─── Add command button on domain event ──────────────── */
+.note-add-command {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--note-blue);
+  background: var(--board-bg);
+  color: var(--note-blue);
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s, color 0.15s;
+  padding: 0;
+  z-index: 10;
+}
+
+.domain-event-node:hover .note-add-command,
+.domain-event-node.selected .note-add-command {
+  opacity: 1;
+}
+
+.note-add-command:hover {
+  background: var(--note-blue) !important;
+  color: #fff !important;
+  opacity: 1 !important;
+}
+
 /* ─── Drag overlay hint ───────────────────────────────── */
 .react-flow__pane {
   cursor: crosshair;

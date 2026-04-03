@@ -1,4 +1,4 @@
-import { GridBoard } from '../../domain/GridBoard';
+import { GridBoard } from '../../../domain/GridBoard';
 import { MoveNodeCommand } from './MoveNodeCommand';
 
 export class MoveNodeCommandHandler {
