@@ -96,10 +96,10 @@ function GridCanvasInner() {
         proOptions={{ hideAttribution: false }}
       >
         <Background
-          variant={BackgroundVariant.Dots}
+          variant={BackgroundVariant.Cross}
           gap={GRID_SIZE}
-          size={2}
-          color="rgba(255,255,255,0.12)"
+          size={6}
+          color="rgba(255,255,255,0.18)"
         />
         <Controls position="bottom-right" />
         <MiniMap

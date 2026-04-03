@@ -29,7 +29,7 @@ export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
 
   return (
     <div
-      className={`domain-event-node${selected ? ' selected' : ''}`}
+      className={`domain-event-node${selected ? ' selected' : ''}${editing ? ' editing' : ''}`}
       data-id={id}
       data-column={nodeData.column}
       data-row={nodeData.row}
