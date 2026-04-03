@@ -1,5 +1,5 @@
-import { GridBoard } from '../../domain/GridBoard';
-import { CommandNode } from '../../domain/CommandNode';
+import { GridBoard } from '../../../domain/GridBoard';
+import { CommandNode } from '../../../domain/CommandNode';
 import { AddCommandNodeCommand } from './AddCommandNodeCommand';
 
 export class AddCommandNodeCommandHandler {

@@ -1,16 +1,16 @@
 import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 import { GridBoard } from '../domain/GridBoard';
-import { AddNodeCommand } from '../usecases/commands/AddNodeCommand';
-import { AddNodeCommandHandler } from '../usecases/commands/AddNodeCommandHandler';
-import { MoveNodeCommand } from '../usecases/commands/MoveNodeCommand';
-import { MoveNodeCommandHandler } from '../usecases/commands/MoveNodeCommandHandler';
-import { UpdateNodeLabelCommand } from '../usecases/commands/UpdateNodeLabelCommand';
-import { UpdateNodeLabelCommandHandler } from '../usecases/commands/UpdateNodeLabelCommandHandler';
-import { RemoveNodeCommand } from '../usecases/commands/RemoveNodeCommand';
-import { RemoveNodeCommandHandler } from '../usecases/commands/RemoveNodeCommandHandler';
-import { AddCommandNodeCommand } from '../usecases/commands/AddCommandNodeCommand';
-import { AddCommandNodeCommandHandler } from '../usecases/commands/AddCommandNodeCommandHandler';
+import { AddNodeCommand } from '../usecases/commands/AddNode/AddNodeCommand';
+import { AddNodeCommandHandler } from '../usecases/commands/AddNode/AddNodeCommandHandler';
+import { MoveNodeCommand } from '../usecases/commands/MoveNode/MoveNodeCommand';
+import { MoveNodeCommandHandler } from '../usecases/commands/MoveNode/MoveNodeCommandHandler';
+import { UpdateNodeLabelCommand } from '../usecases/commands/UpdateNodeLabel/UpdateNodeLabelCommand';
+import { UpdateNodeLabelCommandHandler } from '../usecases/commands/UpdateNodeLabel/UpdateNodeLabelCommandHandler';
+import { RemoveNodeCommand } from '../usecases/commands/RemoveNode/RemoveNodeCommand';
+import { RemoveNodeCommandHandler } from '../usecases/commands/RemoveNode/RemoveNodeCommandHandler';
+import { AddCommandNodeCommand } from '../usecases/commands/AddCommandNode/AddCommandNodeCommand';
+import { AddCommandNodeCommandHandler } from '../usecases/commands/AddCommandNode/AddCommandNodeCommandHandler';
 
 /** A directed link from a command node to the domain event it triggers. */
 interface NodeLink {

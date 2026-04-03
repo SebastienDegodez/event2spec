@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { GridBoard } from '../../../src/core/domain/GridBoard';
-import { AddNodeCommand } from '../../../src/core/usecases/commands/AddNodeCommand';
-import { AddNodeCommandHandler } from '../../../src/core/usecases/commands/AddNodeCommandHandler';
-import { RemoveNodeCommand } from '../../../src/core/usecases/commands/RemoveNodeCommand';
-import { RemoveNodeCommandHandler } from '../../../src/core/usecases/commands/RemoveNodeCommandHandler';
+import { GridBoard } from '../../../../src/core/domain/GridBoard';
+import { AddNodeCommand } from '../../../../src/core/usecases/commands/AddNode/AddNodeCommand';
+import { AddNodeCommandHandler } from '../../../../src/core/usecases/commands/AddNode/AddNodeCommandHandler';
+import { RemoveNodeCommand } from '../../../../src/core/usecases/commands/RemoveNode/RemoveNodeCommand';
+import { RemoveNodeCommandHandler } from '../../../../src/core/usecases/commands/RemoveNode/RemoveNodeCommandHandler';
 
 const addHandler = new AddNodeCommandHandler();
 const handler = new RemoveNodeCommandHandler();

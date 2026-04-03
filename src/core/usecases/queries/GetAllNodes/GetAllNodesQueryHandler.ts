@@ -1,5 +1,5 @@
-import { GridBoard } from '../../domain/GridBoard';
-import { BoardNode } from '../../domain/BoardNode';
+import { GridBoard } from '../../../domain/GridBoard';
+import { BoardNode } from '../../../domain/BoardNode';
 import { GetAllNodesQuery } from './GetAllNodesQuery';
 
 export class GetAllNodesQueryHandler {

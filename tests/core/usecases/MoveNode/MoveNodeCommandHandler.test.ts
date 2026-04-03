@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { GridBoard } from '../../../src/core/domain/GridBoard';
-import { GridPosition } from '../../../src/core/domain/GridPosition';
-import { AddNodeCommand } from '../../../src/core/usecases/commands/AddNodeCommand';
-import { AddNodeCommandHandler } from '../../../src/core/usecases/commands/AddNodeCommandHandler';
-import { MoveNodeCommand } from '../../../src/core/usecases/commands/MoveNodeCommand';
-import { MoveNodeCommandHandler } from '../../../src/core/usecases/commands/MoveNodeCommandHandler';
+import { GridBoard } from '../../../../src/core/domain/GridBoard';
+import { GridPosition } from '../../../../src/core/domain/GridPosition';
+import { AddNodeCommand } from '../../../../src/core/usecases/commands/AddNode/AddNodeCommand';
+import { AddNodeCommandHandler } from '../../../../src/core/usecases/commands/AddNode/AddNodeCommandHandler';
+import { MoveNodeCommand } from '../../../../src/core/usecases/commands/MoveNode/MoveNodeCommand';
+import { MoveNodeCommandHandler } from '../../../../src/core/usecases/commands/MoveNode/MoveNodeCommandHandler';
 
 const addHandler = new AddNodeCommandHandler();
 const handler = new MoveNodeCommandHandler();
