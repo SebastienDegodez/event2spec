@@ -17,17 +17,10 @@ import '@xyflow/react/dist/style.css';
 import { useBoard, useBoardActions } from '../../../core/store/useBoardStore';
 import { DomainEventNode, type DomainEventNodeData } from './DomainEventNode';
 import { ContextMenu } from './ContextMenu';
+import { type ContextMenuState } from './ContextMenuState';
 import { GRID_SIZE, NOTE_SIZE, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 
 const nodeTypes = { domainEvent: DomainEventNode };
-
-interface ContextMenuState {
-  readonly x: number;
-  readonly y: number;
-  readonly column: number;
-  readonly row: number;
-  readonly nodeId?: string;
-}
 
 function GridCanvasInner() {
   const board = useBoard();

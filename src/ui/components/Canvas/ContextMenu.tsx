@@ -1,9 +1,5 @@
 import { memo, useCallback, useEffect, useRef } from 'react';
-
-export interface ContextMenuItem {
-  readonly label: string;
-  readonly onClick: () => void;
-}
+import { type ContextMenuItem } from './ContextMenuItem';
 
 interface ContextMenuProps {
   readonly x: number;
