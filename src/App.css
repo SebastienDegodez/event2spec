@@ -161,6 +161,7 @@
   text-align: center;
   line-height: 1.4;
   word-break: break-word;
+  cursor: pointer;
 }
 
 .note-editor {
@@ -249,4 +250,38 @@
 
 .react-flow__pane:not(.dragging) {
   cursor: default;
+}
+
+/* ─── Context Menu ────────────────────────────────────── */
+.context-menu {
+  position: fixed;
+  z-index: 1000;
+  min-width: 200px;
+  background: rgba(19, 20, 31, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  padding: 4px;
+  backdrop-filter: blur(12px);
+}
+
+.context-menu-item {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s, color 0.1s;
+}
+
+.context-menu-item:hover {
+  background: var(--accent-dim);
+  color: var(--accent);
 }
