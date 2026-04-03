@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { useShallow } from 'zustand/react/shallow';
 import { GridBoard } from '../domain/GridBoard';
 import { AddNodeCommand } from '../usecases/commands/AddNodeCommand';
 import { AddNodeCommandHandler } from '../usecases/commands/AddNodeCommandHandler';
@@ -56,9 +57,11 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set) => ({
 export const useBoard = () => useBoardStore((state) => state.board);
 
 export const useBoardActions = () =>
-  useBoardStore((state) => ({
-    addNode: state.addNode,
-    moveNode: state.moveNode,
-    updateLabel: state.updateLabel,
-    removeNode: state.removeNode,
-  }));
+  useBoardStore(
+    useShallow((state) => ({
+      addNode: state.addNode,
+      moveNode: state.moveNode,
+      updateLabel: state.updateLabel,
+      removeNode: state.removeNode,
+    }))
+  );
