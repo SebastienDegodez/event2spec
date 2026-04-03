@@ -2,15 +2,15 @@ import { memo, useCallback, useState } from 'react';
 import { Handle, Position, useReactFlow, type NodeProps } from '@xyflow/react';
 import { useBoardActions } from '../../../core/store/useBoardStore';
 
-export type DomainEventNodeData = {
+export type CommandNodeData = {
   label: string;
   column: number;
   row: number;
 };
 
-export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
-  const nodeData = data as DomainEventNodeData;
-  const { updateLabel, removeNode, addCommandNode } = useBoardActions();
+export const CommandNodeComponent = memo(({ id, data, selected }: NodeProps) => {
+  const nodeData = data as CommandNodeData;
+  const { updateLabel, removeNode } = useBoardActions();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(nodeData.label);
   const { deleteElements } = useReactFlow();
@@ -27,30 +27,20 @@ export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
     deleteElements({ nodes: [{ id }] });
   }, [id, removeNode, deleteElements]);
 
-  const handleLabelClick = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      setDraft(nodeData.label);
-      setEditing(true);
-    },
-    [nodeData.label]
-  );
-
-  const handleAddCommand = useCallback(() => {
-    const commandId = `command-${crypto.randomUUID()}`;
-    addCommandNode(commandId, 'Command', nodeData.column, nodeData.row - 1, id);
-  }, [addCommandNode, id, nodeData.column, nodeData.row]);
-
   return (
     <div
-      className={`domain-event-node${selected ? ' selected' : ''}${editing ? ' editing' : ''}`}
+      className={`command-node${selected ? ' selected' : ''}`}
       data-id={id}
       data-column={nodeData.column}
       data-row={nodeData.row}
+      onDoubleClick={() => {
+        setDraft(nodeData.label);
+        setEditing(true);
+      }}
     >
-      <Handle type="target" position={Position.Top} className="event-handle" />
+      <Handle type="target" position={Position.Left} className="command-handle" />
 
-      <div className="note-fold" />
+      <div className="note-fold command-fold" />
 
       <div className="note-content">
         {editing ? (
@@ -72,39 +62,24 @@ export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
             }}
           />
         ) : (
-          <span
-            className="note-label"
-            onClick={handleLabelClick}
-            onMouseDown={(e) => e.stopPropagation()}
-          >
-            {nodeData.label}
-          </span>
+          <span className="note-label">{nodeData.label}</span>
         )}
       </div>
 
-      <div className="note-type-badge">Domain Event</div>
+      <div className="note-type-badge">Command</div>
 
       <button
         className="note-delete"
         onClick={handleDelete}
-        title="Remove event"
-        aria-label="Remove event"
+        title="Remove command"
+        aria-label="Remove command"
       >
         ×
       </button>
 
-      <button
-        className="note-add-command"
-        onClick={handleAddCommand}
-        title="Add command"
-        aria-label="Add command"
-      >
-        +
-      </button>
-
-      <Handle type="source" position={Position.Right} className="event-handle" />
+      <Handle type="source" position={Position.Bottom} className="command-handle" />
     </div>
   );
 });
 
-DomainEventNode.displayName = 'DomainEventNode';
+CommandNodeComponent.displayName = 'CommandNodeComponent';

@@ -1,4 +1,4 @@
-import { GridBoard } from '../../domain/GridBoard';
+import { GridBoard } from '../../../domain/GridBoard';
 import { UpdateNodeLabelCommand } from './UpdateNodeLabelCommand';
 
 export class UpdateNodeLabelCommandHandler {

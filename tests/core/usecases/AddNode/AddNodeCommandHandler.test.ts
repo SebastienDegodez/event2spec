@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { GridBoard } from '../../../src/core/domain/GridBoard';
-import { GridPosition } from '../../../src/core/domain/GridPosition';
-import { AddNodeCommand } from '../../../src/core/usecases/commands/AddNodeCommand';
-import { AddNodeCommandHandler } from '../../../src/core/usecases/commands/AddNodeCommandHandler';
+import { GridBoard } from '../../../../src/core/domain/GridBoard';
+import { GridPosition } from '../../../../src/core/domain/GridPosition';
+import { AddNodeCommand } from '../../../../src/core/usecases/commands/AddNode/AddNodeCommand';
+import { AddNodeCommandHandler } from '../../../../src/core/usecases/commands/AddNode/AddNodeCommandHandler';
 
 const handler = new AddNodeCommandHandler();
 

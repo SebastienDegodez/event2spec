@@ -1,5 +1,5 @@
-import { GridBoard } from '../../domain/GridBoard';
-import { DomainEventNode } from '../../domain/DomainEventNode';
+import { GridBoard } from '../../../domain/GridBoard';
+import { DomainEventNode } from '../../../domain/DomainEventNode';
 import { AddNodeCommand } from './AddNodeCommand';
 
 export class AddNodeCommandHandler {
