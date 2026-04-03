@@ -70,7 +70,7 @@ export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
           <span
             className="note-label"
             onClick={handleLabelClick}
-            onMouseDown={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()} // Prevent React Flow drag initiation when clicking label
           >
             {nodeData.label}
           </span>

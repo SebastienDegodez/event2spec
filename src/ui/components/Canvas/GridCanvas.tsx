@@ -107,16 +107,9 @@ function GridCanvasInner() {
     [screenToFlowPosition]
   );
 
-  const insertEventBefore = useCallback(
+  const addEventAtPosition = useCallback(
     (column: number, row: number) => {
       addNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
-    },
-    [addNode]
-  );
-
-  const insertEventAfter = useCallback(
-    (column: number, row: number) => {
-      addNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column + 1, row);
     },
     [addNode]
   );
@@ -125,14 +118,14 @@ function GridCanvasInner() {
     if (!contextMenu) return [];
     if (contextMenu.nodeId) {
       return [
-        { label: 'Insert event before', onClick: () => insertEventBefore(contextMenu.column, contextMenu.row) },
-        { label: 'Insert event after', onClick: () => insertEventAfter(contextMenu.column, contextMenu.row) },
+        { label: 'Insert event before', onClick: () => addEventAtPosition(contextMenu.column, contextMenu.row) },
+        { label: 'Insert event after', onClick: () => addEventAtPosition(contextMenu.column + 1, contextMenu.row) },
       ];
     }
     return [
-      { label: 'Add domain event', onClick: () => insertEventBefore(contextMenu.column, contextMenu.row) },
+      { label: 'Add domain event', onClick: () => addEventAtPosition(contextMenu.column, contextMenu.row) },
     ];
-  }, [contextMenu, insertEventBefore, insertEventAfter]);
+  }, [contextMenu, addEventAtPosition]);
 
   return (
     <div
