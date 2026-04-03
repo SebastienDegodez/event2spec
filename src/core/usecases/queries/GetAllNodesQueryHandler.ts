@@ -1,9 +1,9 @@
 import { GridBoard } from '../../domain/GridBoard';
-import { DomainEventNode } from '../../domain/DomainEventNode';
+import { BoardNode } from '../../domain/BoardNode';
 import { GetAllNodesQuery } from './GetAllNodesQuery';
 
 export class GetAllNodesQueryHandler {
-  handle(board: GridBoard, query: GetAllNodesQuery): ReadonlyArray<DomainEventNode> {
+  handle(board: GridBoard, query: GetAllNodesQuery): ReadonlyArray<BoardNode> {
     void query;
     return board.toArray();
   }

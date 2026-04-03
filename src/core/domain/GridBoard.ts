@@ -1,10 +1,10 @@
-import { DomainEventNode } from './DomainEventNode';
+import { BoardNode } from './BoardNode';
 import { GridPosition } from './GridPosition';
 
 export class GridBoard {
-  private readonly nodes: ReadonlyArray<DomainEventNode>;
+  private readonly nodes: ReadonlyArray<BoardNode>;
 
-  private constructor(nodes: ReadonlyArray<DomainEventNode>) {
+  private constructor(nodes: ReadonlyArray<BoardNode>) {
     this.nodes = nodes;
   }
 
@@ -12,7 +12,7 @@ export class GridBoard {
     return new GridBoard([]);
   }
 
-  insertNode(node: DomainEventNode): GridBoard {
+  insertNode(node: BoardNode): GridBoard {
     const shifted = this.nodes.map((existing) =>
       this.shouldShift(existing, node)
         ? existing.shiftRight()
@@ -38,11 +38,11 @@ export class GridBoard {
     ));
   }
 
-  toArray(): ReadonlyArray<DomainEventNode> {
+  toArray(): ReadonlyArray<BoardNode> {
     return this.nodes;
   }
 
-  private shouldShift(existing: DomainEventNode, incoming: DomainEventNode): boolean {
+  private shouldShift(existing: BoardNode, incoming: BoardNode): boolean {
     return existing.shouldShiftWhenInserted(incoming);
   }
 }

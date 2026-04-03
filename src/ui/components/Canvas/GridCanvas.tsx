@@ -10,30 +10,40 @@ import {
   useReactFlow,
   ReactFlowProvider,
   type Node,
+  type Edge,
   type OnNodeDrag,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { useBoard, useBoardActions } from '../../../core/store/useBoardStore';
+import { useBoard, useBoardActions, useLinks } from '../../../core/store/useBoardStore';
+import { DomainEventNode as DomainEventNodeDomain } from '../../../core/domain/DomainEventNode';
+import { CommandNode as CommandNodeDomain } from '../../../core/domain/CommandNode';
 import { DomainEventNode, type DomainEventNodeData } from './DomainEventNode';
+import { CommandNodeComponent, type CommandNodeData } from './CommandNodeComponent';
 import { GRID_SIZE, NOTE_SIZE, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 
-const nodeTypes = { domainEvent: DomainEventNode };
+const nodeTypes = {
+  domainEvent: DomainEventNode,
+  command: CommandNodeComponent,
+};
 
 function GridCanvasInner() {
   const board = useBoard();
+  const links = useLinks();
   const { addNode, moveNode } = useBoardActions();
   const { screenToFlowPosition } = useReactFlow();
 
   // Map domain nodes → React Flow nodes (column/row → x/y pixels)
-  const rfNodes = useMemo<Node<DomainEventNodeData>[]>(
+  const rfNodes = useMemo<Node<DomainEventNodeData | CommandNodeData>[]>(
     () =>
       board.toArray().map((domainNode) => {
         const gridPos = domainNode.gridPosition();
         const pos = domainNodeToPixelPosition(gridPos);
+        const isCommand = domainNode instanceof CommandNodeDomain;
+        const isDomainEvent = domainNode instanceof DomainEventNodeDomain;
         return {
           id: domainNode.id,
-          type: 'domainEvent',
+          type: isCommand ? 'command' : isDomainEvent ? 'domainEvent' : 'domainEvent',
           position: pos,
           data: {
             label: domainNode.label,
@@ -46,16 +56,37 @@ function GridCanvasInner() {
     [board]
   );
 
+  // Create edges from links
+  const rfEdges = useMemo<Edge[]>(
+    () =>
+      links.map((link) => ({
+        id: `edge-${link.commandNodeId}-${link.eventNodeId}`,
+        source: link.commandNodeId,
+        target: link.eventNodeId,
+        sourceHandle: null,
+        targetHandle: null,
+        type: 'default',
+        animated: true,
+        style: { stroke: '#60a5fa', strokeWidth: 2 },
+      })),
+    [links]
+  );
+
   const [nodes, setNodes, onNodesChange] = useNodesState(rfNodes);
-  const [edges, , onEdgesChange] = useEdgesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(rfEdges);
 
   // Keep React Flow nodes in sync whenever the board state changes
   useEffect(() => {
     setNodes(rfNodes);
   }, [rfNodes, setNodes]);
 
+  // Keep React Flow edges in sync whenever links change
+  useEffect(() => {
+    setEdges(rfEdges);
+  }, [rfEdges, setEdges]);
+
   // On drag stop: convert pixel position back to grid coordinates and dispatch
-  const onNodeDragStop: OnNodeDrag<Node<DomainEventNodeData>> = useCallback(
+  const onNodeDragStop: OnNodeDrag<Node<DomainEventNodeData | CommandNodeData>> = useCallback(
     (_event, node) => {
       const { column, row } = pixelToGrid(node.position.x, node.position.y);
       moveNode(node.id, column, row);
@@ -103,7 +134,7 @@ function GridCanvasInner() {
         />
         <Controls position="bottom-right" />
         <MiniMap
-          nodeColor="#f59e0b"
+          nodeColor={(node) => node.type === 'command' ? '#3b82f6' : '#f59e0b'}
           maskColor="rgba(15,15,25,0.7)"
           position="bottom-left"
         />
