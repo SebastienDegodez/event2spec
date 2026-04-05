@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 import { GridBoard } from '../domain/GridBoard';
+import { type BoardNodeVisitor } from '../domain/BoardNodeVisitor';
 import { DomainEventNode } from '../domain/DomainEventNode';
 import { CommandNode } from '../domain/CommandNode';
 import { ReadModelNode } from '../domain/ReadModelNode';
@@ -76,22 +77,25 @@ function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink> }
 }
 
 function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>): void {
-  const nodes: PersistedNode[] = board.toArray().map((node) => {
-    const pos = node.gridPosition();
-    if (node instanceof CommandNode) {
-      return { id: node.id, label: node.label, column: pos.column, row: pos.row, type: 'command' };
-    }
-    if (node instanceof ReadModelNode) {
-      return { id: node.id, label: node.label, column: pos.column, row: pos.row, type: 'readModel' };
-    }
-    if (node instanceof PolicyNode) {
-      return { id: node.id, label: node.label, column: pos.column, row: pos.row, type: 'policy' };
-    }
-    if (node instanceof UIScreenNode) {
-      return { id: node.id, label: node.label, column: pos.column, row: pos.row, type: 'uiScreen' };
-    }
-    return { id: node.id, label: node.label, column: pos.column, row: pos.row, type: 'domainEvent' };
-  });
+  const nodes: PersistedNode[] = [];
+  const visitor: BoardNodeVisitor = {
+    visitDomainEventNode(id, label, column, row) {
+      nodes.push({ id, label, column, row, type: 'domainEvent' });
+    },
+    visitCommandNode(id, label, column, row) {
+      nodes.push({ id, label, column, row, type: 'command' });
+    },
+    visitReadModelNode(id, label, column, row) {
+      nodes.push({ id, label, column, row, type: 'readModel' });
+    },
+    visitPolicyNode(id, label, column, row) {
+      nodes.push({ id, label, column, row, type: 'policy' });
+    },
+    visitUIScreenNode(id, label, column, row) {
+      nodes.push({ id, label, column, row, type: 'uiScreen' });
+    },
+  };
+  board.accept(visitor);
   localStorage.setItem(STORAGE_KEY, JSON.stringify({ nodes, links }));
 }
 

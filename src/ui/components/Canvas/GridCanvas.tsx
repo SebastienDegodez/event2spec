@@ -16,10 +16,7 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import { useBoard, useBoardActions, useLinks } from '../../../core/store/useBoardStore';
-import { CommandNode as CommandNodeDomain } from '../../../core/domain/CommandNode';
-import { ReadModelNode as ReadModelNodeDomain } from '../../../core/domain/ReadModelNode';
-import { PolicyNode as PolicyNodeDomain } from '../../../core/domain/PolicyNode';
-import { UIScreenNode as UIScreenNodeDomain } from '../../../core/domain/UIScreenNode';
+import { type BoardNodeVisitor } from '../../../core/domain/BoardNodeVisitor';
 import { DomainEventNode, type DomainEventNodeData } from './DomainEventNode';
 import { CommandNodeComponent, type CommandNodeData } from './CommandNodeComponent';
 import { ReadModelNodeComponent, type ReadModelNodeData } from './ReadModelNodeComponent';
@@ -44,31 +41,27 @@ function GridCanvasInner() {
   const { screenToFlowPosition } = useReactFlow();
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
 
-  // Map domain nodes to React Flow nodes (column/row to x/y pixels)
+  // Map domain nodes to React Flow nodes via visitor (column/row to x/y pixels)
   const reactFlowNodes = useMemo<Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData>[]>(
-    () =>
-      board.toArray().map((domainNode) => {
-        const gridPosition = domainNode.gridPosition();
-        const position = domainNodeToPixelPosition(gridPosition);
-        const nodeData = {
-          label: domainNode.label,
-          column: gridPosition.column,
-          row: gridPosition.row,
-        };
-        if (domainNode instanceof CommandNodeDomain) {
-          return { id: domainNode.id, type: 'command', position, data: nodeData, style: { width: NOTE_SIZE, height: NOTE_SIZE } };
-        }
-        if (domainNode instanceof ReadModelNodeDomain) {
-          return { id: domainNode.id, type: 'readModel', position, data: nodeData, style: { width: NOTE_SIZE, height: NOTE_SIZE } };
-        }
-        if (domainNode instanceof PolicyNodeDomain) {
-          return { id: domainNode.id, type: 'policy', position, data: nodeData, style: { width: NOTE_SIZE, height: NOTE_SIZE } };
-        }
-        if (domainNode instanceof UIScreenNodeDomain) {
-          return { id: domainNode.id, type: 'uiScreen', position, data: nodeData, style: { width: NOTE_SIZE, height: NOTE_SIZE } };
-        }
-        return { id: domainNode.id, type: 'domainEvent', position, data: nodeData, style: { width: NOTE_SIZE, height: NOTE_SIZE } };
-      }),
+    () => {
+      const result: Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData>[] = [];
+
+      const createFlowNode = (id: string, label: string, column: number, row: number, type: string) => {
+        const position = domainNodeToPixelPosition({ column, row });
+        result.push({ id, type, position, data: { label, column, row }, style: { width: NOTE_SIZE, height: NOTE_SIZE } });
+      };
+
+      const visitor: BoardNodeVisitor = {
+        visitDomainEventNode(id, label, column, row) { createFlowNode(id, label, column, row, 'domainEvent'); },
+        visitCommandNode(id, label, column, row) { createFlowNode(id, label, column, row, 'command'); },
+        visitReadModelNode(id, label, column, row) { createFlowNode(id, label, column, row, 'readModel'); },
+        visitPolicyNode(id, label, column, row) { createFlowNode(id, label, column, row, 'policy'); },
+        visitUIScreenNode(id, label, column, row) { createFlowNode(id, label, column, row, 'uiScreen'); },
+      };
+
+      board.accept(visitor);
+      return result;
+    },
     [board]
   );
 

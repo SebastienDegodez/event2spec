@@ -1,9 +1,5 @@
 import { GridBoard } from '../../../domain/GridBoard';
-import { DomainEventNode } from '../../../domain/DomainEventNode';
-import { CommandNode } from '../../../domain/CommandNode';
-import { ReadModelNode } from '../../../domain/ReadModelNode';
-import { PolicyNode } from '../../../domain/PolicyNode';
-import { UIScreenNode } from '../../../domain/UIScreenNode';
+import { type BoardNodeVisitor } from '../../../domain/BoardNodeVisitor';
 import { ExportMarkdownQuery } from './ExportMarkdownQuery';
 
 interface NodeLink {
@@ -11,16 +7,30 @@ interface NodeLink {
   eventNodeId: string;
 }
 
+interface NamedEntry {
+  id: string;
+  label: string;
+}
+
 export class ExportMarkdownQueryHandler {
   handle(board: GridBoard, links: ReadonlyArray<NodeLink>, query: ExportMarkdownQuery): string {
     void query;
-    const nodes = board.toArray();
 
-    const domainEvents = nodes.filter((node) => node instanceof DomainEventNode);
-    const commands = nodes.filter((node) => node instanceof CommandNode);
-    const readModels = nodes.filter((node) => node instanceof ReadModelNode);
-    const policies = nodes.filter((node) => node instanceof PolicyNode);
-    const uiScreens = nodes.filter((node) => node instanceof UIScreenNode);
+    const domainEvents: NamedEntry[] = [];
+    const commands: NamedEntry[] = [];
+    const readModels: NamedEntry[] = [];
+    const policies: NamedEntry[] = [];
+    const uiScreens: NamedEntry[] = [];
+
+    const visitor: BoardNodeVisitor = {
+      visitDomainEventNode(id, label) { domainEvents.push({ id, label }); },
+      visitCommandNode(id, label) { commands.push({ id, label }); },
+      visitReadModelNode(id, label) { readModels.push({ id, label }); },
+      visitPolicyNode(id, label) { policies.push({ id, label }); },
+      visitUIScreenNode(id, label) { uiScreens.push({ id, label }); },
+    };
+
+    board.accept(visitor);
 
     const commandLinks = new Map<string, string>(
       links.map((link) => [link.commandNodeId, link.eventNodeId])
@@ -40,8 +50,8 @@ export class ExportMarkdownQueryHandler {
     if (domainEvents.length === 0) {
       lines.push('*(No domain events defined yet)*');
     } else {
-      domainEvents.forEach((node) => {
-        lines.push(`- **${node.label}** (id: \`${node.id}\`)`);
+      domainEvents.forEach((entry) => {
+        lines.push(`- **${entry.label}** (id: \`${entry.id}\`)`);
       });
     }
 
@@ -50,10 +60,10 @@ export class ExportMarkdownQueryHandler {
     if (commands.length === 0) {
       lines.push('*(No commands defined yet)*');
     } else {
-      commands.forEach((node) => {
-        const resultingEvent = commandLinks.get(node.id);
+      commands.forEach((entry) => {
+        const resultingEvent = commandLinks.get(entry.id);
         const trigger = resultingEvent ? ` → triggers \`${resultingEvent}\`` : '';
-        lines.push(`- **${node.label}** (id: \`${node.id}\`)${trigger}`);
+        lines.push(`- **${entry.label}** (id: \`${entry.id}\`)${trigger}`);
       });
     }
 
@@ -62,8 +72,8 @@ export class ExportMarkdownQueryHandler {
     if (readModels.length === 0) {
       lines.push('*(No read models defined yet)*');
     } else {
-      readModels.forEach((node) => {
-        lines.push(`- **${node.label}** (id: \`${node.id}\`)`);
+      readModels.forEach((entry) => {
+        lines.push(`- **${entry.label}** (id: \`${entry.id}\`)`);
       });
     }
 
@@ -72,8 +82,8 @@ export class ExportMarkdownQueryHandler {
     if (policies.length === 0) {
       lines.push('*(No policies defined yet)*');
     } else {
-      policies.forEach((node) => {
-        lines.push(`- **${node.label}** (id: \`${node.id}\`)`);
+      policies.forEach((entry) => {
+        lines.push(`- **${entry.label}** (id: \`${entry.id}\`)`);
       });
     }
 
@@ -82,8 +92,8 @@ export class ExportMarkdownQueryHandler {
     if (uiScreens.length === 0) {
       lines.push('*(No UI screens defined yet)*');
     } else {
-      uiScreens.forEach((node) => {
-        lines.push(`- **${node.label}** (id: \`${node.id}\`)`);
+      uiScreens.forEach((entry) => {
+        lines.push(`- **${entry.label}** (id: \`${entry.id}\`)`);
       });
     }
 

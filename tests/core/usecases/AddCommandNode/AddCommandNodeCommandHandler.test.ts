@@ -1,11 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { GridBoard } from '../../../../src/core/domain/GridBoard';
-import { GridPosition } from '../../../../src/core/domain/GridPosition';
-import { CommandNode } from '../../../../src/core/domain/CommandNode';
 import { AddNodeCommand } from '../../../../src/core/usecases/commands/AddNode/AddNodeCommand';
 import { AddNodeCommandHandler } from '../../../../src/core/usecases/commands/AddNode/AddNodeCommandHandler';
 import { AddCommandNodeCommand } from '../../../../src/core/usecases/commands/AddCommandNode/AddCommandNodeCommand';
 import { AddCommandNodeCommandHandler } from '../../../../src/core/usecases/commands/AddCommandNode/AddCommandNodeCommandHandler';
+import { collectNodes } from '../../../helpers/collectNodes';
 
 const addEventHandler = new AddNodeCommandHandler();
 const handler = new AddCommandNodeCommandHandler();
@@ -15,12 +14,13 @@ describe('AddCommandNodeCommandHandler', () => {
     const board = GridBoard.empty();
     const result = handler.handle(board, new AddCommandNodeCommand('c1', 'PlaceOrder', 2, 0, 'e1'));
 
-    const nodes = result.toArray();
+    const nodes = collectNodes(result);
     const placed = nodes[0];
 
     expect(nodes).toHaveLength(1);
-    expect(placed.isAt(new GridPosition(2, 0))).toBe(true);
-    expect(placed).toBeInstanceOf(CommandNode);
+    expect(placed.column).toBe(2);
+    expect(placed.row).toBe(0);
+    expect(placed.type).toBe('command');
     expect(placed.label).toBe('PlaceOrder');
   });
 
@@ -31,15 +31,17 @@ describe('AddCommandNodeCommandHandler', () => {
     );
 
     const result = handler.handle(board, new AddCommandNodeCommand('c1', 'PlaceOrder', 2, 0, 'e1'));
-    const nodes = result.toArray();
+    const nodes = collectNodes(result);
 
     const event = nodes.find((n) => n.id === 'e1');
     const command = nodes.find((n) => n.id === 'c1');
 
     expect(nodes).toHaveLength(2);
-    expect(event?.isAt(new GridPosition(2, 1))).toBe(true);
-    expect(command?.isAt(new GridPosition(2, 0))).toBe(true);
-    expect(command).toBeInstanceOf(CommandNode);
+    expect(event?.column).toBe(2);
+    expect(event?.row).toBe(1);
+    expect(command?.column).toBe(2);
+    expect(command?.row).toBe(0);
+    expect(command?.type).toBe('command');
   });
 
   it('shifts existing nodes in the same row when inserting at an occupied position', () => {
@@ -49,13 +51,15 @@ describe('AddCommandNodeCommandHandler', () => {
     );
 
     const result = handler.handle(board, new AddCommandNodeCommand('c2', 'New', 2, 0, 'e2'));
-    const nodes = result.toArray();
+    const nodes = collectNodes(result);
 
     const existing = nodes.find((n) => n.id === 'c1');
     const inserted = nodes.find((n) => n.id === 'c2');
 
-    expect(existing?.isAt(new GridPosition(3, 0))).toBe(true);
-    expect(inserted?.isAt(new GridPosition(2, 0))).toBe(true);
+    expect(existing?.column).toBe(3);
+    expect(existing?.row).toBe(0);
+    expect(inserted?.column).toBe(2);
+    expect(inserted?.row).toBe(0);
   });
 
   it('does not mutate the original board', () => {
@@ -65,6 +69,6 @@ describe('AddCommandNodeCommandHandler', () => {
     );
     handler.handle(board, new AddCommandNodeCommand('c2', 'Y', 0, 0, 'e2'));
 
-    expect(board.toArray()).toHaveLength(1);
+    expect(collectNodes(board)).toHaveLength(1);
   });
 });

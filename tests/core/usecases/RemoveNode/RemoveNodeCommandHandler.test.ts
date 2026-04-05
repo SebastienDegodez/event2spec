@@ -4,6 +4,7 @@ import { AddNodeCommand } from '../../../../src/core/usecases/commands/AddNode/A
 import { AddNodeCommandHandler } from '../../../../src/core/usecases/commands/AddNode/AddNodeCommandHandler';
 import { RemoveNodeCommand } from '../../../../src/core/usecases/commands/RemoveNode/RemoveNodeCommand';
 import { RemoveNodeCommandHandler } from '../../../../src/core/usecases/commands/RemoveNode/RemoveNodeCommandHandler';
+import { collectNodes } from '../../../helpers/collectNodes';
 
 const addHandler = new AddNodeCommandHandler();
 const handler = new RemoveNodeCommandHandler();
@@ -16,7 +17,7 @@ describe('RemoveNodeCommandHandler', () => {
     ].reduce((b, cmd) => addHandler.handle(b, cmd), GridBoard.empty());
 
     const result = handler.handle(board, new RemoveNodeCommand('remove'));
-    const nodes = result.toArray();
+    const nodes = collectNodes(result);
 
     expect(nodes).toHaveLength(1);
     expect(nodes[0].id).toBe('keep');
@@ -27,6 +28,6 @@ describe('RemoveNodeCommandHandler', () => {
 
     const result = handler.handle(board, new RemoveNodeCommand('unknown'));
 
-    expect(result.toArray()).toHaveLength(1);
+    expect(collectNodes(result)).toHaveLength(1);
   });
 });

@@ -1,9 +1,5 @@
 import { GridBoard } from '../../../domain/GridBoard';
-import { DomainEventNode } from '../../../domain/DomainEventNode';
-import { CommandNode } from '../../../domain/CommandNode';
-import { ReadModelNode } from '../../../domain/ReadModelNode';
-import { PolicyNode } from '../../../domain/PolicyNode';
-import { UIScreenNode } from '../../../domain/UIScreenNode';
+import { type BoardNodeVisitor } from '../../../domain/BoardNodeVisitor';
 import { type EventModel, type DomainEventEntry, type CommandEntry, type ReadModelEntry, type PolicyEntry, type UIScreenEntry } from '../../../domain/EventModelSchema';
 import { ExportJSONQuery } from './ExportJSONQuery';
 
@@ -15,64 +11,69 @@ interface NodeLink {
 export class ExportJSONQueryHandler {
   handle(board: GridBoard, links: ReadonlyArray<NodeLink>, query: ExportJSONQuery): string {
     void query;
-    const nodes = board.toArray();
 
-    const domainEvents: DomainEventEntry[] = nodes
-      .filter((node) => node instanceof DomainEventNode)
-      .map((node) => ({
-        id: node.id,
-        name: node.label,
-        swimlaneId: '',
-        triggeredBy: '',
-        data: {},
-        timelinePosition: node.gridPosition().column,
-      }));
+    const domainEvents: DomainEventEntry[] = [];
+    const commands: CommandEntry[] = [];
+    const readModels: ReadModelEntry[] = [];
+    const policies: PolicyEntry[] = [];
+    const uiScreens: UIScreenEntry[] = [];
 
     const commandLinks = new Map<string, string>(
       links.map((link) => [link.commandNodeId, link.eventNodeId])
     );
 
-    const commands: CommandEntry[] = nodes
-      .filter((node) => node instanceof CommandNode)
-      .map((node) => ({
-        id: node.id,
-        name: node.label,
-        actor: '',
-        payload: {},
-        resultingEvents: commandLinks.has(node.id) ? [commandLinks.get(node.id)!] : [],
-        guardConditions: [],
-      }));
+    const visitor: BoardNodeVisitor = {
+      visitDomainEventNode(id, label, column) {
+        domainEvents.push({
+          id,
+          name: label,
+          swimlaneId: '',
+          triggeredBy: '',
+          data: {},
+          timelinePosition: column,
+        });
+      },
+      visitCommandNode(id, label) {
+        commands.push({
+          id,
+          name: label,
+          actor: '',
+          payload: {},
+          resultingEvents: commandLinks.has(id) ? [commandLinks.get(id)!] : [],
+          guardConditions: [],
+        });
+      },
+      visitReadModelNode(id, label) {
+        readModels.push({
+          id,
+          name: label,
+          fedBy: [],
+          consumedBy: '',
+          data: {},
+        });
+      },
+      visitPolicyNode(id, label) {
+        policies.push({
+          id,
+          name: label,
+          whenEvent: '',
+          thenCommand: '',
+          condition: '',
+        });
+      },
+      visitUIScreenNode(id, label, column) {
+        uiScreens.push({
+          id,
+          name: label,
+          description: '',
+          triggersCommand: '',
+          displaysReadModel: '',
+          timelinePosition: column,
+        });
+      },
+    };
 
-    const readModels: ReadModelEntry[] = nodes
-      .filter((node) => node instanceof ReadModelNode)
-      .map((node) => ({
-        id: node.id,
-        name: node.label,
-        fedBy: [],
-        consumedBy: '',
-        data: {},
-      }));
-
-    const policies: PolicyEntry[] = nodes
-      .filter((node) => node instanceof PolicyNode)
-      .map((node) => ({
-        id: node.id,
-        name: node.label,
-        whenEvent: '',
-        thenCommand: '',
-        condition: '',
-      }));
-
-    const uiScreens: UIScreenEntry[] = nodes
-      .filter((node) => node instanceof UIScreenNode)
-      .map((node) => ({
-        id: node.id,
-        name: node.label,
-        description: '',
-        triggersCommand: '',
-        displaysReadModel: '',
-        timelinePosition: node.gridPosition().column,
-      }));
+    board.accept(visitor);
 
     const model: EventModel = {
       name: 'Event Model',

@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { GridBoard } from '../../../../src/core/domain/GridBoard';
-import { GridPosition } from '../../../../src/core/domain/GridPosition';
 import { AddNodeCommand } from '../../../../src/core/usecases/commands/AddNode/AddNodeCommand';
 import { AddNodeCommandHandler } from '../../../../src/core/usecases/commands/AddNode/AddNodeCommandHandler';
 import { MoveNodeCommand } from '../../../../src/core/usecases/commands/MoveNode/MoveNodeCommand';
 import { MoveNodeCommandHandler } from '../../../../src/core/usecases/commands/MoveNode/MoveNodeCommandHandler';
+import { collectNodes } from '../../../helpers/collectNodes';
 
 const addHandler = new AddNodeCommandHandler();
 const handler = new MoveNodeCommandHandler();
@@ -14,10 +14,11 @@ describe('MoveNodeCommandHandler', () => {
     const board = addHandler.handle(GridBoard.empty(), new AddNodeCommand('a', 'A', 0, 0));
 
     const result = handler.handle(board, new MoveNodeCommand('a', 2, 1));
-    const nodes = result.toArray();
+    const nodes = collectNodes(result);
     const moved = nodes.find((n) => n.id === 'a');
 
-    expect(moved?.isAt(new GridPosition(2, 1))).toBe(true);
+    expect(moved?.column).toBe(2);
+    expect(moved?.row).toBe(1);
   });
 
   it('resolves collisions when moving to an occupied position', () => {
@@ -27,13 +28,15 @@ describe('MoveNodeCommandHandler', () => {
     ].reduce((b, cmd) => addHandler.handle(b, cmd), GridBoard.empty());
 
     const result = handler.handle(board, new MoveNodeCommand('a', 1, 0));
-    const nodes = result.toArray();
+    const nodes = collectNodes(result);
 
     const nodeA = nodes.find((n) => n.id === 'a');
     const nodeB = nodes.find((n) => n.id === 'b');
 
-    expect(nodeA?.isAt(new GridPosition(1, 0))).toBe(true);
-    expect(nodeB?.isAt(new GridPosition(2, 0))).toBe(true);
+    expect(nodeA?.column).toBe(1);
+    expect(nodeA?.row).toBe(0);
+    expect(nodeB?.column).toBe(2);
+    expect(nodeB?.row).toBe(0);
   });
 
   it('does not shift nodes when moving to an unoccupied position on the same row', () => {
@@ -43,13 +46,15 @@ describe('MoveNodeCommandHandler', () => {
     ].reduce((b, cmd) => addHandler.handle(b, cmd), GridBoard.empty());
 
     const result = handler.handle(board, new MoveNodeCommand('a', 1, 0));
-    const nodes = result.toArray();
+    const nodes = collectNodes(result);
 
     const nodeA = nodes.find((n) => n.id === 'a');
     const nodeB = nodes.find((n) => n.id === 'b');
 
-    expect(nodeA?.isAt(new GridPosition(1, 0))).toBe(true);
-    expect(nodeB?.isAt(new GridPosition(2, 0))).toBe(true);
+    expect(nodeA?.column).toBe(1);
+    expect(nodeA?.row).toBe(0);
+    expect(nodeB?.column).toBe(2);
+    expect(nodeB?.row).toBe(0);
   });
 
   it('leaves the board unchanged when moving an unknown id', () => {
@@ -57,6 +62,6 @@ describe('MoveNodeCommandHandler', () => {
 
     const result = handler.handle(board, new MoveNodeCommand('unknown', 1, 0));
 
-    expect(result.toArray()).toHaveLength(1);
+    expect(collectNodes(result)).toHaveLength(1);
   });
 });

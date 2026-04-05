@@ -1,4 +1,5 @@
 import { BoardNode } from './BoardNode';
+import type { BoardNodeVisitor } from './BoardNodeVisitor';
 import { GridPosition } from './GridPosition';
 
 export class ReadModelNode extends BoardNode {
@@ -8,6 +9,11 @@ export class ReadModelNode extends BoardNode {
 
   static create(id: string, label: string, column: number, row: number): ReadModelNode {
     return new ReadModelNode(id, label, new GridPosition(column, row));
+  }
+
+  accept(visitor: BoardNodeVisitor): void {
+    const position = this.gridPosition();
+    visitor.visitReadModelNode(this.id, this.label, position.column, position.row);
   }
 
   shiftRight(): ReadModelNode {

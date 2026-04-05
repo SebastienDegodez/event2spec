@@ -4,6 +4,7 @@ import { AddNodeCommand } from '../../../../src/core/usecases/commands/AddNode/A
 import { AddNodeCommandHandler } from '../../../../src/core/usecases/commands/AddNode/AddNodeCommandHandler';
 import { UpdateNodeLabelCommand } from '../../../../src/core/usecases/commands/UpdateNodeLabel/UpdateNodeLabelCommand';
 import { UpdateNodeLabelCommandHandler } from '../../../../src/core/usecases/commands/UpdateNodeLabel/UpdateNodeLabelCommandHandler';
+import { collectNodes } from '../../../helpers/collectNodes';
 
 const addHandler = new AddNodeCommandHandler();
 const handler = new UpdateNodeLabelCommandHandler();
@@ -13,7 +14,7 @@ describe('UpdateNodeLabelCommandHandler', () => {
     const board = addHandler.handle(GridBoard.empty(), new AddNodeCommand('n1', 'OldLabel', 0, 0));
 
     const result = handler.handle(board, new UpdateNodeLabelCommand('n1', 'NewLabel'));
-    const nodes = result.toArray();
+    const nodes = collectNodes(result);
     const updated = nodes[0];
 
     expect(updated.label).toBe('NewLabel');
@@ -26,7 +27,7 @@ describe('UpdateNodeLabelCommandHandler', () => {
     ].reduce((b, cmd) => addHandler.handle(b, cmd), GridBoard.empty());
 
     const result = handler.handle(board, new UpdateNodeLabelCommand('n1', 'Updated'));
-    const nodes = result.toArray();
+    const nodes = collectNodes(result);
 
     const n1 = nodes.find((n) => n.id === 'n1');
     const n2 = nodes.find((n) => n.id === 'n2');
