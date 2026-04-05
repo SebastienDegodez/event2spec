@@ -46,7 +46,7 @@ function GridCanvasInner() {
     () => {
       const result: Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData>[] = [];
 
-      const createFlowNode = (id: string, label: string, column: number, row: number, type: string) => {
+      const createFlowNode = (id: string, label: string, column: number, row: number, type: 'domainEvent' | 'command' | 'readModel' | 'policy' | 'uiScreen') => {
         const position = domainNodeToPixelPosition({ column, row });
         result.push({ id, type, position, data: { label, column, row }, style: { width: NOTE_SIZE, height: NOTE_SIZE } });
       };
