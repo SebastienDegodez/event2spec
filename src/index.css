@@ -19,6 +19,18 @@
   --note-blue-light: #93c5fd;
   --note-shadow-command-selected: 0 0 0 2px #3b82f6, 0 8px 32px rgba(59, 130, 246, 0.35);
 
+  --note-green: #22c55e;
+  --note-green-dark: #16a34a;
+  --note-shadow-read-model-selected: 0 0 0 2px #22c55e, 0 8px 32px rgba(34, 197, 94, 0.35);
+
+  --note-purple: #a855f7;
+  --note-purple-dark: #9333ea;
+  --note-shadow-policy-selected: 0 0 0 2px #a855f7, 0 8px 32px rgba(168, 85, 247, 0.35);
+
+  --note-yellow: #eab308;
+  --note-yellow-dark: #ca8a04;
+  --note-shadow-ui-screen-selected: 0 0 0 2px #eab308, 0 8px 32px rgba(234, 179, 8, 0.35);
+
   --accent: #f59e0b;
   --accent-dim: rgba(245, 158, 11, 0.18);
   --text-muted: rgba(255, 255, 255, 0.38);

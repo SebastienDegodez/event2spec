@@ -1,4 +1,6 @@
 import { GridCanvas } from './ui/components/Canvas/GridCanvas';
+import { ExportToolbar } from './ui/components/Toolbar/ExportToolbar';
+import { NodePalette } from './ui/components/Toolbar/NodePalette';
 import './App.css';
 
 export default function App() {
@@ -10,12 +12,16 @@ export default function App() {
           <span className="logo-text">event<strong>2spec</strong></span>
         </div>
         <div className="app-hint">
-          Right-click to add a Domain Event · Click + to add a Command · Click label to edit · Drag to reposition
+          Right-click · Double-click to add · Click + to add Command · Double-click label to edit · Drag to move
         </div>
+        <ExportToolbar />
       </header>
-      <main className="app-canvas">
-        <GridCanvas />
-      </main>
+      <div className="app-workspace">
+        <NodePalette />
+        <main className="app-canvas">
+          <GridCanvas />
+        </main>
+      </div>
     </div>
   );
 }
