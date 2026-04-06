@@ -1,4 +1,4 @@
-import type { BoardNodeVisitor } from './BoardNodeVisitor';
+import type { BoardProjection } from './BoardProjection';
 import { GridPosition } from './GridPosition';
 
 export abstract class BoardNode {
@@ -32,7 +32,7 @@ export abstract class BoardNode {
     return this.occupiesSameRowAtOrBeyond(incoming.gridPosition());
   }
 
-  abstract accept(visitor: BoardNodeVisitor): void;
+  abstract describeTo(projection: BoardProjection): void;
 
   abstract shiftRight(): BoardNode;
 

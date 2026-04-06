@@ -1,5 +1,5 @@
 import { GridBoard } from '../../../domain/GridBoard';
-import { type BoardNodeVisitor } from '../../../domain/BoardNodeVisitor';
+import { type BoardProjection } from '../../../domain/BoardProjection';
 import { ExportMarkdownQuery } from './ExportMarkdownQuery';
 
 interface NodeLink {
@@ -22,15 +22,15 @@ export class ExportMarkdownQueryHandler {
     const policies: NamedEntry[] = [];
     const uiScreens: NamedEntry[] = [];
 
-    const visitor: BoardNodeVisitor = {
-      visitDomainEventNode(id, label) { domainEvents.push({ id, label }); },
-      visitCommandNode(id, label) { commands.push({ id, label }); },
-      visitReadModelNode(id, label) { readModels.push({ id, label }); },
-      visitPolicyNode(id, label) { policies.push({ id, label }); },
-      visitUIScreenNode(id, label) { uiScreens.push({ id, label }); },
+    const projection: BoardProjection = {
+      onDomainEventNode(id, label) { domainEvents.push({ id, label }); },
+      onCommandNode(id, label) { commands.push({ id, label }); },
+      onReadModelNode(id, label) { readModels.push({ id, label }); },
+      onPolicyNode(id, label) { policies.push({ id, label }); },
+      onUIScreenNode(id, label) { uiScreens.push({ id, label }); },
     };
 
-    board.accept(visitor);
+    board.describeTo(projection);
 
     const commandLinks = new Map<string, string>(
       links.map((link) => [link.commandNodeId, link.eventNodeId])

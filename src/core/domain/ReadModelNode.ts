@@ -1,5 +1,5 @@
 import { BoardNode } from './BoardNode';
-import type { BoardNodeVisitor } from './BoardNodeVisitor';
+import type { BoardProjection } from './BoardProjection';
 import { GridPosition } from './GridPosition';
 
 export class ReadModelNode extends BoardNode {
@@ -11,9 +11,9 @@ export class ReadModelNode extends BoardNode {
     return new ReadModelNode(id, label, new GridPosition(column, row));
   }
 
-  accept(visitor: BoardNodeVisitor): void {
+  describeTo(projection: BoardProjection): void {
     const position = this.gridPosition();
-    visitor.visitReadModelNode(this.id, this.label, position.column, position.row);
+    projection.onReadModelNode(this.id, this.label, position.column, position.row);
   }
 
   shiftRight(): ReadModelNode {

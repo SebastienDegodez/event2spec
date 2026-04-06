@@ -1,5 +1,5 @@
 import { BoardNode } from './BoardNode';
-import type { BoardNodeVisitor } from './BoardNodeVisitor';
+import type { BoardProjection } from './BoardProjection';
 import { GridPosition } from './GridPosition';
 
 export class CommandNode extends BoardNode {
@@ -11,9 +11,9 @@ export class CommandNode extends BoardNode {
     return new CommandNode(id, label, new GridPosition(column, row));
   }
 
-  accept(visitor: BoardNodeVisitor): void {
+  describeTo(projection: BoardProjection): void {
     const position = this.gridPosition();
-    visitor.visitCommandNode(this.id, this.label, position.column, position.row);
+    projection.onCommandNode(this.id, this.label, position.column, position.row);
   }
 
   shiftRight(): CommandNode {

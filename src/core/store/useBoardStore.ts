@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 import { GridBoard } from '../domain/GridBoard';
-import { type BoardNodeVisitor } from '../domain/BoardNodeVisitor';
+import { type BoardProjection } from '../domain/BoardProjection';
 import { DomainEventNode } from '../domain/DomainEventNode';
 import { CommandNode } from '../domain/CommandNode';
 import { ReadModelNode } from '../domain/ReadModelNode';
@@ -78,24 +78,24 @@ function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink> }
 
 function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>): void {
   const nodes: PersistedNode[] = [];
-  const visitor: BoardNodeVisitor = {
-    visitDomainEventNode(id, label, column, row) {
+  const projection: BoardProjection = {
+    onDomainEventNode(id, label, column, row) {
       nodes.push({ id, label, column, row, type: 'domainEvent' });
     },
-    visitCommandNode(id, label, column, row) {
+    onCommandNode(id, label, column, row) {
       nodes.push({ id, label, column, row, type: 'command' });
     },
-    visitReadModelNode(id, label, column, row) {
+    onReadModelNode(id, label, column, row) {
       nodes.push({ id, label, column, row, type: 'readModel' });
     },
-    visitPolicyNode(id, label, column, row) {
+    onPolicyNode(id, label, column, row) {
       nodes.push({ id, label, column, row, type: 'policy' });
     },
-    visitUIScreenNode(id, label, column, row) {
+    onUIScreenNode(id, label, column, row) {
       nodes.push({ id, label, column, row, type: 'uiScreen' });
     },
   };
-  board.accept(visitor);
+  board.describeTo(projection);
   localStorage.setItem(STORAGE_KEY, JSON.stringify({ nodes, links }));
 }
 

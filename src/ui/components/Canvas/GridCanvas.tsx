@@ -16,7 +16,7 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import { useBoard, useBoardActions, useLinks } from '../../../core/store/useBoardStore';
-import { type BoardNodeVisitor } from '../../../core/domain/BoardNodeVisitor';
+import { type BoardProjection } from '../../../core/domain/BoardProjection';
 import { DomainEventNode, type DomainEventNodeData } from './DomainEventNode';
 import { CommandNodeComponent, type CommandNodeData } from './CommandNodeComponent';
 import { ReadModelNodeComponent, type ReadModelNodeData } from './ReadModelNodeComponent';
@@ -51,15 +51,15 @@ function GridCanvasInner() {
         result.push({ id, type, position, data: { label, column, row }, style: { width: NOTE_SIZE, height: NOTE_SIZE } });
       };
 
-      const visitor: BoardNodeVisitor = {
-        visitDomainEventNode(id, label, column, row) { createFlowNode(id, label, column, row, 'domainEvent'); },
-        visitCommandNode(id, label, column, row) { createFlowNode(id, label, column, row, 'command'); },
-        visitReadModelNode(id, label, column, row) { createFlowNode(id, label, column, row, 'readModel'); },
-        visitPolicyNode(id, label, column, row) { createFlowNode(id, label, column, row, 'policy'); },
-        visitUIScreenNode(id, label, column, row) { createFlowNode(id, label, column, row, 'uiScreen'); },
+      const projection: BoardProjection = {
+        onDomainEventNode(id, label, column, row) { createFlowNode(id, label, column, row, 'domainEvent'); },
+        onCommandNode(id, label, column, row) { createFlowNode(id, label, column, row, 'command'); },
+        onReadModelNode(id, label, column, row) { createFlowNode(id, label, column, row, 'readModel'); },
+        onPolicyNode(id, label, column, row) { createFlowNode(id, label, column, row, 'policy'); },
+        onUIScreenNode(id, label, column, row) { createFlowNode(id, label, column, row, 'uiScreen'); },
       };
 
-      board.accept(visitor);
+      board.describeTo(projection);
       return result;
     },
     [board]

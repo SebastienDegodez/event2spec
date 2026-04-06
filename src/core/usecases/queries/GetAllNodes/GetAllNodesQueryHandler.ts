@@ -1,10 +1,10 @@
 import { GridBoard } from '../../../domain/GridBoard';
-import type { BoardNodeVisitor } from '../../../domain/BoardNodeVisitor';
+import type { BoardProjection } from '../../../domain/BoardProjection';
 import { GetAllNodesQuery } from './GetAllNodesQuery';
 
 export class GetAllNodesQueryHandler {
-  handle(board: GridBoard, visitor: BoardNodeVisitor, query: GetAllNodesQuery): void {
+  handle(board: GridBoard, projection: BoardProjection, query: GetAllNodesQuery): void {
     void query;
-    board.accept(visitor);
+    board.describeTo(projection);
   }
 }

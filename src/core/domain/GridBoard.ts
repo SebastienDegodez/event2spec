@@ -1,5 +1,5 @@
 import { BoardNode } from './BoardNode';
-import type { BoardNodeVisitor } from './BoardNodeVisitor';
+import type { BoardProjection } from './BoardProjection';
 import { GridPosition } from './GridPosition';
 
 export class GridBoard {
@@ -43,9 +43,9 @@ export class GridBoard {
     ));
   }
 
-  accept(visitor: BoardNodeVisitor): void {
+  describeTo(projection: BoardProjection): void {
     for (const node of this.nodes) {
-      node.accept(visitor);
+      node.describeTo(projection);
     }
   }
 

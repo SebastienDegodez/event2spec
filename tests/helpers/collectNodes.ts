@@ -1,5 +1,5 @@
 import { GridBoard } from '../../src/core/domain/GridBoard';
-import { type BoardNodeVisitor } from '../../src/core/domain/BoardNodeVisitor';
+import { type BoardProjection } from '../../src/core/domain/BoardProjection';
 
 export interface CollectedNode {
   id: string;
@@ -11,23 +11,23 @@ export interface CollectedNode {
 
 export function collectNodes(board: GridBoard): CollectedNode[] {
   const nodes: CollectedNode[] = [];
-  const visitor: BoardNodeVisitor = {
-    visitDomainEventNode(id, label, column, row) {
+  const projection: BoardProjection = {
+    onDomainEventNode(id, label, column, row) {
       nodes.push({ id, label, column, row, type: 'domainEvent' });
     },
-    visitCommandNode(id, label, column, row) {
+    onCommandNode(id, label, column, row) {
       nodes.push({ id, label, column, row, type: 'command' });
     },
-    visitReadModelNode(id, label, column, row) {
+    onReadModelNode(id, label, column, row) {
       nodes.push({ id, label, column, row, type: 'readModel' });
     },
-    visitPolicyNode(id, label, column, row) {
+    onPolicyNode(id, label, column, row) {
       nodes.push({ id, label, column, row, type: 'policy' });
     },
-    visitUIScreenNode(id, label, column, row) {
+    onUIScreenNode(id, label, column, row) {
       nodes.push({ id, label, column, row, type: 'uiScreen' });
     },
   };
-  board.accept(visitor);
+  board.describeTo(projection);
   return nodes;
 }

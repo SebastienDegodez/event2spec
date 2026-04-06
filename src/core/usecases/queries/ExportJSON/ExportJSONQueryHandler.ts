@@ -1,5 +1,5 @@
 import { GridBoard } from '../../../domain/GridBoard';
-import { type BoardNodeVisitor } from '../../../domain/BoardNodeVisitor';
+import { type BoardProjection } from '../../../domain/BoardProjection';
 import { type EventModel, type DomainEventEntry, type CommandEntry, type ReadModelEntry, type PolicyEntry, type UIScreenEntry } from '../../../domain/EventModelSchema';
 import { ExportJSONQuery } from './ExportJSONQuery';
 
@@ -22,8 +22,8 @@ export class ExportJSONQueryHandler {
       links.map((link) => [link.commandNodeId, link.eventNodeId])
     );
 
-    const visitor: BoardNodeVisitor = {
-      visitDomainEventNode(id, label, column) {
+    const projection: BoardProjection = {
+      onDomainEventNode(id, label, column) {
         domainEvents.push({
           id,
           name: label,
@@ -33,7 +33,7 @@ export class ExportJSONQueryHandler {
           timelinePosition: column,
         });
       },
-      visitCommandNode(id, label) {
+      onCommandNode(id, label) {
         commands.push({
           id,
           name: label,
@@ -43,7 +43,7 @@ export class ExportJSONQueryHandler {
           guardConditions: [],
         });
       },
-      visitReadModelNode(id, label) {
+      onReadModelNode(id, label) {
         readModels.push({
           id,
           name: label,
@@ -52,7 +52,7 @@ export class ExportJSONQueryHandler {
           data: {},
         });
       },
-      visitPolicyNode(id, label) {
+      onPolicyNode(id, label) {
         policies.push({
           id,
           name: label,
@@ -61,7 +61,7 @@ export class ExportJSONQueryHandler {
           condition: '',
         });
       },
-      visitUIScreenNode(id, label, column) {
+      onUIScreenNode(id, label, column) {
         uiScreens.push({
           id,
           name: label,
@@ -73,7 +73,7 @@ export class ExportJSONQueryHandler {
       },
     };
 
-    board.accept(visitor);
+    board.describeTo(projection);
 
     const model: EventModel = {
       name: 'Event Model',

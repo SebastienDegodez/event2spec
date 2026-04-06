@@ -1,5 +1,5 @@
 import { BoardNode } from './BoardNode';
-import type { BoardNodeVisitor } from './BoardNodeVisitor';
+import type { BoardProjection } from './BoardProjection';
 import { GridPosition } from './GridPosition';
 
 export class PolicyNode extends BoardNode {
@@ -11,9 +11,9 @@ export class PolicyNode extends BoardNode {
     return new PolicyNode(id, label, new GridPosition(column, row));
   }
 
-  accept(visitor: BoardNodeVisitor): void {
+  describeTo(projection: BoardProjection): void {
     const position = this.gridPosition();
-    visitor.visitPolicyNode(this.id, this.label, position.column, position.row);
+    projection.onPolicyNode(this.id, this.label, position.column, position.row);
   }
 
   shiftRight(): PolicyNode {
