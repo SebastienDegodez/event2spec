@@ -2,10 +2,11 @@ import { GridBoard } from '../../../domain/GridBoard';
 import { type BoardProjection } from '../../../domain/BoardProjection';
 import { type EventModel, type DomainEventEntry, type CommandEntry, type ReadModelEntry, type PolicyEntry, type UIScreenEntry } from '../../../domain/EventModelSchema';
 import { type NodeLink } from '../../../domain/NodeLink';
+import { SwimlaneCollection } from '../../../domain/SwimlaneCollection';
 import { ExportJSONQuery } from './ExportJSONQuery';
 
 export class ExportJSONQueryHandler {
-  handle(board: GridBoard, links: ReadonlyArray<NodeLink>, query: ExportJSONQuery): string {
+  handle(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlanes: SwimlaneCollection, query: ExportJSONQuery): string {
     void query;
 
     const domainEvents: DomainEventEntry[] = [];
@@ -90,12 +91,19 @@ export class ExportJSONQueryHandler {
 
     board.describeTo(projection);
 
+    const exportedSwimlanes: EventModel['swimlanes'] = [];
+    swimlanes.describeTo({
+      onSwimlane(id, actorName, _actorType, color, index) {
+        exportedSwimlanes.push({ id, actorName, order: index, color });
+      },
+    });
+
     const model: EventModel = {
       name: 'Event Model',
       version: '1.0.0',
       description: '',
       actors: [],
-      swimlanes: [],
+      swimlanes: exportedSwimlanes,
       domainEvents,
       commands,
       readModels,

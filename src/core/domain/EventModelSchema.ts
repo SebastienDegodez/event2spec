@@ -1,8 +1,7 @@
-/** Type of actor in the system. */
-export type ActorType = 'human' | 'internal_system' | 'external_system' | 'automated_process';
-
-/** Type of swimlane (corresponds to actor color convention). */
-export type SwimlaneColor = 'yellow' | 'blue' | 'red' | 'grey';
+import type { ActorType } from './ActorType';
+import type { SwimlaneColor } from './SwimlaneColor';
+export type { ActorType } from './ActorType';
+export type { SwimlaneColor } from './SwimlaneColor';
 
 /** An actor or system participant in the event model. */
 export interface Actor {
