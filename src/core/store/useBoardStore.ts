@@ -27,12 +27,11 @@ import { ExportJSONQuery } from '../usecases/queries/ExportJSON/ExportJSONQuery'
 import { ExportJSONQueryHandler } from '../usecases/queries/ExportJSON/ExportJSONQueryHandler';
 import { ExportMarkdownQuery } from '../usecases/queries/ExportMarkdown/ExportMarkdownQuery';
 import { ExportMarkdownQueryHandler } from '../usecases/queries/ExportMarkdown/ExportMarkdownQueryHandler';
+import { type NodeLink } from '../domain/NodeLink';
+import { type ConnectionType } from '../domain/ConnectionType';
 
-/** A directed link from a command node to the domain event it triggers. */
-export interface NodeLink {
-  commandNodeId: string;
-  eventNodeId: string;
-}
+export type { NodeLink };
+export type { ConnectionType };
 
 /** Serialisable representation of a node for localStorage persistence. */
 interface PersistedNode {
@@ -55,7 +54,8 @@ function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink> }
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return { board: GridBoard.empty(), links: [] };
-    const { nodes, links } = JSON.parse(raw) as PersistedState;
+    const parsed = JSON.parse(raw) as PersistedState;
+    const { nodes } = parsed;
     let board = GridBoard.empty();
     for (const node of nodes) {
       if (node.type === 'domainEvent') {
@@ -70,6 +70,13 @@ function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink> }
         board = board.insertNode(UIScreenNode.create(node.id, node.label, node.column, node.row));
       }
     }
+    const rawLinks = parsed.links as Array<NodeLink | { commandNodeId: string; eventNodeId: string }>;
+    const links: NodeLink[] = rawLinks.map((link) => {
+      if ('commandNodeId' in link) {
+        return { sourceNodeId: link.commandNodeId, targetNodeId: link.eventNodeId, connectionType: 'triggers' as const };
+      }
+      return link as NodeLink;
+    });
     return { board, links };
   } catch {
     return { board: GridBoard.empty(), links: [] };
@@ -121,6 +128,10 @@ interface BoardActions {
   updateLabel: (id: string, label: string) => void;
   /** Remove a node from the board. */
   removeNode: (id: string) => void;
+  /** Add a directed, typed link between two nodes. */
+  addLink: (sourceNodeId: string, targetNodeId: string, connectionType: ConnectionType) => void;
+  /** Remove a link by its source and target node ids. */
+  removeLink: (sourceNodeId: string, targetNodeId: string) => void;
   /** Export the current board as a JSON string conforming to the EventModel schema. */
   exportJSON: () => string;
   /** Export the current board as a Markdown string conforming to the event-modeling skill format. */
@@ -154,7 +165,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
   addCommandNode: (id, label, column, row, linkedEventId) =>
     set((state) => {
       const board = addCommandNodeHandler.handle(state.board, new AddCommandNodeCommand(id, label, column, row, linkedEventId));
-      const links = [...state.links, { commandNodeId: id, eventNodeId: linkedEventId }];
+      const links = [...state.links, { sourceNodeId: id, targetNodeId: linkedEventId, connectionType: 'triggers' as const }];
       saveToStorage(board, links);
       return { board, links };
     }),
@@ -197,9 +208,29 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
   removeNode: (id) =>
     set((state) => {
       const board = removeNodeHandler.handle(state.board, new RemoveNodeCommand(id));
-      const links = state.links.filter((link) => link.commandNodeId !== id && link.eventNodeId !== id);
+      const links = state.links.filter((link) => link.sourceNodeId !== id && link.targetNodeId !== id);
       saveToStorage(board, links);
       return { board, links };
+    }),
+
+  addLink: (sourceNodeId, targetNodeId, connectionType) =>
+    set((state) => {
+      const alreadyExists = state.links.some(
+        (link) => link.sourceNodeId === sourceNodeId && link.targetNodeId === targetNodeId
+      );
+      if (alreadyExists) return state;
+      const links = [...state.links, { sourceNodeId, targetNodeId, connectionType }];
+      saveToStorage(state.board, links);
+      return { links };
+    }),
+
+  removeLink: (sourceNodeId, targetNodeId) =>
+    set((state) => {
+      const links = state.links.filter(
+        (link) => !(link.sourceNodeId === sourceNodeId && link.targetNodeId === targetNodeId)
+      );
+      saveToStorage(state.board, links);
+      return { links };
     }),
 
   exportJSON: () => {
@@ -228,6 +259,8 @@ export const useBoardActions = () =>
       moveNode: state.moveNode,
       updateLabel: state.updateLabel,
       removeNode: state.removeNode,
+      addLink: state.addLink,
+      removeLink: state.removeLink,
       exportJSON: state.exportJSON,
       exportMarkdown: state.exportMarkdown,
     }))

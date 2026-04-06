@@ -1,11 +1,7 @@
 import { GridBoard } from '../../../domain/GridBoard';
 import { type BoardProjection } from '../../../domain/BoardProjection';
+import { type NodeLink } from '../../../domain/NodeLink';
 import { ExportMarkdownQuery } from './ExportMarkdownQuery';
-
-interface NodeLink {
-  commandNodeId: string;
-  eventNodeId: string;
-}
 
 interface NamedEntry {
   id: string;
@@ -32,9 +28,29 @@ export class ExportMarkdownQueryHandler {
 
     board.describeTo(projection);
 
-    const commandLinks = new Map<string, string>(
-      links.map((link) => [link.commandNodeId, link.eventNodeId])
+    const triggersLinks = new Map<string, string>(
+      links.filter((l) => l.connectionType === 'triggers').map((l) => [l.sourceNodeId, l.targetNodeId])
     );
+    const feedsLinks = new Map<string, string[]>();
+    const policyEventLinks = new Map<string, string>();
+    const policyCommandLinks = new Map<string, string>();
+    const uiScreenCommandLinks = new Map<string, string>();
+    const readModelScreenLinks = new Map<string, string>();
+
+    for (const link of links) {
+      if (link.connectionType === 'feeds') {
+        const existing = feedsLinks.get(link.targetNodeId) ?? [];
+        feedsLinks.set(link.targetNodeId, [...existing, link.sourceNodeId]);
+      } else if (link.connectionType === 'triggers policy') {
+        policyEventLinks.set(link.targetNodeId, link.sourceNodeId);
+      } else if (link.connectionType === 'executes') {
+        policyCommandLinks.set(link.sourceNodeId, link.targetNodeId);
+      } else if (link.connectionType === 'user action') {
+        uiScreenCommandLinks.set(link.sourceNodeId, link.targetNodeId);
+      } else if (link.connectionType === 'displays') {
+        readModelScreenLinks.set(link.sourceNodeId, link.targetNodeId);
+      }
+    }
 
     const lines: string[] = [
       '# Event Model',
@@ -61,7 +77,7 @@ export class ExportMarkdownQueryHandler {
       lines.push('*(No commands defined yet)*');
     } else {
       commands.forEach((entry) => {
-        const resultingEvent = commandLinks.get(entry.id);
+        const resultingEvent = triggersLinks.get(entry.id);
         const trigger = resultingEvent ? ` → triggers \`${resultingEvent}\`` : '';
         lines.push(`- **${entry.label}** (id: \`${entry.id}\`)${trigger}`);
       });
@@ -73,7 +89,9 @@ export class ExportMarkdownQueryHandler {
       lines.push('*(No read models defined yet)*');
     } else {
       readModels.forEach((entry) => {
-        lines.push(`- **${entry.label}** (id: \`${entry.id}\`)`);
+        const sources = feedsLinks.get(entry.id);
+        const fedBy = sources && sources.length > 0 ? ` ← fed by ${sources.map((s) => `\`${s}\``).join(', ')}` : '';
+        lines.push(`- **${entry.label}** (id: \`${entry.id}\`)${fedBy}`);
       });
     }
 
@@ -83,7 +101,11 @@ export class ExportMarkdownQueryHandler {
       lines.push('*(No policies defined yet)*');
     } else {
       policies.forEach((entry) => {
-        lines.push(`- **${entry.label}** (id: \`${entry.id}\`)`);
+        const whenEvent = policyEventLinks.get(entry.id);
+        const thenCommand = policyCommandLinks.get(entry.id);
+        const when = whenEvent ? ` when \`${whenEvent}\`` : '';
+        const then = thenCommand ? ` → executes \`${thenCommand}\`` : '';
+        lines.push(`- **${entry.label}** (id: \`${entry.id}\`)${when}${then}`);
       });
     }
 
@@ -93,7 +115,9 @@ export class ExportMarkdownQueryHandler {
       lines.push('*(No UI screens defined yet)*');
     } else {
       uiScreens.forEach((entry) => {
-        lines.push(`- **${entry.label}** (id: \`${entry.id}\`)`);
+        const triggersCommand = uiScreenCommandLinks.get(entry.id);
+        const action = triggersCommand ? ` → user action \`${triggersCommand}\`` : '';
+        lines.push(`- **${entry.label}** (id: \`${entry.id}\`)${action}`);
       });
     }
 
