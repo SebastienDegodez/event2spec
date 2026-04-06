@@ -3,6 +3,8 @@ import { GridBoard } from '../../../../src/core/domain/GridBoard';
 import { DomainEventNode } from '../../../../src/core/domain/DomainEventNode';
 import { CommandNode } from '../../../../src/core/domain/CommandNode';
 import { ReadModelNode } from '../../../../src/core/domain/ReadModelNode';
+import { PolicyNode } from '../../../../src/core/domain/PolicyNode';
+import { UIScreenNode } from '../../../../src/core/domain/UIScreenNode';
 import { ExportMarkdownQuery } from '../../../../src/core/usecases/queries/ExportMarkdown/ExportMarkdownQuery';
 import { ExportMarkdownQueryHandler } from '../../../../src/core/usecases/queries/ExportMarkdown/ExportMarkdownQueryHandler';
 
@@ -38,7 +40,7 @@ describe('ExportMarkdownQueryHandler', () => {
     const board = GridBoard.empty()
       .insertNode(DomainEventNode.create('e1', 'OrderPlaced', 0, 0))
       .insertNode(CommandNode.create('c1', 'PlaceOrder', 0, 1));
-    const links = [{ commandNodeId: 'c1', eventNodeId: 'e1' }];
+    const links = [{ sourceNodeId: 'c1', targetNodeId: 'e1', connectionType: 'triggers' as const }];
 
     const result = handler.handle(board, links, new ExportMarkdownQuery());
 
@@ -46,7 +48,48 @@ describe('ExportMarkdownQueryHandler', () => {
     expect(result).toContain('e1');
   });
 
-  it('lists read model names', () => {
+  it('lists read model names with fed-by sources from feeds links', () => {
+    const board = GridBoard.empty()
+      .insertNode(DomainEventNode.create('e1', 'OrderPlaced', 0, 0))
+      .insertNode(ReadModelNode.create('rm1', 'Order Summary', 1, 0));
+    const links = [{ sourceNodeId: 'e1', targetNodeId: 'rm1', connectionType: 'feeds' as const }];
+
+    const result = handler.handle(board, links, new ExportMarkdownQuery());
+
+    expect(result).toContain('Order Summary');
+    expect(result).toContain('e1');
+  });
+
+  it('lists policies with their triggering event and executed command', () => {
+    const board = GridBoard.empty()
+      .insertNode(DomainEventNode.create('e1', 'OrderPlaced', 0, 0))
+      .insertNode(PolicyNode.create('p1', 'AutoConfirm', 1, 0))
+      .insertNode(CommandNode.create('c1', 'ConfirmOrder', 2, 0));
+    const links = [
+      { sourceNodeId: 'e1', targetNodeId: 'p1', connectionType: 'triggers policy' as const },
+      { sourceNodeId: 'p1', targetNodeId: 'c1', connectionType: 'executes' as const },
+    ];
+
+    const result = handler.handle(board, links, new ExportMarkdownQuery());
+
+    expect(result).toContain('AutoConfirm');
+    expect(result).toContain('e1');
+    expect(result).toContain('c1');
+  });
+
+  it('lists UI screens with their triggered command', () => {
+    const board = GridBoard.empty()
+      .insertNode(UIScreenNode.create('ui1', 'Order Form', 0, 0))
+      .insertNode(CommandNode.create('c1', 'PlaceOrder', 1, 0));
+    const links = [{ sourceNodeId: 'ui1', targetNodeId: 'c1', connectionType: 'user action' as const }];
+
+    const result = handler.handle(board, links, new ExportMarkdownQuery());
+
+    expect(result).toContain('Order Form');
+    expect(result).toContain('c1');
+  });
+
+  it('lists read models', () => {
     const board = GridBoard.empty().insertNode(
       ReadModelNode.create('rm1', 'Order Summary', 0, 0)
     );

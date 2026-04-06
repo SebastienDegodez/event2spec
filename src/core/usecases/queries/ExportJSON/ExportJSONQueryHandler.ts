@@ -1,12 +1,8 @@
 import { GridBoard } from '../../../domain/GridBoard';
 import { type BoardProjection } from '../../../domain/BoardProjection';
 import { type EventModel, type DomainEventEntry, type CommandEntry, type ReadModelEntry, type PolicyEntry, type UIScreenEntry } from '../../../domain/EventModelSchema';
+import { type NodeLink } from '../../../domain/NodeLink';
 import { ExportJSONQuery } from './ExportJSONQuery';
-
-interface NodeLink {
-  commandNodeId: string;
-  eventNodeId: string;
-}
 
 export class ExportJSONQueryHandler {
   handle(board: GridBoard, links: ReadonlyArray<NodeLink>, query: ExportJSONQuery): string {
@@ -18,9 +14,28 @@ export class ExportJSONQueryHandler {
     const policies: PolicyEntry[] = [];
     const uiScreens: UIScreenEntry[] = [];
 
-    const commandLinks = new Map<string, string>(
-      links.map((link) => [link.commandNodeId, link.eventNodeId])
+    const triggersLinks = new Map<string, string>(
+      links.filter((l) => l.connectionType === 'triggers').map((l) => [l.sourceNodeId, l.targetNodeId])
     );
+    const feedsLinks = new Map<string, string[]>();
+    const policyCommandLinks = new Map<string, string>();
+    const uiScreenCommandLinks = new Map<string, string>();
+    const readModelScreenLinks = new Map<string, string>();
+
+    for (const link of links) {
+      if (link.connectionType === 'feeds') {
+        const existing = feedsLinks.get(link.targetNodeId) ?? [];
+        feedsLinks.set(link.targetNodeId, [...existing, link.sourceNodeId]);
+      } else if (link.connectionType === 'executes') {
+        policyCommandLinks.set(link.sourceNodeId, link.targetNodeId);
+      } else if (link.connectionType === 'user action') {
+        uiScreenCommandLinks.set(link.sourceNodeId, link.targetNodeId);
+      } else if (link.connectionType === 'displays') {
+        readModelScreenLinks.set(link.sourceNodeId, link.targetNodeId);
+      } else if (link.connectionType === 'triggers policy') {
+        // tracked separately if needed
+      }
+    }
 
     const projection: BoardProjection = {
       onDomainEventNode(id, label, column) {
@@ -39,7 +54,7 @@ export class ExportJSONQueryHandler {
           name: label,
           actor: '',
           payload: {},
-          resultingEvents: commandLinks.has(id) ? [commandLinks.get(id)!] : [],
+          resultingEvents: triggersLinks.has(id) ? [triggersLinks.get(id)!] : [],
           guardConditions: [],
         });
       },
@@ -47,8 +62,8 @@ export class ExportJSONQueryHandler {
         readModels.push({
           id,
           name: label,
-          fedBy: [],
-          consumedBy: '',
+          fedBy: feedsLinks.get(id) ?? [],
+          consumedBy: readModelScreenLinks.get(id) ?? '',
           data: {},
         });
       },
@@ -57,7 +72,7 @@ export class ExportJSONQueryHandler {
           id,
           name: label,
           whenEvent: '',
-          thenCommand: '',
+          thenCommand: policyCommandLinks.get(id) ?? '',
           condition: '',
         });
       },
@@ -66,7 +81,7 @@ export class ExportJSONQueryHandler {
           id,
           name: label,
           description: '',
-          triggersCommand: '',
+          triggersCommand: uiScreenCommandLinks.get(id) ?? '',
           displaysReadModel: '',
           timelinePosition: column,
         });

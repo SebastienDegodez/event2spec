@@ -3,6 +3,8 @@ import { GridBoard } from '../../../../src/core/domain/GridBoard';
 import { DomainEventNode } from '../../../../src/core/domain/DomainEventNode';
 import { CommandNode } from '../../../../src/core/domain/CommandNode';
 import { ReadModelNode } from '../../../../src/core/domain/ReadModelNode';
+import { PolicyNode } from '../../../../src/core/domain/PolicyNode';
+import { UIScreenNode } from '../../../../src/core/domain/UIScreenNode';
 import { ExportJSONQuery } from '../../../../src/core/usecases/queries/ExportJSON/ExportJSONQuery';
 import { ExportJSONQueryHandler } from '../../../../src/core/usecases/queries/ExportJSON/ExportJSONQueryHandler';
 
@@ -36,11 +38,11 @@ describe('ExportJSONQueryHandler', () => {
     expect(model.domainEvents[0].timelinePosition).toBe(2);
   });
 
-  it('exports commands with resultingEvents from links', () => {
+  it('exports commands with resultingEvents from triggers links', () => {
     const board = GridBoard.empty()
       .insertNode(DomainEventNode.create('e1', 'OrderPlaced', 2, 0))
       .insertNode(CommandNode.create('c1', 'PlaceOrder', 2, 1));
-    const links = [{ commandNodeId: 'c1', eventNodeId: 'e1' }];
+    const links = [{ sourceNodeId: 'c1', targetNodeId: 'e1', connectionType: 'triggers' as const }];
 
     const result = handler.handle(board, links, new ExportJSONQuery());
     const model = JSON.parse(result);
@@ -48,6 +50,42 @@ describe('ExportJSONQueryHandler', () => {
     expect(model.commands).toHaveLength(1);
     expect(model.commands[0].id).toBe('c1');
     expect(model.commands[0].resultingEvents).toContain('e1');
+  });
+
+  it('exports read models with fedBy from feeds links', () => {
+    const board = GridBoard.empty()
+      .insertNode(DomainEventNode.create('e1', 'OrderPlaced', 2, 0))
+      .insertNode(ReadModelNode.create('rm1', 'Order Summary', 3, 0));
+    const links = [{ sourceNodeId: 'e1', targetNodeId: 'rm1', connectionType: 'feeds' as const }];
+
+    const result = handler.handle(board, links, new ExportJSONQuery());
+    const model = JSON.parse(result);
+
+    expect(model.readModels[0].fedBy).toContain('e1');
+  });
+
+  it('exports policies with thenCommand from executes links', () => {
+    const board = GridBoard.empty()
+      .insertNode(PolicyNode.create('p1', 'AutoConfirm', 3, 0))
+      .insertNode(CommandNode.create('c1', 'ConfirmOrder', 4, 0));
+    const links = [{ sourceNodeId: 'p1', targetNodeId: 'c1', connectionType: 'executes' as const }];
+
+    const result = handler.handle(board, links, new ExportJSONQuery());
+    const model = JSON.parse(result);
+
+    expect(model.policies[0].thenCommand).toBe('c1');
+  });
+
+  it('exports UI screens with triggersCommand from user action links', () => {
+    const board = GridBoard.empty()
+      .insertNode(UIScreenNode.create('ui1', 'Order Form', 1, 0))
+      .insertNode(CommandNode.create('c1', 'PlaceOrder', 2, 1));
+    const links = [{ sourceNodeId: 'ui1', targetNodeId: 'c1', connectionType: 'user action' as const }];
+
+    const result = handler.handle(board, links, new ExportJSONQuery());
+    const model = JSON.parse(result);
+
+    expect(model.uiScreens[0].triggersCommand).toBe('c1');
   });
 
   it('exports read models', () => {

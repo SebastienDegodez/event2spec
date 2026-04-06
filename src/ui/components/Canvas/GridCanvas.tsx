@@ -12,11 +12,16 @@ import {
   type Node,
   type Edge,
   type OnNodeDrag,
+  type Connection,
+  type OnEdgesChange,
+  applyEdgeChanges,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 import { useBoard, useBoardActions, useLinks } from '../../../core/store/useBoardStore';
 import { type BoardProjection } from '../../../core/domain/BoardProjection';
+import { type NodeKind } from '../../../core/domain/NodeKind';
+import { resolveConnectionType } from '../../../core/domain/resolveConnectionType';
 import { DomainEventNode, type DomainEventNodeData } from './DomainEventNode';
 import { CommandNodeComponent, type CommandNodeData } from './CommandNodeComponent';
 import { ReadModelNodeComponent, type ReadModelNodeData } from './ReadModelNodeComponent';
@@ -37,7 +42,7 @@ const nodeTypes = {
 function GridCanvasInner() {
   const board = useBoard();
   const links = useLinks();
-  const { addDomainEventNode, moveNode } = useBoardActions();
+  const { addDomainEventNode, moveNode, addLink, removeLink } = useBoardActions();
   const { screenToFlowPosition } = useReactFlow();
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
 
@@ -69,20 +74,23 @@ function GridCanvasInner() {
   const reactFlowEdges = useMemo<Edge[]>(
     () =>
       links.map((link) => ({
-        id: `edge-${link.commandNodeId}-${link.eventNodeId}`,
-        source: link.commandNodeId,
-        target: link.eventNodeId,
+        id: `edge-${link.sourceNodeId}-${link.targetNodeId}`,
+        source: link.sourceNodeId,
+        target: link.targetNodeId,
         sourceHandle: null,
         targetHandle: null,
         type: 'default',
         animated: true,
+        label: link.connectionType,
         style: { stroke: EDGE_COLOR, strokeWidth: 2 },
+        labelStyle: { fill: '#fff', fontWeight: 600, fontSize: 11 },
+        labelBgStyle: { fill: 'rgba(30,30,40,0.75)', rx: 4 },
       })),
     [links]
   );
 
   const [nodes, setNodes, onNodesChange] = useNodesState(reactFlowNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(reactFlowEdges);
+  const [edges, setEdges] = useEdgesState(reactFlowEdges);
 
   // Keep React Flow nodes in sync whenever the board state changes
   useEffect(() => {
@@ -93,6 +101,43 @@ function GridCanvasInner() {
   useEffect(() => {
     setEdges(reactFlowEdges);
   }, [reactFlowEdges, setEdges]);
+
+  const onEdgesChange: OnEdgesChange = useCallback(
+    (changes) => {
+      const deletions = changes.filter((c) => c.type === 'remove');
+      deletions.forEach((c) => {
+        if (c.type !== 'remove') return;
+        const edge = edges.find((e) => e.id === c.id);
+        if (edge) removeLink(edge.source, edge.target);
+      });
+      setEdges((eds) => applyEdgeChanges(changes, eds));
+    },
+    [edges, removeLink, setEdges]
+  );
+
+  const isValidConnection = useCallback(
+    (connection: Connection) => {
+      if (!connection.source || !connection.target) return false;
+      const sourceNode = nodes.find((n) => n.id === connection.source);
+      const targetNode = nodes.find((n) => n.id === connection.target);
+      if (!sourceNode?.type || !targetNode?.type) return false;
+      return resolveConnectionType(sourceNode.type as NodeKind, targetNode.type as NodeKind) !== null;
+    },
+    [nodes]
+  );
+
+  const onConnect = useCallback(
+    (connection: Connection) => {
+      if (!connection.source || !connection.target) return;
+      const sourceNode = nodes.find((n) => n.id === connection.source);
+      const targetNode = nodes.find((n) => n.id === connection.target);
+      if (!sourceNode?.type || !targetNode?.type) return;
+      const connectionType = resolveConnectionType(sourceNode.type as NodeKind, targetNode.type as NodeKind);
+      if (!connectionType) return;
+      addLink(connection.source, connection.target, connectionType);
+    },
+    [nodes, addLink]
+  );
 
   // On drag stop: convert pixel position back to grid coordinates and dispatch
   const onNodeDragStop: OnNodeDrag<Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData>> = useCallback(
@@ -177,6 +222,8 @@ function GridCanvasInner() {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        isValidConnection={isValidConnection}
         onNodeDragStop={onNodeDragStop}
         onNodeContextMenu={onNodeContextMenu}
         onPaneContextMenu={onPaneContextMenu}
