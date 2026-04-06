@@ -283,7 +283,8 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
   addSwimlane: (id, actorName, actorType) =>
     set((state) => {
-      const swimlanes = addSwimlaneHandler.handle(state.swimlanes, new AddSwimlaneCommand(id, actorName, actorType));
+      const swimlane = addSwimlaneHandler.handle(new AddSwimlaneCommand(id, actorName, actorType));
+      const swimlanes = state.swimlanes.add(swimlane);
       saveToStorage(state.board, state.links, swimlanes);
       return { swimlanes };
     }),
