@@ -2,11 +2,12 @@ import { GridBoard } from '../../../domain/GridBoard';
 import { type BoardProjection } from '../../../domain/BoardProjection';
 import { type EventModel, type DomainEventEntry, type CommandEntry, type ReadModelEntry, type PolicyEntry, type UIScreenEntry } from '../../../domain/EventModelSchema';
 import { type NodeLink } from '../../../domain/NodeLink';
+import { type NodeProperties } from '../../../domain/NodeProperties';
 import { SwimlaneCollection } from '../../../domain/SwimlaneCollection';
 import { ExportJSONQuery } from './ExportJSONQuery';
 
 export class ExportJSONQueryHandler {
-  handle(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlanes: SwimlaneCollection, query: ExportJSONQuery): string {
+  handle(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlanes: SwimlaneCollection, nodeProperties: Record<string, NodeProperties>, query: ExportJSONQuery): string {
     void query;
 
     const domainEvents: DomainEventEntry[] = [];
@@ -40,48 +41,53 @@ export class ExportJSONQueryHandler {
 
     const projection: BoardProjection = {
       onDomainEventNode(id, label, column) {
+        const props = nodeProperties[id];
         domainEvents.push({
           id,
           name: label,
           swimlaneId: '',
           triggeredBy: '',
-          data: {},
+          data: props?.type === 'domainEvent' ? props.data : {},
           timelinePosition: column,
         });
       },
       onCommandNode(id, label) {
+        const props = nodeProperties[id];
         commands.push({
           id,
           name: label,
-          actor: '',
-          payload: {},
+          actor: props?.type === 'command' ? props.actor : '',
+          payload: props?.type === 'command' ? props.payload : {},
           resultingEvents: triggersLinks.has(id) ? [triggersLinks.get(id)!] : [],
-          guardConditions: [],
+          guardConditions: props?.type === 'command' ? props.guardConditions : [],
         });
       },
       onReadModelNode(id, label) {
+        const props = nodeProperties[id];
         readModels.push({
           id,
           name: label,
           fedBy: feedsLinks.get(id) ?? [],
-          consumedBy: readModelScreenLinks.get(id) ?? '',
-          data: {},
+          consumedBy: props?.type === 'readModel' ? props.consumedBy : readModelScreenLinks.get(id) ?? '',
+          data: props?.type === 'readModel' ? props.data : {},
         });
       },
       onPolicyNode(id, label) {
+        const props = nodeProperties[id];
         policies.push({
           id,
           name: label,
           whenEvent: '',
           thenCommand: policyCommandLinks.get(id) ?? '',
-          condition: '',
+          condition: props?.type === 'policy' ? props.condition : '',
         });
       },
       onUIScreenNode(id, label, column) {
+        const props = nodeProperties[id];
         uiScreens.push({
           id,
           name: label,
-          description: '',
+          description: props?.type === 'uiScreen' ? props.description : '',
           triggersCommand: uiScreenCommandLinks.get(id) ?? '',
           displaysReadModel: '',
           timelinePosition: column,
