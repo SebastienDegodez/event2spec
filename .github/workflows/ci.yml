@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   check-skip:
     name: Check if CI should run
@@ -21,7 +24,7 @@ jobs:
         run: |
           COMMIT_MSG=$(git log -1 --format="%s")
           echo "Commit message: $COMMIT_MSG"
-          if echo "$COMMIT_MSG" | grep -iqE "^init(ial)? plan$"; then
+          if echo "$COMMIT_MSG" | grep -iqE "^init(ial)? plan\s*$"; then
             echo "skip=true" >> $GITHUB_OUTPUT
           else
             echo "skip=false" >> $GITHUB_OUTPUT
