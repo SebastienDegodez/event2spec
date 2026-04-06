@@ -214,6 +214,8 @@ function GridCanvasInner() {
   // Double-click on the pane: create a new Domain Event at the clicked grid cell
   const onPaneDoubleClick = useCallback(
     (event: React.MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (target.closest('.react-flow__node')) return;
       const flowPosition = screenToFlowPosition({ x: event.clientX, y: event.clientY });
       const { column, row } = pixelToGrid(flowPosition.x, flowPosition.y);
       addDomainEventNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
