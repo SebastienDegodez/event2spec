@@ -1,8 +1,15 @@
-import { SwimlaneCollection } from '../../../domain/SwimlaneCollection';
+import { type SwimlaneRepository } from '../../../domain/SwimlaneRepository';
 import { ReorderSwimlanesCommand } from './ReorderSwimlanesCommand';
 
 export class ReorderSwimlanesCommandHandler {
-  handle(collection: SwimlaneCollection, command: ReorderSwimlanesCommand): SwimlaneCollection {
-    return collection.reorder(command.id, command.targetIndex);
+  private readonly repository: SwimlaneRepository;
+
+  constructor(repository: SwimlaneRepository) {
+    this.repository = repository;
+  }
+
+  handle(command: ReorderSwimlanesCommand): void {
+    const collection = this.repository.load();
+    this.repository.save(collection.reorder(command.id, command.targetIndex));
   }
 }

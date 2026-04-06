@@ -8,6 +8,7 @@ import { ReadModelNode } from '../domain/ReadModelNode';
 import { PolicyNode } from '../domain/PolicyNode';
 import { UIScreenNode } from '../domain/UIScreenNode';
 import { SwimlaneCollection } from '../domain/SwimlaneCollection';
+import { type SwimlaneRepository } from '../domain/SwimlaneRepository';
 import { type ActorType } from '../domain/ActorType';
 import { AddDomainEventNodeCommand } from '../usecases/commands/AddDomainEventNode/AddDomainEventNodeCommand';
 import { AddDomainEventNodeCommandHandler } from '../usecases/commands/AddDomainEventNode/AddDomainEventNodeCommandHandler';
@@ -188,144 +189,141 @@ const addUIScreenNodeHandler = new AddUIScreenNodeCommandHandler();
 const moveNodeHandler = new MoveNodeCommandHandler();
 const updateLabelHandler = new UpdateNodeLabelCommandHandler();
 const removeNodeHandler = new RemoveNodeCommandHandler();
-const addSwimlaneHandler = new AddSwimlaneCommandHandler();
-const removeSwimlaneHandler = new RemoveSwimlaneCommandHandler();
-const renameSwimlaneHandler = new RenameSwimlaneCommandHandler();
-const reorderSwimlanesHandler = new ReorderSwimlanesCommandHandler();
-const changeSwimlaneActorTypeHandler = new ChangeSwimlaneActorTypeCommandHandler();
 const exportJSONHandler = new ExportJSONQueryHandler();
 const exportMarkdownHandler = new ExportMarkdownQueryHandler();
 
 const initialState = loadFromStorage();
 
-export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) => ({
-  board: initialState.board,
-  links: initialState.links,
-  swimlanes: initialState.swimlanes,
+export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) => {
+  const swimlaneRepository: SwimlaneRepository = {
+    load: () => get().swimlanes,
+    save: (swimlanes) => {
+      const { board, links } = get();
+      saveToStorage(board, links, swimlanes);
+      set({ swimlanes });
+    },
+  };
 
-  addDomainEventNode: (id, label, column, row) =>
-    set((state) => {
-      const board = addDomainEventNodeHandler.handle(state.board, new AddDomainEventNodeCommand(id, label, column, row));
-      saveToStorage(board, state.links, state.swimlanes);
-      return { board };
-    }),
+  const addSwimlaneHandler = new AddSwimlaneCommandHandler(swimlaneRepository);
+  const removeSwimlaneHandler = new RemoveSwimlaneCommandHandler(swimlaneRepository);
+  const renameSwimlaneHandler = new RenameSwimlaneCommandHandler(swimlaneRepository);
+  const reorderSwimlanesHandler = new ReorderSwimlanesCommandHandler(swimlaneRepository);
+  const changeSwimlaneActorTypeHandler = new ChangeSwimlaneActorTypeCommandHandler(swimlaneRepository);
 
-  addCommandNode: (id, label, column, row, linkedEventId) =>
-    set((state) => {
-      const board = addCommandNodeHandler.handle(state.board, new AddCommandNodeCommand(id, label, column, row, linkedEventId));
-      const links = [...state.links, { sourceNodeId: id, targetNodeId: linkedEventId, connectionType: 'triggers' as const }];
-      saveToStorage(board, links, state.swimlanes);
-      return { board, links };
-    }),
+  return {
+    board: initialState.board,
+    links: initialState.links,
+    swimlanes: initialState.swimlanes,
 
-  addReadModelNode: (id, label, column, row) =>
-    set((state) => {
-      const board = addReadModelNodeHandler.handle(state.board, new AddReadModelNodeCommand(id, label, column, row));
-      saveToStorage(board, state.links, state.swimlanes);
-      return { board };
-    }),
+    addDomainEventNode: (id, label, column, row) =>
+      set((state) => {
+        const board = addDomainEventNodeHandler.handle(state.board, new AddDomainEventNodeCommand(id, label, column, row));
+        saveToStorage(board, state.links, state.swimlanes);
+        return { board };
+      }),
 
-  addPolicyNode: (id, label, column, row) =>
-    set((state) => {
-      const board = addPolicyNodeHandler.handle(state.board, new AddPolicyNodeCommand(id, label, column, row));
-      saveToStorage(board, state.links, state.swimlanes);
-      return { board };
-    }),
+    addCommandNode: (id, label, column, row, linkedEventId) =>
+      set((state) => {
+        const board = addCommandNodeHandler.handle(state.board, new AddCommandNodeCommand(id, label, column, row, linkedEventId));
+        const links = [...state.links, { sourceNodeId: id, targetNodeId: linkedEventId, connectionType: 'triggers' as const }];
+        saveToStorage(board, links, state.swimlanes);
+        return { board, links };
+      }),
 
-  addUIScreenNode: (id, label, column, row) =>
-    set((state) => {
-      const board = addUIScreenNodeHandler.handle(state.board, new AddUIScreenNodeCommand(id, label, column, row));
-      saveToStorage(board, state.links, state.swimlanes);
-      return { board };
-    }),
+    addReadModelNode: (id, label, column, row) =>
+      set((state) => {
+        const board = addReadModelNodeHandler.handle(state.board, new AddReadModelNodeCommand(id, label, column, row));
+        saveToStorage(board, state.links, state.swimlanes);
+        return { board };
+      }),
 
-  moveNode: (id, column, row) =>
-    set((state) => {
-      const board = moveNodeHandler.handle(state.board, new MoveNodeCommand(id, column, row));
-      saveToStorage(board, state.links, state.swimlanes);
-      return { board };
-    }),
+    addPolicyNode: (id, label, column, row) =>
+      set((state) => {
+        const board = addPolicyNodeHandler.handle(state.board, new AddPolicyNodeCommand(id, label, column, row));
+        saveToStorage(board, state.links, state.swimlanes);
+        return { board };
+      }),
 
-  updateLabel: (id, label) =>
-    set((state) => {
-      const board = updateLabelHandler.handle(state.board, new UpdateNodeLabelCommand(id, label));
-      saveToStorage(board, state.links, state.swimlanes);
-      return { board };
-    }),
+    addUIScreenNode: (id, label, column, row) =>
+      set((state) => {
+        const board = addUIScreenNodeHandler.handle(state.board, new AddUIScreenNodeCommand(id, label, column, row));
+        saveToStorage(board, state.links, state.swimlanes);
+        return { board };
+      }),
 
-  removeNode: (id) =>
-    set((state) => {
-      const board = removeNodeHandler.handle(state.board, new RemoveNodeCommand(id));
-      const links = state.links.filter((link) => link.sourceNodeId !== id && link.targetNodeId !== id);
-      saveToStorage(board, links, state.swimlanes);
-      return { board, links };
-    }),
+    moveNode: (id, column, row) =>
+      set((state) => {
+        const board = moveNodeHandler.handle(state.board, new MoveNodeCommand(id, column, row));
+        saveToStorage(board, state.links, state.swimlanes);
+        return { board };
+      }),
 
-  addLink: (sourceNodeId, targetNodeId, connectionType) =>
-    set((state) => {
-      const alreadyExists = state.links.some(
-        (link) => link.sourceNodeId === sourceNodeId && link.targetNodeId === targetNodeId
-      );
-      if (alreadyExists) return state;
-      const links = [...state.links, { sourceNodeId, targetNodeId, connectionType }];
-      saveToStorage(state.board, links, state.swimlanes);
-      return { links };
-    }),
+    updateLabel: (id, label) =>
+      set((state) => {
+        const board = updateLabelHandler.handle(state.board, new UpdateNodeLabelCommand(id, label));
+        saveToStorage(board, state.links, state.swimlanes);
+        return { board };
+      }),
 
-  removeLink: (sourceNodeId, targetNodeId) =>
-    set((state) => {
-      const links = state.links.filter(
-        (link) => !(link.sourceNodeId === sourceNodeId && link.targetNodeId === targetNodeId)
-      );
-      saveToStorage(state.board, links, state.swimlanes);
-      return { links };
-    }),
+    removeNode: (id) =>
+      set((state) => {
+        const board = removeNodeHandler.handle(state.board, new RemoveNodeCommand(id));
+        const links = state.links.filter((link) => link.sourceNodeId !== id && link.targetNodeId !== id);
+        saveToStorage(board, links, state.swimlanes);
+        return { board, links };
+      }),
 
-  addSwimlane: (id, actorName, actorType) =>
-    set((state) => {
-      const swimlanes = addSwimlaneHandler.handle(state.swimlanes, new AddSwimlaneCommand(id, actorName, actorType));
-      saveToStorage(state.board, state.links, swimlanes);
-      return { swimlanes };
-    }),
+    addLink: (sourceNodeId, targetNodeId, connectionType) =>
+      set((state) => {
+        const alreadyExists = state.links.some(
+          (link) => link.sourceNodeId === sourceNodeId && link.targetNodeId === targetNodeId
+        );
+        if (alreadyExists) return state;
+        const links = [...state.links, { sourceNodeId, targetNodeId, connectionType }];
+        saveToStorage(state.board, links, state.swimlanes);
+        return { links };
+      }),
 
-  removeSwimlane: (id) =>
-    set((state) => {
-      const swimlanes = removeSwimlaneHandler.handle(state.swimlanes, new RemoveSwimlaneCommand(id));
-      saveToStorage(state.board, state.links, swimlanes);
-      return { swimlanes };
-    }),
+    removeLink: (sourceNodeId, targetNodeId) =>
+      set((state) => {
+        const links = state.links.filter(
+          (link) => !(link.sourceNodeId === sourceNodeId && link.targetNodeId === targetNodeId)
+        );
+        saveToStorage(state.board, links, state.swimlanes);
+        return { links };
+      }),
 
-  renameSwimlane: (id, actorName) =>
-    set((state) => {
-      const swimlanes = renameSwimlaneHandler.handle(state.swimlanes, new RenameSwimlaneCommand(id, actorName));
-      saveToStorage(state.board, state.links, swimlanes);
-      return { swimlanes };
-    }),
+    addSwimlane: (id, actorName, actorType) => {
+      addSwimlaneHandler.handle(new AddSwimlaneCommand(id, actorName, actorType));
+    },
 
-  reorderSwimlanes: (id, targetIndex) =>
-    set((state) => {
-      const swimlanes = reorderSwimlanesHandler.handle(state.swimlanes, new ReorderSwimlanesCommand(id, targetIndex));
-      saveToStorage(state.board, state.links, swimlanes);
-      return { swimlanes };
-    }),
+    removeSwimlane: (id) => {
+      removeSwimlaneHandler.handle(new RemoveSwimlaneCommand(id));
+    },
 
-  changeSwimlaneActorType: (id, actorType) =>
-    set((state) => {
-      const swimlanes = changeSwimlaneActorTypeHandler.handle(state.swimlanes, new ChangeSwimlaneActorTypeCommand(id, actorType));
-      saveToStorage(state.board, state.links, swimlanes);
-      return { swimlanes };
-    }),
+    renameSwimlane: (id, actorName) => {
+      renameSwimlaneHandler.handle(new RenameSwimlaneCommand(id, actorName));
+    },
 
-  exportJSON: () => {
-    const { board, links, swimlanes } = get();
-    return exportJSONHandler.handle(board, links, swimlanes, new ExportJSONQuery());
-  },
+    reorderSwimlanes: (id, targetIndex) => {
+      reorderSwimlanesHandler.handle(new ReorderSwimlanesCommand(id, targetIndex));
+    },
 
-  exportMarkdown: () => {
-    const { board, links } = get();
-    return exportMarkdownHandler.handle(board, links, new ExportMarkdownQuery());
-  },
-}));
+    changeSwimlaneActorType: (id, actorType) => {
+      changeSwimlaneActorTypeHandler.handle(new ChangeSwimlaneActorTypeCommand(id, actorType));
+    },
+
+    exportJSON: () => {
+      const { board, links, swimlanes } = get();
+      return exportJSONHandler.handle(board, links, swimlanes, new ExportJSONQuery());
+    },
+
+    exportMarkdown: () => {
+      const { board, links } = get();
+      return exportMarkdownHandler.handle(board, links, new ExportMarkdownQuery());
+    },
+  };
+});
 
 export const useBoard = () => useBoardStore((state) => state.board);
 

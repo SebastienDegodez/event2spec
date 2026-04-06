@@ -3,16 +3,17 @@ import { SwimlaneCollection } from '../../../../src/core/domain/SwimlaneCollecti
 import { type ActorType } from '../../../../src/core/domain/ActorType';
 import { AddSwimlaneCommand } from '../../../../src/core/usecases/commands/AddSwimlane/AddSwimlaneCommand';
 import { AddSwimlaneCommandHandler } from '../../../../src/core/usecases/commands/AddSwimlane/AddSwimlaneCommandHandler';
+import { InMemorySwimlaneRepository } from '../../../helpers/InMemorySwimlaneRepository';
 import { collectSwimlanes } from '../../../helpers/collectSwimlanes';
-
-const handler = new AddSwimlaneCommandHandler();
 
 describe('AddSwimlaneCommandHandler', () => {
   it('adds a swimlane to an empty collection', () => {
-    const collection = SwimlaneCollection.empty();
-    const result = handler.handle(collection, new AddSwimlaneCommand('s1', 'Customer', 'human'));
+    const repository = new InMemorySwimlaneRepository();
+    const handler = new AddSwimlaneCommandHandler(repository);
 
-    const swimlanes = collectSwimlanes(result);
+    handler.handle(new AddSwimlaneCommand('s1', 'Customer', 'human'));
+
+    const swimlanes = collectSwimlanes(repository.load());
     expect(swimlanes).toHaveLength(1);
     expect(swimlanes[0].id).toBe('s1');
     expect(swimlanes[0].actorName).toBe('Customer');
@@ -21,13 +22,13 @@ describe('AddSwimlaneCommandHandler', () => {
   });
 
   it('appends a swimlane at the end of an existing collection', () => {
-    const collection = handler.handle(
-      SwimlaneCollection.empty(),
-      new AddSwimlaneCommand('s1', 'Customer', 'human')
-    );
-    const result = handler.handle(collection, new AddSwimlaneCommand('s2', 'Order Service', 'internal_system'));
+    const repository = new InMemorySwimlaneRepository();
+    const handler = new AddSwimlaneCommandHandler(repository);
 
-    const swimlanes = collectSwimlanes(result);
+    handler.handle(new AddSwimlaneCommand('s1', 'Customer', 'human'));
+    handler.handle(new AddSwimlaneCommand('s2', 'Order Service', 'internal_system'));
+
+    const swimlanes = collectSwimlanes(repository.load());
     expect(swimlanes).toHaveLength(2);
     expect(swimlanes[0].id).toBe('s1');
     expect(swimlanes[1].id).toBe('s2');
@@ -42,11 +43,12 @@ describe('AddSwimlaneCommandHandler', () => {
     ];
 
     cases.forEach(([id, actorType, expectedColor]) => {
-      const result = handler.handle(
-        SwimlaneCollection.empty(),
-        new AddSwimlaneCommand(id, 'Lane', actorType)
-      );
-      const swimlanes = collectSwimlanes(result);
+      const repository = new InMemorySwimlaneRepository();
+      const handler = new AddSwimlaneCommandHandler(repository);
+
+      handler.handle(new AddSwimlaneCommand(id, 'Lane', actorType));
+
+      const swimlanes = collectSwimlanes(repository.load());
       expect(swimlanes[0].color).toBe(expectedColor);
     });
   });
