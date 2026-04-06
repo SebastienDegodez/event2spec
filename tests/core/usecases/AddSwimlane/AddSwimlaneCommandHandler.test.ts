@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { SwimlaneCollection } from '../../../../src/core/domain/SwimlaneCollection';
+import { type ActorType } from '../../../../src/core/domain/ActorType';
 import { AddSwimlaneCommand } from '../../../../src/core/usecases/commands/AddSwimlane/AddSwimlaneCommand';
 import { AddSwimlaneCommandHandler } from '../../../../src/core/usecases/commands/AddSwimlane/AddSwimlaneCommandHandler';
 import { collectSwimlanes } from '../../../helpers/collectSwimlanes';
@@ -33,7 +34,7 @@ describe('AddSwimlaneCommandHandler', () => {
   });
 
   it('assigns correct color for each actor type', () => {
-    const cases: Array<[string, Parameters<typeof AddSwimlaneCommand.prototype.constructor>[2], string]> = [
+    const cases: Array<[string, ActorType, string]> = [
       ['s1', 'human', 'yellow'],
       ['s2', 'internal_system', 'blue'],
       ['s3', 'external_system', 'red'],

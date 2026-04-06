@@ -64,39 +64,36 @@ function GridCanvasInner() {
   const viewport = useViewport();
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
 
-  // Collect swimlane data via projection for rendering labels overlay
-  const swimlaneLabels = useMemo<SwimlaneLabelEntry[]>(() => {
+  // Collect swimlane background nodes AND label entries in a single projection pass
+  const swimlaneRenderData = useMemo(() => {
+    const bgNodes: Node<SwimlaneBackgroundNodeData>[] = [];
     const labels: SwimlaneLabelEntry[] = [];
     const projection: SwimlaneProjection = {
       onSwimlane(id, actorName, actorType, color, index) {
+        bgNodes.push({
+          id: `swimlane-bg-${id}`,
+          type: 'swimlane',
+          position: { x: SWIMLANE_LABEL_OFFSET_X, y: index * GRID_SIZE },
+          data: { actorName, color },
+          style: { width: 20000, height: GRID_SIZE },
+          draggable: false,
+          selectable: false,
+          focusable: false,
+          zIndex: -1,
+        });
         labels.push({ id, actorName, actorType, color, index });
       },
     };
     swimlanes.describeTo(projection);
-    return labels;
+    return { bgNodes, labels };
   }, [swimlanes]);
 
   // Map domain nodes to React Flow nodes via visitor (column/row to x/y pixels)
   const reactFlowNodes = useMemo<Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData | SwimlaneBackgroundNodeData>[]>(
     () => {
-      const result: Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData | SwimlaneBackgroundNodeData>[] = [];
-
-      // Add swimlane background bands via projection (rendered behind other nodes)
-      swimlanes.describeTo({
-        onSwimlane(id, actorName, _actorType, color, index) {
-          result.push({
-            id: `swimlane-bg-${id}`,
-            type: 'swimlane',
-            position: { x: SWIMLANE_LABEL_OFFSET_X, y: index * GRID_SIZE },
-            data: { actorName, color },
-            style: { width: 20000, height: GRID_SIZE },
-            draggable: false,
-            selectable: false,
-            focusable: false,
-            zIndex: -1,
-          });
-        },
-      });
+      const result: Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData | SwimlaneBackgroundNodeData>[] = [
+        ...swimlaneRenderData.bgNodes,
+      ];
 
       const createFlowNode = (id: string, label: string, column: number, row: number, type: 'domainEvent' | 'command' | 'readModel' | 'policy' | 'uiScreen') => {
         const position = domainNodeToPixelPosition({ column, row });
@@ -114,7 +111,7 @@ function GridCanvasInner() {
       board.describeTo(projection);
       return result;
     },
-    [board, swimlanes]
+    [board, swimlaneRenderData]
   );
 
   // Create edges from links
@@ -309,7 +306,7 @@ function GridCanvasInner() {
       </ReactFlow>
       {!swimlanes.isEmpty() && (
         <div className="swimlane-labels-overlay" aria-hidden="true">
-          {swimlaneLabels.map((entry) => {
+          {swimlaneRenderData.labels.map((entry) => {
             const top = entry.index * GRID_SIZE * viewport.zoom + viewport.y;
             const height = GRID_SIZE * viewport.zoom;
             return (
