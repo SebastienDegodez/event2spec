@@ -98,7 +98,7 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
     expect(Number(newColumnA)).toBe(Number(columnA) + 1);
   });
 
-  test('clicking the note label enters edit mode and updates the label', async ({ page }) => {
+  test('double-clicking the note label enters edit mode and updates the label', async ({ page }) => {
     const pane = page.locator('.react-flow__pane');
 
     // Create a note via right-click context menu
@@ -108,9 +108,9 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
     const note = page.locator('.domain-event-node').first();
     await expect(note).toBeVisible();
 
-    // Click the note label to enter edit mode
+    // Double-click the note label to enter edit mode
     const noteLabel = note.locator('.note-label');
-    await noteLabel.click();
+    await noteLabel.dblclick();
 
     const editor = note.locator('.note-editor');
     await expect(editor).toBeVisible();
