@@ -12,6 +12,8 @@ jobs:
   check-skip:
     name: Check if lint should run
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       skip: ${{ steps.check.outputs.skip }}
     steps:
