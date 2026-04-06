@@ -1,0 +1,575 @@
+name: Create Missing Feature Issues
+on:
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  create-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create issues for missing features
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          create_issue() {
+            local title="$1"
+            local body="$2"
+            local label="$3"
+
+            # Check if issue already exists (open or closed)
+            existing=$(gh issue list --repo "$REPO" --search "$title" --state all --limit 1 --json title --jq '.[0].title // empty')
+            if [ -n "$existing" ]; then
+              echo "⏭️  Issue already exists: $title"
+              return 0
+            fi
+
+            gh issue create \
+              --repo "$REPO" \
+              --title "$title" \
+              --body "$body" \
+              --label "$label"
+            echo "✅ Created: $title"
+          }
+
+          # ─── Issue 1: Connexions entre post-its ───────────────────
+          create_issue \
+            "[Epic 2] Implémenter les connexions validées entre post-its" \
+            "## Objectif
+          Implémenter les 6 types de connexions autorisées entre post-its avec validation stricte des liaisons interdites.
+
+          ## Contexte
+          Actuellement, seuls les liens \`Command → Event\` sont trackés (via \`NodeLink\` dans le store). Il manque les 5 autres types de connexions et surtout la **validation** empêchant les connexions interdites.
+
+          ## Connexions autorisées (6 types)
+
+          | Source | Target | Label | Sémantique |
+          |--------|--------|-------|------------|
+          | Command (🔵) | Event (🟠) | \"triggers\" | Une commande déclenche un événement |
+          | Event (🟠) | Read Model (🟢) | \"feeds\" | Un événement alimente un read model |
+          | Event (🟠) | Policy (🟣) | \"triggers policy\" | Un événement déclenche une politique |
+          | Policy (🟣) | Command (🔵) | \"executes\" | Une politique exécute une commande |
+          | UI Screen (🟡) | Command (🔵) | \"user action\" | Un écran déclenche une commande |
+          | Read Model (🟢) | UI Screen (🟡) | \"displays\" | Un read model est affiché sur un écran |
+
+          ## Connexions interdites (à bloquer)
+          - ❌ Event → Command (directement)
+          - ❌ ReadModel → Event
+          - ❌ Command → ReadModel
+          - ❌ Policy → Event
+          - ❌ Toute connexion entre nœuds du même type
+
+          ## Critères d'acceptation
+          - [ ] **Given** un utilisateur tire un edge depuis un Command vers un Event, **Then** le lien est créé avec le label \"triggers\"
+          - [ ] **Given** un utilisateur tire un edge depuis un Event vers un ReadModel, **Then** le lien est créé avec le label \"feeds\"
+          - [ ] **Given** un utilisateur tire un edge depuis un Event vers une Policy, **Then** le lien est créé avec le label \"triggers policy\"
+          - [ ] **Given** un utilisateur tire un edge depuis une Policy vers un Command, **Then** le lien est créé avec le label \"executes\"
+          - [ ] **Given** un utilisateur tire un edge depuis un UIScreen vers un Command, **Then** le lien est créé avec le label \"user action\"
+          - [ ] **Given** un utilisateur tire un edge depuis un ReadModel vers un UIScreen, **Then** le lien est créé avec le label \"displays\"
+          - [ ] **Given** un utilisateur tente une connexion interdite (ex: Event→Command), **Then** le lien est refusé avec un feedback visuel
+          - [ ] **Given** les connexions existantes, **Then** l'export JSON et Markdown inclut les relations correctement
+
+          ## Détails techniques
+          - Étendre \`NodeLink\` pour supporter un \`type\` de connexion
+          - Ajouter une logique de validation \`isConnectionAllowed(sourceType, targetType): boolean\`
+          - Mettre à jour \`GridCanvas.tsx\` pour utiliser \`onConnect\` de React Flow
+          - Mettre à jour les query handlers \`ExportJSON\` et \`ExportMarkdown\` pour inclure les relations" \
+            "enhancement"
+
+          # ─── Issue 2: Swimlanes ───────────────────────────────────
+          create_issue \
+            "[Epic 2] Implémenter les swimlanes horizontales" \
+            "## Objectif
+          Implémenter les swimlanes (couloirs horizontaux) permettant de grouper les post-its par acteur ou système.
+
+          ## Contexte
+          Le schéma \`EventModelSchema.ts\` définit déjà les interfaces \`Swimlane\` et \`Actor\` avec les types \`human | internal_system | external_system | automated_process\`. Il manque l'implémentation UI et la logique de gestion des swimlanes.
+
+          ## Fonctionnalités attendues
+
+          ### Gestion des swimlanes
+          - Créer, renommer et supprimer des swimlanes
+          - Réordonner les swimlanes par drag & drop
+          - Assigner un acteur à chaque swimlane
+          - Couleur automatique selon le type d'acteur (yellow/blue/red/grey)
+
+          ### Contraintes visuelles
+          - Chaque swimlane occupe une bande horizontale sur le canvas
+          - Les post-its sont contraints à leur swimlane (row = index de la swimlane)
+          - Un label à gauche affiche le nom de l'acteur/système
+          - Séparateurs visuels entre swimlanes
+
+          ## Critères d'acceptation
+          - [ ] **Given** un canvas vierge, **When** l'utilisateur ajoute une swimlane, **Then** une bande horizontale apparaît avec un label éditable
+          - [ ] **Given** des swimlanes existantes, **When** l'utilisateur crée un post-it, **Then** il est placé dans la swimlane correspondant à sa row
+          - [ ] **Given** des swimlanes, **When** l'utilisateur exporte en JSON, **Then** le champ \`swimlanes[]\` est rempli avec les acteurs
+          - [ ] **Given** une swimlane avec acteur, **Then** sa couleur correspond au type (yellow=human, blue=internal, red=external, grey=automated)
+          - [ ] **Given** des swimlanes réordonnées, **Then** les post-its suivent leur swimlane
+
+          ## Détails techniques
+          - Créer un domain object \`Swimlane\` dans \`src/core/domain/\`
+          - Ajouter les use cases \`AddSwimlane\`, \`RemoveSwimlane\`, \`ReorderSwimlanes\`
+          - Étendre le store avec la gestion des swimlanes
+          - Implémenter le rendu visuel dans \`GridCanvas.tsx\` ou un composant dédié" \
+            "enhancement"
+
+          # ─── Issue 3: Panneau de propriétés ───────────────────────
+          create_issue \
+            "[Epic 3] Implémenter le panneau de propriétés" \
+            "## Objectif
+          Implémenter un panneau latéral de propriétés qui s'ouvre lorsqu'on clique sur un post-it, permettant d'éditer ses propriétés détaillées.
+
+          ## Contexte
+          Actuellement, on ne peut modifier que le label d'un post-it (via double-click inline). Les propriétés riches définies dans \`EventModelSchema.ts\` (payload, acteur, données, conditions, etc.) ne sont pas éditables.
+
+          ## Fonctionnalités attendues
+
+          ### Par type de post-it
+
+          **Domain Event (🟠)** :
+          - Nom (PascalCase past tense)
+          - Données (schéma clé/valeur)
+          - Triggered by (command source)
+          - Timeline position
+
+          **Command (🔵)** :
+          - Nom (PascalCase imperative)
+          - Acteur déclencheur
+          - Payload (schéma clé/valeur)
+          - Guard conditions (liste de chaînes)
+          - Resulting events (liste)
+
+          **Read Model (🟢)** :
+          - Nom (noun phrase)
+          - Fed by (liste d'events)
+          - Consumed by (acteur/screen)
+          - Data (schéma clé/valeur)
+
+          **Policy (🟣)** :
+          - Nom
+          - When event
+          - Then command
+          - Condition
+
+          **UI Screen (🟡)** :
+          - Nom
+          - Description
+          - Triggers command
+          - Displays read model
+
+          ## Critères d'acceptation
+          - [ ] **Given** un post-it sélectionné, **When** l'utilisateur clique dessus, **Then** un panneau s'ouvre à droite avec les propriétés éditables
+          - [ ] **Given** le panneau ouvert, **When** l'utilisateur modifie une propriété, **Then** la modification est reflétée dans le store
+          - [ ] **Given** le panneau ouvert, **When** l'utilisateur clique en dehors, **Then** le panneau se ferme
+          - [ ] **Given** des propriétés remplies, **When** on exporte en JSON, **Then** les propriétés sont incluses dans l'export
+          - [ ] **Given** un Command avec payload, **Then** l'éditeur de payload permet d'ajouter/supprimer des champs
+
+          ## Détails techniques
+          - Créer \`src/ui/components/PropertiesPanel/PropertiesPanel.tsx\`
+          - Étendre les domain nodes pour stocker des propriétés additionnelles
+          - Mettre à jour le store pour les mutations de propriétés" \
+            "enhancement"
+
+          # ─── Issue 4: Validation nommage ──────────────────────────
+          create_issue \
+            "[Epic 4] Validation des conventions de nommage en temps réel" \
+            "## Objectif
+          Implémenter la validation en temps réel des conventions de nommage pour chaque type de post-it.
+
+          ## Contexte
+          Le schéma Event Modeling impose des conventions de nommage strictes. Actuellement, aucune validation n'est effectuée sur les labels des post-its.
+
+          ## Règles de nommage
+
+          | Type | Convention | Exemples valides | Exemples invalides |
+          |------|-----------|-----------------|-------------------|
+          | Domain Event (🟠) | PascalCase past tense | \`OrderPlaced\`, \`PaymentReceived\` | \`order placed\`, \`PlaceOrder\` |
+          | Command (🔵) | PascalCase imperative | \`PlaceOrder\`, \`CancelSubscription\` | \`OrderPlaced\`, \`placing order\` |
+          | Read Model (🟢) | Noun phrase | \`Order Summary\`, \`Customer Profile\` | \`GetOrders\`, \`Showing orders\` |
+          | Policy (🟣) | \"When…then…\" | \`When OrderPlaced then NotifyCustomer\` | \`NotifyPolicy\` |
+          | UI Screen (🟡) | Title case | \`Order Dashboard\`, \`Payment Form\` | \`orderDashboard\` |
+
+          ## Critères d'acceptation
+          - [ ] **Given** un Domain Event avec un nom non-PascalCase, **Then** un indicateur visuel (bordure rouge, icône warning) s'affiche sur le post-it
+          - [ ] **Given** un Command avec un nom au passé, **Then** un warning s'affiche suggérant l'impératif
+          - [ ] **Given** un nom invalide, **When** l'utilisateur survole le warning, **Then** un tooltip explique la convention attendue
+          - [ ] **Given** un nom corrigé, **Then** l'indicateur de warning disparaît immédiatement
+          - [ ] **Given** un export, **Then** les warnings de nommage sont listés dans un rapport de validation
+
+          ## Détails techniques
+          - Créer des fonctions de validation dans \`src/core/domain/\` (ex: \`NamingValidator.ts\`)
+          - Ajouter un hook \`useValidation()\` qui retourne les warnings par node
+          - Afficher les indicateurs visuels dans les composants post-it
+          - Optionnel : auto-suggestion de correction" \
+            "enhancement"
+
+          # ─── Issue 5: Validation complétude ───────────────────────
+          create_issue \
+            "[Epic 4] Validation de complétude du modèle" \
+            "## Objectif
+          Implémenter la détection automatique des incohérences et lacunes dans le modèle d'event modeling.
+
+          ## Contexte
+          Un modèle complet nécessite que chaque élément soit correctement relié. Les éléments orphelins ou déconnectés indiquent des lacunes dans la modélisation.
+
+          ## Validations à implémenter
+
+          ### Éléments orphelins
+          - 🟠 **Events sans Command** : Un domain event n'est déclenché par aucune commande
+          - 🔵 **Commands sans Event résultant** : Une commande ne produit aucun event
+          - 🟢 **Read Models sans Event source** : Un read model n'est alimenté par aucun event
+          - 🟡 **UI Screens déconnectés** : Un écran ne déclenche aucune commande et n'affiche aucun read model
+          - 🟣 **Policies déconnectées** : Une policy n'écoute aucun event ou ne déclenche aucune commande
+
+          ### Swimlanes
+          - Swimlanes vides (sans aucun post-it)
+          - Acteurs référencés dans les commands mais sans swimlane
+
+          ### Flux
+          - Boucles infinies détectées (Policy → Command → Event → Policy → ...)
+          - Chaînes interrompues (Command → Event → ??? rien après)
+
+          ## Critères d'acceptation
+          - [ ] **Given** un Event sans commande source, **Then** un badge \"orphan\" s'affiche sur le post-it
+          - [ ] **Given** un Command sans event résultant, **Then** un badge \"incomplete\" s'affiche
+          - [ ] **Given** un Read Model sans event source, **Then** un badge \"disconnected\" s'affiche
+          - [ ] **Given** des problèmes de complétude, **Then** un compteur global dans le header indique le nombre de warnings
+          - [ ] **Given** l'utilisateur clique sur le compteur de warnings, **Then** une liste détaillée des problèmes s'affiche
+          - [ ] **Given** un problème résolu, **Then** le warning disparaît immédiatement
+
+          ## Dépendances
+          - Nécessite [Epic 2] Connexions entre post-its (pour détecter les éléments non reliés)
+
+          ## Détails techniques
+          - Créer \`src/core/domain/ModelValidator.ts\` avec les règles de validation
+          - Ajouter une query \`ValidateModel\` retournant la liste des warnings
+          - Afficher un indicateur global dans le header et des badges sur les post-its" \
+            "enhancement"
+
+          # ─── Issue 6: Vertical Slices ─────────────────────────────
+          create_issue \
+            "[Epic 5] Éditeur de Vertical Slices" \
+            "## Objectif
+          Implémenter un éditeur permettant de définir des tranches verticales (vertical slices) regroupant Command → Events → Read Model.
+
+          ## Contexte
+          Les vertical slices sont un concept clé de l'Event Modeling. Une slice représente une fonctionnalité complète traversant toutes les couches : depuis la commande utilisateur jusqu'à la vue affichée. L'interface \`VerticalSlice\` est déjà définie dans \`EventModelSchema.ts\`.
+
+          ## Fonctionnalités attendues
+
+          ### Création de slices
+          - Sélectionner un groupe de post-its (Command + Events + ReadModel) pour créer une slice
+          - Nommer la slice
+          - Visualiser les slices comme des colonnes ou groupes visuels sur le canvas
+
+          ### Gestion
+          - Lister toutes les slices dans un panneau dédié
+          - Éditer les slices (ajouter/retirer des éléments)
+          - Supprimer une slice
+          - Navigation : cliquer sur une slice scroll le canvas vers les éléments concernés
+
+          ### Visualisation
+          - Overlay visuel montrant les limites de chaque slice sur le canvas
+          - Couleurs distinctes par slice
+          - Toggle show/hide des overlays
+
+          ## Critères d'acceptation
+          - [ ] **Given** des post-its connectés (Command→Event→ReadModel), **When** l'utilisateur crée une slice, **Then** elle apparaît dans la liste des slices
+          - [ ] **Given** une slice existante, **When** l'utilisateur clique dessus dans la liste, **Then** le canvas scroll vers les éléments de la slice
+          - [ ] **Given** des slices définies, **When** on exporte en JSON, **Then** le champ \`verticalSlices[]\` est rempli correctement
+          - [ ] **Given** l'overlay activé, **Then** les limites visuelles des slices sont visibles sur le canvas
+
+          ## Dépendances
+          - Nécessite [Epic 2] Connexions entre post-its
+
+          ## Détails techniques
+          - Créer le domain object \`VerticalSlice\` dans \`src/core/domain/\`
+          - Ajouter les use cases \`CreateSlice\`, \`UpdateSlice\`, \`DeleteSlice\`
+          - Créer \`src/ui/components/Slices/SlicePanel.tsx\`
+          - Mettre à jour les exports JSON/Markdown" \
+            "enhancement"
+
+          # ─── Issue 7: Given/When/Then ─────────────────────────────
+          create_issue \
+            "[Epic 5] Éditeur de scénarios Given/When/Then" \
+            "## Objectif
+          Implémenter un éditeur de scénarios BDD (Behavior-Driven Development) pour chaque vertical slice.
+
+          ## Contexte
+          Chaque vertical slice devrait être accompagnée de scénarios Given/When/Then décrivant le comportement attendu. L'interface \`Scenario\` est déjà définie dans \`EventModelSchema.ts\` avec \`given: string[]\`, \`when: string\`, \`then: string[]\`.
+
+          ## Fonctionnalités attendues
+
+          ### Éditeur de scénarios
+          - Pour chaque vertical slice, pouvoir ajouter un ou plusieurs scénarios
+          - Formulaire structuré :
+            - **Given** : liste de préconditions (multi-lignes, ajout/suppression)
+            - **When** : l'action déclenchante (une seule ligne)
+            - **Then** : liste de résultats attendus (multi-lignes, ajout/suppression)
+
+          ### Gestion
+          - Ajouter, éditer, dupliquer et supprimer des scénarios
+          - Réordonner les scénarios par drag & drop
+          - Preview formatée du scénario en Gherkin
+
+          ### Export
+          - Les scénarios sont inclus dans l'export JSON (\`verticalSlices[].scenarios[]\`)
+          - Les scénarios sont formatés en Gherkin dans l'export Markdown
+
+          ## Critères d'acceptation
+          - [ ] **Given** une vertical slice, **When** l'utilisateur ouvre l'éditeur de scénarios, **Then** il peut ajouter des lignes Given/When/Then
+          - [ ] **Given** un scénario rempli, **Then** la preview Gherkin s'affiche correctement
+          - [ ] **Given** des scénarios, **When** on exporte en JSON, **Then** \`scenarios[]\` contient les données structurées
+          - [ ] **Given** des scénarios, **When** on exporte en Markdown, **Then** ils sont formatés en syntaxe Gherkin
+          - [ ] **Given** un scénario, **When** l'utilisateur clique sur dupliquer, **Then** une copie est créée
+
+          ## Dépendances
+          - Nécessite [Epic 5] Éditeur de Vertical Slices
+
+          ## Détails techniques
+          - Créer \`src/ui/components/Scenarios/ScenarioEditor.tsx\`
+          - Étendre le domain \`VerticalSlice\` pour stocker les scénarios
+          - Mettre à jour \`ExportMarkdownQueryHandler\` pour formatter en Gherkin" \
+            "enhancement"
+
+          # ─── Issue 8: Bounded Contexts ────────────────────────────
+          create_issue \
+            "[Epic 6] Éditeur de Bounded Contexts" \
+            "## Objectif
+          Implémenter un éditeur de contextes bornés (Bounded Contexts) permettant de grouper des domain events en contextes, assigner des équipes propriétaires, et identifier les events d'intégration entre contextes.
+
+          ## Contexte
+          Les Bounded Contexts sont un concept fondamental du Domain-Driven Design. L'interface \`BoundedContext\` est déjà définie dans \`EventModelSchema.ts\` avec \`name\`, \`events[]\`, \`owningTeam\`, et \`integrationEvents[]\`.
+
+          ## Fonctionnalités attendues
+
+          ### Création et gestion
+          - Créer un bounded context en sélectionnant un groupe d'events
+          - Nommer le contexte et assigner une équipe propriétaire
+          - Modifier la composition d'un contexte (ajouter/retirer des events)
+          - Supprimer un contexte
+
+          ### Events d'intégration
+          - Identifier les events partagés entre contextes (integration events)
+          - Visualiser les dépendances inter-contextes
+          - Marquer explicitement un event comme \"integration event\"
+
+          ### Visualisation
+          - Overlay visuel avec des zones colorées délimitant chaque contexte
+          - Labels des contextes affichés sur le canvas
+          - Lignes pointillées entre contextes partageant des integration events
+
+          ## Critères d'acceptation
+          - [ ] **Given** des domain events, **When** l'utilisateur crée un bounded context, **Then** il peut sélectionner les events à inclure
+          - [ ] **Given** un bounded context, **When** l'utilisateur assigne une équipe, **Then** l'info est stockée
+          - [ ] **Given** un event partagé entre 2 contextes, **Then** il est marqué comme \"integration event\"
+          - [ ] **Given** des bounded contexts, **When** on exporte en JSON, **Then** \`boundedContexts[]\` est rempli
+          - [ ] **Given** l'overlay activé, **Then** les zones de contextes sont visibles sur le canvas
+
+          ## Détails techniques
+          - Créer le domain object \`BoundedContext\` dans \`src/core/domain/\`
+          - Ajouter les use cases \`CreateContext\`, \`UpdateContext\`, \`DeleteContext\`
+          - Créer \`src/ui/components/Contexts/ContextEditor.tsx\`
+          - Mettre à jour les exports" \
+            "enhancement"
+
+          # ─── Issue 9: Import JSON ─────────────────────────────────
+          create_issue \
+            "[Epic 7] Import JSON pour restaurer un modèle" \
+            "## Objectif
+          Implémenter l'import d'un fichier JSON conforme au schéma \`EventModel\` pour restaurer un modèle complet sur le canvas.
+
+          ## Contexte
+          L'export JSON est déjà implémenté (\`ExportJSONQueryHandler\`). L'import permettrait de charger un modèle précédemment exporté ou créé manuellement.
+
+          ## Fonctionnalités attendues
+
+          ### Import
+          - Bouton \"Import JSON\" dans la toolbar
+          - Sélection de fichier via file picker natif
+          - Validation du JSON contre le schéma \`EventModel\`
+          - Création de tous les nœuds et connexions sur le canvas
+          - Placement automatique si les positions ne sont pas spécifiées
+
+          ### Validation
+          - Vérifier que le JSON est bien formé
+          - Vérifier la conformité au schéma EventModel
+          - Afficher les erreurs de validation (champs manquants, types incorrects)
+          - Option : import partiel (ignorer les éléments invalides)
+
+          ### Comportement
+          - Demander confirmation si le canvas n'est pas vide (remplacer ou fusionner)
+          - Restaurer les nodes, links, et métadonnées
+          - Auto-layout si les positions de grille ne sont pas fournies
+
+          ## Critères d'acceptation
+          - [ ] **Given** un fichier JSON valide exporté par event2spec, **When** l'utilisateur l'importe, **Then** le canvas restaure exactement le modèle
+          - [ ] **Given** un fichier JSON invalide, **When** l'utilisateur l'importe, **Then** un message d'erreur détaillé s'affiche
+          - [ ] **Given** un canvas non vide, **When** l'utilisateur importe, **Then** une confirmation est demandée (remplacer/fusionner/annuler)
+          - [ ] **Given** un import réussi, **Then** le localStorage est mis à jour avec le nouveau modèle
+          - [ ] **Given** un JSON sans positions, **Then** un auto-layout place les nœuds intelligemment
+
+          ## Détails techniques
+          - Créer le use case \`ImportModel\` dans \`src/core/usecases/commands/\`
+          - Ajouter un validateur de schéma dans \`src/core/domain/\`
+          - Créer le bouton import dans \`ExportToolbar.tsx\` (renommer en \`ImportExportToolbar\`)
+          - Mettre à jour le store pour gérer le chargement complet" \
+            "enhancement"
+
+          # ─── Issue 10: Collaboration ──────────────────────────────
+          create_issue \
+            "[Epic 8] Collaboration multi-utilisateurs temps réel" \
+            "## Objectif
+          Implémenter la collaboration en temps réel permettant à plusieurs utilisateurs de travailler simultanément sur le même modèle d'Event Modeling.
+
+          ## Contexte
+          L'application est actuellement locale-first (localStorage uniquement). Pour la collaboration en équipe, il faut ajouter une couche de synchronisation temps réel.
+
+          ## Options techniques
+          - **Yjs** : CRDT library pour la collaboration (recommandé pour offline-first)
+          - **Liveblocks** : Service hébergé avec API simple
+          - **WebSocket** : Serveur custom avec synchronisation manuelle
+
+          ## Fonctionnalités attendues
+
+          ### Synchronisation
+          - Synchronisation en temps réel des ajouts, déplacements et modifications de post-its
+          - Résolution de conflits (deux utilisateurs modifient le même post-it)
+          - Indicateur de présence (curseurs des autres utilisateurs visibles)
+          - Mode offline avec sync au retour en ligne
+
+          ### Gestion des sessions
+          - Créer une session de collaboration (génère un lien partageable)
+          - Rejoindre une session existante via URL
+          - Liste des participants connectés
+          - Historique des modifications (undo/redo collaboratif)
+
+          ### Sécurité
+          - Rooms/sessions isolées
+          - Optionnel : mot de passe de session
+
+          ## Critères d'acceptation
+          - [ ] **Given** deux utilisateurs sur la même session, **When** l'un ajoute un post-it, **Then** l'autre le voit apparaître en temps réel
+          - [ ] **Given** deux utilisateurs, **Then** les curseurs des autres sont visibles sur le canvas
+          - [ ] **Given** un utilisateur hors ligne, **When** il revient en ligne, **Then** ses modifications sont synchronisées
+          - [ ] **Given** un lien de session, **When** un nouvel utilisateur l'ouvre, **Then** il rejoint la session avec l'état actuel du modèle
+
+          ## Détails techniques
+          - Intégrer Yjs (ou alternative) comme CRDT layer
+          - Adapter le store Zustand pour synchroniser via Yjs
+          - Ajouter un provider WebSocket/WebRTC pour le transport
+          - Créer le composant \`CollaborationBar\` pour la gestion de session" \
+            "enhancement"
+
+          # ─── Issue 11: Mode guidé ────────────────────────────────
+          create_issue \
+            "[Epic 9] Mode guidé par phases d'Event Modeling" \
+            "## Objectif
+          Implémenter un mode pas-à-pas guidant l'utilisateur à travers les 7 phases de l'Event Modeling tel que défini par le skill \`event-modeling\`.
+
+          ## Les 7 phases
+
+          ### Phase 1 : Brainstorming 🟠
+          - Ajouter librement des Domain Events sur la timeline
+          - Pas de contrainte de nommage ni de connexion
+          - Focus : identifier tous les événements métier
+
+          ### Phase 2 : Timeline ⏳
+          - Organiser les events chronologiquement (gauche → droite)
+          - Identifier les swimlanes (acteurs/systèmes)
+          - Focus : ordonner le flux temporel
+
+          ### Phase 3 : Storyboarding 🟡
+          - Ajouter les UI Screens
+          - Relier les écrans aux events qu'ils déclenchent ou affichent
+          - Focus : parcours utilisateur
+
+          ### Phase 4 : Commands 🔵
+          - Ajouter les Commands déclenchées par les écrans
+          - Relier Command → Event
+          - Focus : intentions utilisateur
+
+          ### Phase 5 : Read Models 🟢
+          - Ajouter les Read Models alimentés par les events
+          - Relier Event → ReadModel → UIScreen
+          - Focus : données affichées
+
+          ### Phase 6 : Bounded Contexts 🔲
+          - Grouper les events en contextes bornés
+          - Identifier les events d'intégration
+          - Focus : architecture des modules
+
+          ### Phase 7 : Vertical Slices 📐
+          - Définir les tranches verticales
+          - Ajouter les scénarios Given/When/Then
+          - Focus : spécification par l'exemple
+
+          ## Fonctionnalités attendues
+          - Indicateur de la phase courante dans le header
+          - Boutons précédent/suivant pour naviguer entre phases
+          - Palette filtrée selon la phase (ex: Phase 1 = seulement Events)
+          - Instructions contextuelles pour chaque phase
+          - Possibilité de quitter le mode guidé à tout moment
+
+          ## Critères d'acceptation
+          - [ ] **Given** le mode guidé activé, **Then** la phase courante est affichée dans le header
+          - [ ] **Given** la Phase 1, **Then** seuls les Domain Events sont disponibles dans la palette
+          - [ ] **Given** la Phase 4, **Then** les Commands et les connexions Command→Event sont disponibles
+          - [ ] **Given** une phase, **Then** un panneau d'instructions explique quoi faire
+          - [ ] **Given** le mode guidé, **When** l'utilisateur clique \"Suivant\", **Then** la phase avance et la palette s'adapte
+          - [ ] **Given** le mode guidé, **When** l'utilisateur clique \"Quitter le mode guidé\", **Then** toutes les fonctionnalités sont accessibles
+
+          ## Détails techniques
+          - Créer \`src/core/domain/ModelingPhase.ts\` avec l'enum des 7 phases
+          - Ajouter l'état de phase dans le store
+          - Créer \`src/ui/components/GuidedMode/PhaseIndicator.tsx\`
+          - Filtrer la NodePalette selon la phase active" \
+            "enhancement"
+
+          # ─── Issue 12: Event Catalog ──────────────────────────────
+          create_issue \
+            "[Epic 10] Event Catalog intégré" \
+            "## Objectif
+          Intégrer un catalogue d'événements types comme aide contextuelle, basé sur les événements courants des domaines métier classiques.
+
+          ## Domaines du catalogue
+
+          ### E-Commerce
+          \`OrderPlaced\`, \`OrderConfirmed\`, \`OrderShipped\`, \`OrderDelivered\`, \`OrderCancelled\`, \`PaymentReceived\`, \`PaymentFailed\`, \`RefundIssued\`, \`CartUpdated\`, \`CheckoutStarted\`, \`CheckoutCompleted\`
+
+          ### User Management
+          \`UserRegistered\`, \`UserActivated\`, \`UserDeactivated\`, \`UserDeleted\`, \`PasswordChanged\`, \`EmailVerified\`, \`RoleAssigned\`, \`LoginSucceeded\`, \`LoginFailed\`, \`SessionExpired\`
+
+          ### Content Management
+          \`ArticlePublished\`, \`ArticleDrafted\`, \`ArticleArchived\`, \`CommentPosted\`, \`CommentModerated\`
+
+          ### Subscription
+          \`SubscriptionCreated\`, \`SubscriptionRenewed\`, \`SubscriptionCancelled\`, \`PlanUpgraded\`, \`PlanDowngraded\`, \`TrialStarted\`, \`TrialExpired\`
+
+          ### Support
+          \`TicketCreated\`, \`TicketAssigned\`, \`TicketResolved\`, \`TicketEscalated\`, \`FeedbackReceived\`, \`SurveyCompleted\`
+
+          ## Fonctionnalités attendues
+          - Panneau ou popup \"Event Catalog\" accessible depuis la toolbar
+          - Recherche par mot-clé dans le catalogue
+          - Filtrage par domaine
+          - Click ou drag pour ajouter un événement du catalogue au canvas
+          - Possibilité d'ajouter ses propres événements au catalogue local
+
+          ## Critères d'acceptation
+          - [ ] **Given** l'utilisateur ouvre le catalogue, **Then** les événements sont listés par domaine
+          - [ ] **Given** un terme de recherche, **Then** les événements sont filtrés en temps réel
+          - [ ] **Given** un événement du catalogue, **When** l'utilisateur clique dessus, **Then** il est ajouté au canvas
+          - [ ] **Given** le catalogue, **When** l'utilisateur tape un nouveau nom, **Then** il peut l'ajouter au catalogue local
+          - [ ] **Given** des événements du catalogue utilisés, **Then** ils sont visuellement marqués comme \"utilisés\"
+
+          ## Détails techniques
+          - Créer \`src/core/domain/EventCatalog.ts\` avec les données du catalogue
+          - Créer \`src/ui/components/Catalog/EventCatalogPanel.tsx\`
+          - Stocker les ajouts locaux dans le localStorage" \
+            "enhancement"
+
+          echo ""
+          echo "🎉 All issues created successfully!"

@@ -13,6 +13,15 @@ export const COMMAND_NODE_COLOR = '#3b82f6';
 /** Color used for domain event nodes on the minimap */
 export const DOMAIN_EVENT_NODE_COLOR = '#f59e0b';
 
+/** Color used for read model nodes on the minimap */
+export const READ_MODEL_NODE_COLOR = '#22c55e';
+
+/** Color used for policy nodes on the minimap */
+export const POLICY_NODE_COLOR = '#a855f7';
+
+/** Color used for UI screen nodes on the minimap */
+export const UI_SCREEN_NODE_COLOR = '#eab308';
+
 /** Color used for edges between command and event nodes */
 export const EDGE_COLOR = '#60a5fa';
 

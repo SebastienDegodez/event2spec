@@ -46,6 +46,15 @@
   font-size: 11px;
   color: var(--text-muted);
   letter-spacing: 0.2px;
+  flex: 1;
+  text-align: center;
+}
+
+/* ─── Workspace (palette + canvas) ───────────────────── */
+.app-workspace {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
 }
 
 /* ─── Canvas ──────────────────────────────────────────── */
@@ -373,5 +382,260 @@
 
 .context-menu-item:hover {
   background: var(--accent-dim);
+  color: var(--accent);
+}
+
+/* ─── Read Model Node ────────────────────────────────── */
+.read-model-node {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  background: var(--note-green);
+  border-radius: 3px 12px 3px 3px;
+  box-shadow: var(--note-shadow);
+  cursor: grab;
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+}
+
+.read-model-node:hover {
+  transform: translateY(-2px) rotate(0.4deg);
+  box-shadow: var(--note-shadow), 0 0 0 1px rgba(34, 197, 94, 0.3);
+}
+
+.read-model-node:active {
+  cursor: grabbing;
+}
+
+.read-model-node.selected {
+  box-shadow: var(--note-shadow-read-model-selected);
+  transform: translateY(-2px);
+}
+
+.read-model-fold {
+  background: var(--note-green-dark) !important;
+}
+
+.read-model-node:hover .note-delete,
+.read-model-node.selected .note-delete {
+  opacity: 1;
+}
+
+.read-model-handle {
+  width: 10px !important;
+  height: 10px !important;
+  background: var(--note-green-dark) !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.read-model-node:hover .read-model-handle,
+.read-model-node.selected .read-model-handle {
+  opacity: 1;
+}
+
+/* ─── Policy Node ────────────────────────────────────── */
+.policy-node {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  background: var(--note-purple);
+  border-radius: 3px 12px 3px 3px;
+  box-shadow: var(--note-shadow);
+  cursor: grab;
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+}
+
+.policy-node:hover {
+  transform: translateY(-2px) rotate(0.4deg);
+  box-shadow: var(--note-shadow), 0 0 0 1px rgba(168, 85, 247, 0.3);
+}
+
+.policy-node:active {
+  cursor: grabbing;
+}
+
+.policy-node.selected {
+  box-shadow: var(--note-shadow-policy-selected);
+  transform: translateY(-2px);
+}
+
+.policy-fold {
+  background: var(--note-purple-dark) !important;
+}
+
+.policy-node:hover .note-delete,
+.policy-node.selected .note-delete {
+  opacity: 1;
+}
+
+.policy-handle {
+  width: 10px !important;
+  height: 10px !important;
+  background: var(--note-purple-dark) !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.policy-node:hover .policy-handle,
+.policy-node.selected .policy-handle {
+  opacity: 1;
+}
+
+/* ─── UI Screen Node ─────────────────────────────────── */
+.ui-screen-node {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  background: var(--note-yellow);
+  border-radius: 3px 12px 3px 3px;
+  box-shadow: var(--note-shadow);
+  cursor: grab;
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+}
+
+.ui-screen-node:hover {
+  transform: translateY(-2px) rotate(0.4deg);
+  box-shadow: var(--note-shadow), 0 0 0 1px rgba(234, 179, 8, 0.3);
+}
+
+.ui-screen-node:active {
+  cursor: grabbing;
+}
+
+.ui-screen-node.selected {
+  box-shadow: var(--note-shadow-ui-screen-selected);
+  transform: translateY(-2px);
+}
+
+.ui-screen-fold {
+  background: var(--note-yellow-dark) !important;
+}
+
+.ui-screen-node:hover .note-delete,
+.ui-screen-node.selected .note-delete {
+  opacity: 1;
+}
+
+.ui-screen-handle {
+  width: 10px !important;
+  height: 10px !important;
+  background: var(--note-yellow-dark) !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.ui-screen-node:hover .ui-screen-handle,
+.ui-screen-node.selected .ui-screen-handle {
+  opacity: 1;
+}
+
+/* ─── Note label text color for light-bg nodes ───────── */
+.read-model-node .note-label,
+.policy-node .note-label,
+.ui-screen-node .note-label {
+  color: #fff;
+}
+
+.read-model-node .note-type-badge,
+.policy-node .note-type-badge,
+.ui-screen-node .note-type-badge {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ─── Node Palette ───────────────────────────────────── */
+.node-palette {
+  width: 140px;
+  flex-shrink: 0;
+  background: rgba(13, 14, 22, 0.96);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 10px;
+  overflow-y: auto;
+}
+
+.palette-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  padding: 0 4px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 4px;
+}
+
+.palette-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  text-align: left;
+}
+
+.palette-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateX(2px);
+}
+
+.palette-event { border-left: 3px solid #f59e0b; }
+.palette-read-model { border-left: 3px solid #22c55e; }
+.palette-policy { border-left: 3px solid #a855f7; }
+.palette-ui-screen { border-left: 3px solid #eab308; }
+
+/* ─── Export Toolbar ─────────────────────────────────── */
+.export-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.export-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.export-btn:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent);
   color: var(--accent);
 }
