@@ -116,7 +116,7 @@ function GridCanvasInner() {
   );
 
   const isValidConnection = useCallback(
-    (connection: Connection) => {
+    (connection: Edge | Connection) => {
       if (!connection.source || !connection.target) return false;
       const sourceNode = nodes.find((n) => n.id === connection.source);
       const targetNode = nodes.find((n) => n.id === connection.target);
