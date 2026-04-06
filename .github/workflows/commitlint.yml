@@ -9,7 +9,31 @@ on:
       - main
 
 jobs:
+  check-skip:
+    name: Check if lint should run
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 1
+      - name: Check commit message
+        id: check
+        run: |
+          COMMIT_MSG=$(git log -1 --format="%s")
+          echo "Commit message: $COMMIT_MSG"
+          if echo "$COMMIT_MSG" | grep -iqE "^\s*init(ial)? plan\s*$"; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
   commitlint:
+    needs: check-skip
+    if: needs.check-skip.outputs.skip != 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
