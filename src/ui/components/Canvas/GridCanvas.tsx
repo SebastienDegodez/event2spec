@@ -37,7 +37,7 @@ const nodeTypes = {
 function GridCanvasInner() {
   const board = useBoard();
   const links = useLinks();
-  const { addNode, moveNode } = useBoardActions();
+  const { addDomainEventNode, moveNode } = useBoardActions();
   const { screenToFlowPosition } = useReactFlow();
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
 
@@ -110,9 +110,9 @@ function GridCanvasInner() {
     (event: React.MouseEvent) => {
       const flowPosition = screenToFlowPosition({ x: event.clientX, y: event.clientY });
       const { column, row } = pixelToGrid(flowPosition.x, flowPosition.y);
-      addNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
+      addDomainEventNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
     },
-    [addNode, screenToFlowPosition]
+    [addDomainEventNode, screenToFlowPosition]
   );
 
   // Right-click on a node: show insert before / insert after options
@@ -149,9 +149,9 @@ function GridCanvasInner() {
 
   const addEventAtPosition = useCallback(
     (column: number, row: number) => {
-      addNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
+      addDomainEventNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
     },
-    [addNode]
+    [addDomainEventNode]
   );
 
   const contextMenuItems = useMemo(() => {

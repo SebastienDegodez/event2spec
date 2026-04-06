@@ -1,15 +1,15 @@
 import { describe, it, expect } from 'vitest';
 import { GridBoard } from '../../../../src/core/domain/GridBoard';
-import { AddNodeCommand } from '../../../../src/core/usecases/commands/AddNode/AddNodeCommand';
-import { AddNodeCommandHandler } from '../../../../src/core/usecases/commands/AddNode/AddNodeCommandHandler';
+import { AddDomainEventNodeCommand } from '../../../../src/core/usecases/commands/AddDomainEventNode/AddDomainEventNodeCommand';
+import { AddDomainEventNodeCommandHandler } from '../../../../src/core/usecases/commands/AddDomainEventNode/AddDomainEventNodeCommandHandler';
 import { collectNodes } from '../../../helpers/collectNodes';
 
-const handler = new AddNodeCommandHandler();
+const handler = new AddDomainEventNodeCommandHandler();
 
-describe('AddNodeCommandHandler', () => {
+describe('AddDomainEventNodeCommandHandler', () => {
   it('places a node on an empty board at the requested position', () => {
     const board = GridBoard.empty();
-    const result = handler.handle(board, new AddNodeCommand('e1', 'OrderPlaced', 2, 0));
+    const result = handler.handle(board, new AddDomainEventNodeCommand('e1', 'OrderPlaced', 2, 0));
 
     const nodes = collectNodes(result);
     const placed = nodes[0];
@@ -22,10 +22,10 @@ describe('AddNodeCommandHandler', () => {
   it('shifts an occupant right when inserting at its position', () => {
     const board = handler.handle(
       GridBoard.empty(),
-      new AddNodeCommand('existing', 'PaymentReceived', 2, 1)
+      new AddDomainEventNodeCommand('existing', 'PaymentReceived', 2, 1)
     );
 
-    const result = handler.handle(board, new AddNodeCommand('new', 'OrderPlaced', 2, 1));
+    const result = handler.handle(board, new AddDomainEventNodeCommand('new', 'OrderPlaced', 2, 1));
     const nodes = collectNodes(result);
 
     const shifted = nodes.find((n) => n.id === 'existing');
@@ -40,12 +40,12 @@ describe('AddNodeCommandHandler', () => {
 
   it('shifts every node in the same row at the target column or beyond', () => {
     const board = [
-      new AddNodeCommand('a', 'A', 2, 1),
-      new AddNodeCommand('b', 'B', 3, 1),
-      new AddNodeCommand('c', 'C', 4, 1),
+      new AddDomainEventNodeCommand('a', 'A', 2, 1),
+      new AddDomainEventNodeCommand('b', 'B', 3, 1),
+      new AddDomainEventNodeCommand('c', 'C', 4, 1),
     ].reduce((b, cmd) => handler.handle(b, cmd), GridBoard.empty());
 
-    const result = handler.handle(board, new AddNodeCommand('new', 'New', 2, 1));
+    const result = handler.handle(board, new AddDomainEventNodeCommand('new', 'New', 2, 1));
     const nodes = collectNodes(result);
 
     const nodeA = nodes.find((n) => n.id === 'a');
@@ -65,11 +65,11 @@ describe('AddNodeCommandHandler', () => {
 
   it('does NOT shift nodes in a different row', () => {
     const board = [
-      new AddNodeCommand('same', 'A', 2, 1),
-      new AddNodeCommand('other', 'B', 2, 2),
+      new AddDomainEventNodeCommand('same', 'A', 2, 1),
+      new AddDomainEventNodeCommand('other', 'B', 2, 2),
     ].reduce((b, cmd) => handler.handle(b, cmd), GridBoard.empty());
 
-    const result = handler.handle(board, new AddNodeCommand('new', 'New', 2, 1));
+    const result = handler.handle(board, new AddDomainEventNodeCommand('new', 'New', 2, 1));
     const nodes = collectNodes(result);
 
     const other = nodes.find((n) => n.id === 'other');
@@ -83,11 +83,11 @@ describe('AddNodeCommandHandler', () => {
 
   it('does NOT shift nodes in the same row that are left of the target column', () => {
     const board = [
-      new AddNodeCommand('left', 'Left', 1, 0),
-      new AddNodeCommand('target', 'Target', 2, 0),
+      new AddDomainEventNodeCommand('left', 'Left', 1, 0),
+      new AddDomainEventNodeCommand('target', 'Target', 2, 0),
     ].reduce((b, cmd) => handler.handle(b, cmd), GridBoard.empty());
 
-    const result = handler.handle(board, new AddNodeCommand('new', 'New', 2, 0));
+    const result = handler.handle(board, new AddDomainEventNodeCommand('new', 'New', 2, 0));
     const nodes = collectNodes(result);
 
     const left = nodes.find((n) => n.id === 'left');
@@ -105,9 +105,9 @@ describe('AddNodeCommandHandler', () => {
   it('does not mutate the original board', () => {
     const board = handler.handle(
       GridBoard.empty(),
-      new AddNodeCommand('x', 'X', 0, 0)
+      new AddDomainEventNodeCommand('x', 'X', 0, 0)
     );
-    handler.handle(board, new AddNodeCommand('y', 'Y', 0, 0));
+    handler.handle(board, new AddDomainEventNodeCommand('y', 'Y', 0, 0));
 
     expect(collectNodes(board)).toHaveLength(1);
   });

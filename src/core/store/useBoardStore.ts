@@ -7,8 +7,8 @@ import { CommandNode } from '../domain/CommandNode';
 import { ReadModelNode } from '../domain/ReadModelNode';
 import { PolicyNode } from '../domain/PolicyNode';
 import { UIScreenNode } from '../domain/UIScreenNode';
-import { AddNodeCommand } from '../usecases/commands/AddNode/AddNodeCommand';
-import { AddNodeCommandHandler } from '../usecases/commands/AddNode/AddNodeCommandHandler';
+import { AddDomainEventNodeCommand } from '../usecases/commands/AddDomainEventNode/AddDomainEventNodeCommand';
+import { AddDomainEventNodeCommandHandler } from '../usecases/commands/AddDomainEventNode/AddDomainEventNodeCommandHandler';
 import { MoveNodeCommand } from '../usecases/commands/MoveNode/MoveNodeCommand';
 import { MoveNodeCommandHandler } from '../usecases/commands/MoveNode/MoveNodeCommandHandler';
 import { UpdateNodeLabelCommand } from '../usecases/commands/UpdateNodeLabel/UpdateNodeLabelCommand';
@@ -106,7 +106,7 @@ interface BoardStoreState {
 
 interface BoardActions {
   /** Add a new domain event node at the given grid position. */
-  addNode: (id: string, label: string, column: number, row: number) => void;
+  addDomainEventNode: (id: string, label: string, column: number, row: number) => void;
   /** Add a command node linked to an existing domain event. */
   addCommandNode: (id: string, label: string, column: number, row: number, linkedEventId: string) => void;
   /** Add a read model node at the given grid position. */
@@ -127,7 +127,7 @@ interface BoardActions {
   exportMarkdown: () => string;
 }
 
-const addNodeHandler = new AddNodeCommandHandler();
+const addDomainEventNodeHandler = new AddDomainEventNodeCommandHandler();
 const addCommandNodeHandler = new AddCommandNodeCommandHandler();
 const addReadModelNodeHandler = new AddReadModelNodeCommandHandler();
 const addPolicyNodeHandler = new AddPolicyNodeCommandHandler();
@@ -144,9 +144,9 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
   board: initialState.board,
   links: initialState.links,
 
-  addNode: (id, label, column, row) =>
+  addDomainEventNode: (id, label, column, row) =>
     set((state) => {
-      const board = addNodeHandler.handle(state.board, new AddNodeCommand(id, label, column, row));
+      const board = addDomainEventNodeHandler.handle(state.board, new AddDomainEventNodeCommand(id, label, column, row));
       saveToStorage(board, state.links);
       return { board };
     }),
@@ -220,7 +220,7 @@ export const useLinks = () => useBoardStore((state) => state.links);
 export const useBoardActions = () =>
   useBoardStore(
     useShallow((state) => ({
-      addNode: state.addNode,
+      addDomainEventNode: state.addDomainEventNode,
       addCommandNode: state.addCommandNode,
       addReadModelNode: state.addReadModelNode,
       addPolicyNode: state.addPolicyNode,

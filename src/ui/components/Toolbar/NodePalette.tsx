@@ -2,12 +2,12 @@ import { useCallback } from 'react';
 import { useBoardActions } from '../../../core/store/useBoardStore';
 
 export function NodePalette() {
-  const { addNode, addReadModelNode, addPolicyNode, addUIScreenNode } = useBoardActions();
+  const { addDomainEventNode, addReadModelNode, addPolicyNode, addUIScreenNode } = useBoardActions();
 
   const addAtOrigin = useCallback((type: string) => {
     const id = `${type}-${crypto.randomUUID()}`;
     if (type === 'domain-event') {
-      addNode(id, 'Domain Event', 0, 0);
+      addDomainEventNode(id, 'Domain Event', 0, 0);
     } else if (type === 'read-model') {
       addReadModelNode(id, 'Read Model', 0, 1);
     } else if (type === 'policy') {
@@ -15,7 +15,7 @@ export function NodePalette() {
     } else if (type === 'ui-screen') {
       addUIScreenNode(id, 'UI Screen', 0, 3);
     }
-  }, [addNode, addReadModelNode, addPolicyNode, addUIScreenNode]);
+  }, [addDomainEventNode, addReadModelNode, addPolicyNode, addUIScreenNode]);
 
   return (
     <aside className="node-palette" aria-label="Node palette">

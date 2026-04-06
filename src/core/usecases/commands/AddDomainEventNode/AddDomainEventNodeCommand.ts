@@ -1,4 +1,4 @@
-export class AddNodeCommand {
+export class AddDomainEventNodeCommand {
   readonly id: string;
   readonly label: string;
   readonly column: number;
