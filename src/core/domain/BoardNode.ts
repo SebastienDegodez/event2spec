@@ -1,8 +1,9 @@
+import type { BoardProjection } from './BoardProjection';
 import { GridPosition } from './GridPosition';
 
 export abstract class BoardNode {
-  readonly id: string;
-  readonly label: string;
+  protected readonly id: string;
+  protected readonly label: string;
   private readonly position: GridPosition;
 
   protected constructor(id: string, label: string, position: GridPosition) {
@@ -11,11 +12,15 @@ export abstract class BoardNode {
     this.position = position;
   }
 
+  hasId(targetId: string): boolean {
+    return this.id === targetId;
+  }
+
   isAt(position: GridPosition): boolean {
     return this.position.equals(position);
   }
 
-  gridPosition(): GridPosition {
+  protected gridPosition(): GridPosition {
     return this.position;
   }
 
@@ -26,6 +31,8 @@ export abstract class BoardNode {
   shouldShiftWhenInserted(incoming: BoardNode): boolean {
     return this.occupiesSameRowAtOrBeyond(incoming.gridPosition());
   }
+
+  abstract describeTo(projection: BoardProjection): void;
 
   abstract shiftRight(): BoardNode;
 

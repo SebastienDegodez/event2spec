@@ -16,44 +16,52 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import { useBoard, useBoardActions, useLinks } from '../../../core/store/useBoardStore';
-import { CommandNode as CommandNodeDomain } from '../../../core/domain/CommandNode';
+import { type BoardProjection } from '../../../core/domain/BoardProjection';
 import { DomainEventNode, type DomainEventNodeData } from './DomainEventNode';
 import { CommandNodeComponent, type CommandNodeData } from './CommandNodeComponent';
+import { ReadModelNodeComponent, type ReadModelNodeData } from './ReadModelNodeComponent';
+import { PolicyNodeComponent, type PolicyNodeData } from './PolicyNodeComponent';
+import { UIScreenNodeComponent, type UIScreenNodeData } from './UIScreenNodeComponent';
 import { ContextMenu } from './ContextMenu';
 import { type ContextMenuState } from './ContextMenuState';
-import { GRID_SIZE, NOTE_SIZE, COMMAND_NODE_COLOR, DOMAIN_EVENT_NODE_COLOR, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
+import { GRID_SIZE, NOTE_SIZE, COMMAND_NODE_COLOR, DOMAIN_EVENT_NODE_COLOR, READ_MODEL_NODE_COLOR, POLICY_NODE_COLOR, UI_SCREEN_NODE_COLOR, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 
 const nodeTypes = {
   domainEvent: DomainEventNode,
   command: CommandNodeComponent,
+  readModel: ReadModelNodeComponent,
+  policy: PolicyNodeComponent,
+  uiScreen: UIScreenNodeComponent,
 };
 
 function GridCanvasInner() {
   const board = useBoard();
   const links = useLinks();
-  const { addNode, moveNode } = useBoardActions();
+  const { addDomainEventNode, moveNode } = useBoardActions();
   const { screenToFlowPosition } = useReactFlow();
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
 
-  // Map domain nodes to React Flow nodes (column/row to x/y pixels)
-  const reactFlowNodes = useMemo<Node<DomainEventNodeData | CommandNodeData>[]>(
-    () =>
-      board.toArray().map((domainNode) => {
-        const gridPosition = domainNode.gridPosition();
-        const position = domainNodeToPixelPosition(gridPosition);
-        const isCommand = domainNode instanceof CommandNodeDomain;
-        return {
-          id: domainNode.id,
-          type: isCommand ? 'command' : 'domainEvent',
-          position: position,
-          data: {
-            label: domainNode.label,
-            column: gridPosition.column,
-            row: gridPosition.row,
-          },
-          style: { width: NOTE_SIZE, height: NOTE_SIZE },
-        };
-      }),
+  // Map domain nodes to React Flow nodes via visitor (column/row to x/y pixels)
+  const reactFlowNodes = useMemo<Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData>[]>(
+    () => {
+      const result: Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData>[] = [];
+
+      const createFlowNode = (id: string, label: string, column: number, row: number, type: 'domainEvent' | 'command' | 'readModel' | 'policy' | 'uiScreen') => {
+        const position = domainNodeToPixelPosition({ column, row });
+        result.push({ id, type, position, data: { label, column, row }, style: { width: NOTE_SIZE, height: NOTE_SIZE } });
+      };
+
+      const projection: BoardProjection = {
+        onDomainEventNode(id, label, column, row) { createFlowNode(id, label, column, row, 'domainEvent'); },
+        onCommandNode(id, label, column, row) { createFlowNode(id, label, column, row, 'command'); },
+        onReadModelNode(id, label, column, row) { createFlowNode(id, label, column, row, 'readModel'); },
+        onPolicyNode(id, label, column, row) { createFlowNode(id, label, column, row, 'policy'); },
+        onUIScreenNode(id, label, column, row) { createFlowNode(id, label, column, row, 'uiScreen'); },
+      };
+
+      board.describeTo(projection);
+      return result;
+    },
     [board]
   );
 
@@ -87,7 +95,7 @@ function GridCanvasInner() {
   }, [reactFlowEdges, setEdges]);
 
   // On drag stop: convert pixel position back to grid coordinates and dispatch
-  const onNodeDragStop: OnNodeDrag<Node<DomainEventNodeData | CommandNodeData>> = useCallback(
+  const onNodeDragStop: OnNodeDrag<Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData>> = useCallback(
     (_event, node) => {
       const { column, row } = pixelToGrid(node.position.x, node.position.y);
       moveNode(node.id, column, row);
@@ -102,14 +110,14 @@ function GridCanvasInner() {
     (event: React.MouseEvent) => {
       const flowPosition = screenToFlowPosition({ x: event.clientX, y: event.clientY });
       const { column, row } = pixelToGrid(flowPosition.x, flowPosition.y);
-      addNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
+      addDomainEventNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
     },
-    [addNode, screenToFlowPosition]
+    [addDomainEventNode, screenToFlowPosition]
   );
 
   // Right-click on a node: show insert before / insert after options
   const onNodeContextMenu = useCallback(
-    (event: React.MouseEvent, node: Node<DomainEventNodeData>) => {
+    (event: React.MouseEvent, node: Node) => {
       event.preventDefault();
       const nodeData = node.data as DomainEventNodeData;
       setContextMenu({
@@ -141,9 +149,9 @@ function GridCanvasInner() {
 
   const addEventAtPosition = useCallback(
     (column: number, row: number) => {
-      addNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
+      addDomainEventNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
     },
-    [addNode]
+    [addDomainEventNode]
   );
 
   const contextMenuItems = useMemo(() => {
@@ -193,7 +201,13 @@ function GridCanvasInner() {
         />
         <Controls position="bottom-right" />
         <MiniMap
-          nodeColor={(node) => node.type === 'command' ? COMMAND_NODE_COLOR : DOMAIN_EVENT_NODE_COLOR}
+          nodeColor={(node) => {
+            if (node.type === 'command') return COMMAND_NODE_COLOR;
+            if (node.type === 'readModel') return READ_MODEL_NODE_COLOR;
+            if (node.type === 'policy') return POLICY_NODE_COLOR;
+            if (node.type === 'uiScreen') return UI_SCREEN_NODE_COLOR;
+            return DOMAIN_EVENT_NODE_COLOR;
+          }}
           maskColor="rgba(15,15,25,0.7)"
           position="bottom-left"
         />

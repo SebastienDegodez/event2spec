@@ -1,10 +1,10 @@
 import { GridBoard } from '../../../domain/GridBoard';
-import { BoardNode } from '../../../domain/BoardNode';
+import type { BoardProjection } from '../../../domain/BoardProjection';
 import { GetAllNodesQuery } from './GetAllNodesQuery';
 
 export class GetAllNodesQueryHandler {
-  handle(board: GridBoard, query: GetAllNodesQuery): ReadonlyArray<BoardNode> {
+  handle(board: GridBoard, projection: BoardProjection, query: GetAllNodesQuery): void {
     void query;
-    return board.toArray();
+    board.describeTo(projection);
   }
 }

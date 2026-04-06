@@ -1,4 +1,5 @@
 import { BoardNode } from './BoardNode';
+import type { BoardProjection } from './BoardProjection';
 import { GridPosition } from './GridPosition';
 
 export class GridBoard {
@@ -22,11 +23,11 @@ export class GridBoard {
   }
 
   removeNode(id: string): GridBoard {
-    return new GridBoard(this.nodes.filter((node) => node.id !== id));
+    return new GridBoard(this.nodes.filter((node) => !node.hasId(id)));
   }
 
   moveNode(id: string, column: number, row: number): GridBoard {
-    const node = this.nodes.find((existing) => existing.id === id);
+    const node = this.nodes.find((existing) => existing.hasId(id));
     if (!node) return this;
     const targetPosition = new GridPosition(column, row);
     const withoutMoved = this.removeNode(id);
@@ -38,12 +39,14 @@ export class GridBoard {
 
   updateLabel(id: string, label: string): GridBoard {
     return new GridBoard(this.nodes.map((node) =>
-      node.id === id ? node.withLabel(label) : node
+      node.hasId(id) ? node.withLabel(label) : node
     ));
   }
 
-  toArray(): ReadonlyArray<BoardNode> {
-    return this.nodes;
+  describeTo(projection: BoardProjection): void {
+    for (const node of this.nodes) {
+      node.describeTo(projection);
+    }
   }
 
   private shouldShift(existing: BoardNode, incoming: BoardNode): boolean {
