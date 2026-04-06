@@ -114,8 +114,8 @@ interface BoardStoreState {
 interface BoardActions {
   /** Add a new domain event node at the given grid position. */
   addDomainEventNode: (id: string, label: string, column: number, row: number) => void;
-  /** Add a command node linked to an existing domain event. */
-  addCommandNode: (id: string, label: string, column: number, row: number, linkedEventId: string) => void;
+  /** Add a command node, optionally linked to an existing domain event. */
+  addCommandNode: (id: string, label: string, column: number, row: number, linkedEventId?: string) => void;
   /** Add a read model node at the given grid position. */
   addReadModelNode: (id: string, label: string, column: number, row: number) => void;
   /** Add a policy node at the given grid position. */
@@ -164,8 +164,10 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
   addCommandNode: (id, label, column, row, linkedEventId) =>
     set((state) => {
-      const board = addCommandNodeHandler.handle(state.board, new AddCommandNodeCommand(id, label, column, row, linkedEventId));
-      const links = [...state.links, { sourceNodeId: id, targetNodeId: linkedEventId, connectionType: 'triggers' as const }];
+      const board = addCommandNodeHandler.handle(state.board, new AddCommandNodeCommand(id, label, column, row, linkedEventId ?? ''));
+      const links = linkedEventId
+        ? [...state.links, { sourceNodeId: id, targetNodeId: linkedEventId, connectionType: 'triggers' as const }]
+        : state.links;
       saveToStorage(board, links);
       return { board, links };
     }),

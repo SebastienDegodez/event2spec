@@ -11,9 +11,9 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
     await expect(background).toBeVisible();
   });
 
-  test('double-clicking the canvas creates a new domain event', async ({ page }) => {
-    const pane = page.locator('.react-flow__pane');
-    await pane.dblclick({ position: { x: 350, y: 250 } });
+  test('clicking a palette item creates a new domain event', async ({ page }) => {
+    const paletteItem = page.locator('.palette-event');
+    await paletteItem.click();
 
     const note = page.locator('.domain-event-node').first();
     await expect(note).toBeVisible();

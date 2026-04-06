@@ -42,7 +42,7 @@ const nodeTypes = {
 function GridCanvasInner() {
   const board = useBoard();
   const links = useLinks();
-  const { addDomainEventNode, moveNode, addLink, removeLink } = useBoardActions();
+  const { addDomainEventNode, addCommandNode, addReadModelNode, addPolicyNode, addUIScreenNode, moveNode, addLink, removeLink } = useBoardActions();
   const { screenToFlowPosition } = useReactFlow();
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
 
@@ -150,14 +150,34 @@ function GridCanvasInner() {
 
   const closeContextMenu = useCallback(() => setContextMenu(null), []);
 
-  // Double-click on the pane: create a new Domain Event at the clicked grid cell
-  const onPaneDoubleClick = useCallback(
-    (event: React.MouseEvent) => {
+  const onDragOver = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  const onDrop = useCallback(
+    (event: React.DragEvent) => {
+      event.preventDefault();
+      const nodeType = event.dataTransfer.getData('application/event2spec-node-type');
+      if (!nodeType) return;
+
       const flowPosition = screenToFlowPosition({ x: event.clientX, y: event.clientY });
       const { column, row } = pixelToGrid(flowPosition.x, flowPosition.y);
-      addDomainEventNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
+      const id = `${nodeType}-${crypto.randomUUID()}`;
+
+      if (nodeType === 'domain-event') {
+        addDomainEventNode(id, 'Domain Event', column, row);
+      } else if (nodeType === 'command') {
+        addCommandNode(id, 'Command', column, row);
+      } else if (nodeType === 'read-model') {
+        addReadModelNode(id, 'Read Model', column, row);
+      } else if (nodeType === 'policy') {
+        addPolicyNode(id, 'Policy', column, row);
+      } else if (nodeType === 'ui-screen') {
+        addUIScreenNode(id, 'UI Screen', column, row);
+      }
     },
-    [addDomainEventNode, screenToFlowPosition]
+    [addDomainEventNode, addCommandNode, addReadModelNode, addPolicyNode, addUIScreenNode, screenToFlowPosition]
   );
 
   // Right-click on a node: show insert before / insert after options
@@ -216,6 +236,8 @@ function GridCanvasInner() {
     <div
       style={{ width: '100%', height: '100%' }}
       data-testid="grid-canvas"
+      onDragOver={onDragOver}
+      onDrop={onDrop}
     >
       <ReactFlow
         nodes={nodes}
@@ -228,7 +250,6 @@ function GridCanvasInner() {
         onNodeContextMenu={onNodeContextMenu}
         onPaneContextMenu={onPaneContextMenu}
         onPaneClick={closeContextMenu}
-        onDoubleClick={onPaneDoubleClick}
         onMoveStart={closeContextMenu}
         nodeTypes={nodeTypes}
         snapToGrid
