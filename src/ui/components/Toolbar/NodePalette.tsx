@@ -1,12 +1,13 @@
 import { useCallback, type DragEvent } from 'react';
 import { useBoardActions } from '../../../core/store/useBoardStore';
+import { DRAG_NODE_TYPE_MIME } from '../Canvas/gridConstants';
 
 const PALETTE_ITEMS = [
-  { type: 'domain-event', label: '🟠 Domain Event', className: 'palette-event' },
-  { type: 'command', label: '🔵 Command', className: 'palette-command' },
-  { type: 'read-model', label: '🟢 Read Model', className: 'palette-read-model' },
-  { type: 'policy', label: '🟣 Policy', className: 'palette-policy' },
-  { type: 'ui-screen', label: '🟡 UI Screen', className: 'palette-ui-screen' },
+  { type: 'domain-event', emoji: '🟠', name: 'Domain Event', className: 'palette-event' },
+  { type: 'command', emoji: '🔵', name: 'Command', className: 'palette-command' },
+  { type: 'read-model', emoji: '🟢', name: 'Read Model', className: 'palette-read-model' },
+  { type: 'policy', emoji: '🟣', name: 'Policy', className: 'palette-policy' },
+  { type: 'ui-screen', emoji: '🟡', name: 'UI Screen', className: 'palette-ui-screen' },
 ] as const;
 
 export function NodePalette() {
@@ -27,8 +28,8 @@ export function NodePalette() {
     }
   }, [addDomainEventNode, addCommandNode, addReadModelNode, addPolicyNode, addUIScreenNode]);
 
-  const onDragStart = useCallback((event: DragEvent<HTMLDivElement>, nodeType: string) => {
-    event.dataTransfer.setData('application/event2spec-node-type', nodeType);
+  const onDragStart = useCallback((event: DragEvent<HTMLButtonElement>, nodeType: string) => {
+    event.dataTransfer.setData(DRAG_NODE_TYPE_MIME, nodeType);
     event.dataTransfer.effectAllowed = 'move';
   }, []);
 
@@ -36,17 +37,17 @@ export function NodePalette() {
     <aside className="node-palette" aria-label="Node palette">
       <div className="palette-title">Post-its</div>
       {PALETTE_ITEMS.map((item) => (
-        <div
+        <button
           key={item.type}
           className={`palette-item ${item.className}`}
           draggable
           onClick={() => addAtOrigin(item.type)}
           onDragStart={(e) => onDragStart(e, item.type)}
-          title={`Add ${item.label.slice(2)}`}
-          aria-label={`Add ${item.label.slice(2)}`}
+          title={`Add ${item.name}`}
+          aria-label={`Add ${item.name}`}
         >
-          {item.label}
-        </div>
+          {item.emoji} {item.name}
+        </button>
       ))}
     </aside>
   );

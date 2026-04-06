@@ -1,3 +1,6 @@
+/** MIME type used to transfer the node type during palette drag & drop. */
+export const DRAG_NODE_TYPE_MIME = 'application/event2spec-node-type';
+
 /** Fixed grid cell size in pixels */
 export const GRID_SIZE = 250;
 

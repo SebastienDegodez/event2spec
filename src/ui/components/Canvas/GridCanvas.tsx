@@ -29,7 +29,7 @@ import { PolicyNodeComponent, type PolicyNodeData } from './PolicyNodeComponent'
 import { UIScreenNodeComponent, type UIScreenNodeData } from './UIScreenNodeComponent';
 import { ContextMenu } from './ContextMenu';
 import { type ContextMenuState } from './ContextMenuState';
-import { GRID_SIZE, NOTE_SIZE, COMMAND_NODE_COLOR, DOMAIN_EVENT_NODE_COLOR, READ_MODEL_NODE_COLOR, POLICY_NODE_COLOR, UI_SCREEN_NODE_COLOR, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
+import { GRID_SIZE, NOTE_SIZE, COMMAND_NODE_COLOR, DOMAIN_EVENT_NODE_COLOR, READ_MODEL_NODE_COLOR, POLICY_NODE_COLOR, UI_SCREEN_NODE_COLOR, EDGE_COLOR, DRAG_NODE_TYPE_MIME, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 
 const nodeTypes = {
   domainEvent: DomainEventNode,
@@ -158,7 +158,7 @@ function GridCanvasInner() {
   const onDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();
-      const nodeType = event.dataTransfer.getData('application/event2spec-node-type');
+      const nodeType = event.dataTransfer.getData(DRAG_NODE_TYPE_MIME);
       if (!nodeType) return;
 
       const flowPosition = screenToFlowPosition({ x: event.clientX, y: event.clientY });
