@@ -7,6 +7,8 @@ import { CommandNode } from '../domain/CommandNode';
 import { ReadModelNode } from '../domain/ReadModelNode';
 import { PolicyNode } from '../domain/PolicyNode';
 import { UIScreenNode } from '../domain/UIScreenNode';
+import { SwimlaneCollection } from '../domain/SwimlaneCollection';
+import { type ActorType } from '../domain/ActorType';
 import { AddDomainEventNodeCommand } from '../usecases/commands/AddDomainEventNode/AddDomainEventNodeCommand';
 import { AddDomainEventNodeCommandHandler } from '../usecases/commands/AddDomainEventNode/AddDomainEventNodeCommandHandler';
 import { MoveNodeCommand } from '../usecases/commands/MoveNode/MoveNodeCommand';
@@ -23,12 +25,23 @@ import { AddPolicyNodeCommand } from '../usecases/commands/AddPolicyNode/AddPoli
 import { AddPolicyNodeCommandHandler } from '../usecases/commands/AddPolicyNode/AddPolicyNodeCommandHandler';
 import { AddUIScreenNodeCommand } from '../usecases/commands/AddUIScreenNode/AddUIScreenNodeCommand';
 import { AddUIScreenNodeCommandHandler } from '../usecases/commands/AddUIScreenNode/AddUIScreenNodeCommandHandler';
+import { AddSwimlaneCommand } from '../usecases/commands/AddSwimlane/AddSwimlaneCommand';
+import { AddSwimlaneCommandHandler } from '../usecases/commands/AddSwimlane/AddSwimlaneCommandHandler';
+import { RemoveSwimlaneCommand } from '../usecases/commands/RemoveSwimlane/RemoveSwimlaneCommand';
+import { RemoveSwimlaneCommandHandler } from '../usecases/commands/RemoveSwimlane/RemoveSwimlaneCommandHandler';
+import { RenameSwimlaneCommand } from '../usecases/commands/RenameSwimlane/RenameSwimlaneCommand';
+import { RenameSwimlaneCommandHandler } from '../usecases/commands/RenameSwimlane/RenameSwimlaneCommandHandler';
+import { ReorderSwimlanesCommand } from '../usecases/commands/ReorderSwimlanes/ReorderSwimlanesCommand';
+import { ReorderSwimlanesCommandHandler } from '../usecases/commands/ReorderSwimlanes/ReorderSwimlanesCommandHandler';
+import { ChangeSwimlaneActorTypeCommand } from '../usecases/commands/ChangeSwimlaneActorType/ChangeSwimlaneActorTypeCommand';
+import { ChangeSwimlaneActorTypeCommandHandler } from '../usecases/commands/ChangeSwimlaneActorType/ChangeSwimlaneActorTypeCommandHandler';
 import { ExportJSONQuery } from '../usecases/queries/ExportJSON/ExportJSONQuery';
 import { ExportJSONQueryHandler } from '../usecases/queries/ExportJSON/ExportJSONQueryHandler';
 import { ExportMarkdownQuery } from '../usecases/queries/ExportMarkdown/ExportMarkdownQuery';
 import { ExportMarkdownQueryHandler } from '../usecases/queries/ExportMarkdown/ExportMarkdownQueryHandler';
 import { type NodeLink } from '../domain/NodeLink';
 import { type ConnectionType } from '../domain/ConnectionType';
+import { Swimlane } from '../domain/Swimlane';
 
 export type { NodeLink };
 export type { ConnectionType };
@@ -42,18 +55,26 @@ interface PersistedNode {
   type: 'domainEvent' | 'command' | 'readModel' | 'policy' | 'uiScreen';
 }
 
+/** Serialisable representation of a swimlane for localStorage persistence. */
+interface PersistedSwimlane {
+  id: string;
+  actorName: string;
+  actorType: ActorType;
+}
+
 /** Shape of the data persisted in localStorage. */
 interface PersistedState {
   nodes: PersistedNode[];
   links: NodeLink[];
+  swimlanes?: PersistedSwimlane[];
 }
 
 const STORAGE_KEY = 'event2spec-board';
 
-function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink> } {
+function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; swimlanes: SwimlaneCollection } {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { board: GridBoard.empty(), links: [] };
+    if (!raw) return { board: GridBoard.empty(), links: [], swimlanes: SwimlaneCollection.empty() };
     const parsed = JSON.parse(raw) as PersistedState;
     const { nodes } = parsed;
     let board = GridBoard.empty();
@@ -77,13 +98,17 @@ function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink> }
       }
       return link as NodeLink;
     });
-    return { board, links };
+    let swimlanes = SwimlaneCollection.empty();
+    for (const s of parsed.swimlanes ?? []) {
+      swimlanes = swimlanes.add(Swimlane.create(s.id, s.actorName, s.actorType));
+    }
+    return { board, links, swimlanes };
   } catch {
-    return { board: GridBoard.empty(), links: [] };
+    return { board: GridBoard.empty(), links: [], swimlanes: SwimlaneCollection.empty() };
   }
 }
 
-function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>): void {
+function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlanes: SwimlaneCollection): void {
   const nodes: PersistedNode[] = [];
   const projection: BoardProjection = {
     onDomainEventNode(id, label, column, row) {
@@ -103,12 +128,19 @@ function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>): void {
     },
   };
   board.describeTo(projection);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ nodes, links }));
+  const persistedSwimlanes: PersistedSwimlane[] = [];
+  swimlanes.describeTo({
+    onSwimlane(id, actorName, actorType) {
+      persistedSwimlanes.push({ id, actorName, actorType });
+    },
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ nodes, links, swimlanes: persistedSwimlanes }));
 }
 
 interface BoardStoreState {
   board: GridBoard;
   links: ReadonlyArray<NodeLink>;
+  swimlanes: SwimlaneCollection;
 }
 
 interface BoardActions {
@@ -132,6 +164,16 @@ interface BoardActions {
   addLink: (sourceNodeId: string, targetNodeId: string, connectionType: ConnectionType) => void;
   /** Remove a link by its source and target node ids. */
   removeLink: (sourceNodeId: string, targetNodeId: string) => void;
+  /** Add a new swimlane. */
+  addSwimlane: (id: string, actorName: string, actorType: ActorType) => void;
+  /** Remove a swimlane by id. */
+  removeSwimlane: (id: string) => void;
+  /** Rename a swimlane. */
+  renameSwimlane: (id: string, actorName: string) => void;
+  /** Reorder a swimlane to a target index. */
+  reorderSwimlanes: (id: string, targetIndex: number) => void;
+  /** Change the actor type of a swimlane. */
+  changeSwimlaneActorType: (id: string, actorType: ActorType) => void;
   /** Export the current board as a JSON string conforming to the EventModel schema. */
   exportJSON: () => string;
   /** Export the current board as a Markdown string conforming to the event-modeling skill format. */
@@ -146,6 +188,11 @@ const addUIScreenNodeHandler = new AddUIScreenNodeCommandHandler();
 const moveNodeHandler = new MoveNodeCommandHandler();
 const updateLabelHandler = new UpdateNodeLabelCommandHandler();
 const removeNodeHandler = new RemoveNodeCommandHandler();
+const addSwimlaneHandler = new AddSwimlaneCommandHandler();
+const removeSwimlaneHandler = new RemoveSwimlaneCommandHandler();
+const renameSwimlaneHandler = new RenameSwimlaneCommandHandler();
+const reorderSwimlanesHandler = new ReorderSwimlanesCommandHandler();
+const changeSwimlaneActorTypeHandler = new ChangeSwimlaneActorTypeCommandHandler();
 const exportJSONHandler = new ExportJSONQueryHandler();
 const exportMarkdownHandler = new ExportMarkdownQueryHandler();
 
@@ -154,11 +201,12 @@ const initialState = loadFromStorage();
 export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) => ({
   board: initialState.board,
   links: initialState.links,
+  swimlanes: initialState.swimlanes,
 
   addDomainEventNode: (id, label, column, row) =>
     set((state) => {
       const board = addDomainEventNodeHandler.handle(state.board, new AddDomainEventNodeCommand(id, label, column, row));
-      saveToStorage(board, state.links);
+      saveToStorage(board, state.links, state.swimlanes);
       return { board };
     }),
 
@@ -166,42 +214,42 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
     set((state) => {
       const board = addCommandNodeHandler.handle(state.board, new AddCommandNodeCommand(id, label, column, row, linkedEventId));
       const links = [...state.links, { sourceNodeId: id, targetNodeId: linkedEventId, connectionType: 'triggers' as const }];
-      saveToStorage(board, links);
+      saveToStorage(board, links, state.swimlanes);
       return { board, links };
     }),
 
   addReadModelNode: (id, label, column, row) =>
     set((state) => {
       const board = addReadModelNodeHandler.handle(state.board, new AddReadModelNodeCommand(id, label, column, row));
-      saveToStorage(board, state.links);
+      saveToStorage(board, state.links, state.swimlanes);
       return { board };
     }),
 
   addPolicyNode: (id, label, column, row) =>
     set((state) => {
       const board = addPolicyNodeHandler.handle(state.board, new AddPolicyNodeCommand(id, label, column, row));
-      saveToStorage(board, state.links);
+      saveToStorage(board, state.links, state.swimlanes);
       return { board };
     }),
 
   addUIScreenNode: (id, label, column, row) =>
     set((state) => {
       const board = addUIScreenNodeHandler.handle(state.board, new AddUIScreenNodeCommand(id, label, column, row));
-      saveToStorage(board, state.links);
+      saveToStorage(board, state.links, state.swimlanes);
       return { board };
     }),
 
   moveNode: (id, column, row) =>
     set((state) => {
       const board = moveNodeHandler.handle(state.board, new MoveNodeCommand(id, column, row));
-      saveToStorage(board, state.links);
+      saveToStorage(board, state.links, state.swimlanes);
       return { board };
     }),
 
   updateLabel: (id, label) =>
     set((state) => {
       const board = updateLabelHandler.handle(state.board, new UpdateNodeLabelCommand(id, label));
-      saveToStorage(board, state.links);
+      saveToStorage(board, state.links, state.swimlanes);
       return { board };
     }),
 
@@ -209,7 +257,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
     set((state) => {
       const board = removeNodeHandler.handle(state.board, new RemoveNodeCommand(id));
       const links = state.links.filter((link) => link.sourceNodeId !== id && link.targetNodeId !== id);
-      saveToStorage(board, links);
+      saveToStorage(board, links, state.swimlanes);
       return { board, links };
     }),
 
@@ -220,7 +268,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       );
       if (alreadyExists) return state;
       const links = [...state.links, { sourceNodeId, targetNodeId, connectionType }];
-      saveToStorage(state.board, links);
+      saveToStorage(state.board, links, state.swimlanes);
       return { links };
     }),
 
@@ -229,13 +277,48 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       const links = state.links.filter(
         (link) => !(link.sourceNodeId === sourceNodeId && link.targetNodeId === targetNodeId)
       );
-      saveToStorage(state.board, links);
+      saveToStorage(state.board, links, state.swimlanes);
       return { links };
     }),
 
+  addSwimlane: (id, actorName, actorType) =>
+    set((state) => {
+      const swimlanes = addSwimlaneHandler.handle(state.swimlanes, new AddSwimlaneCommand(id, actorName, actorType));
+      saveToStorage(state.board, state.links, swimlanes);
+      return { swimlanes };
+    }),
+
+  removeSwimlane: (id) =>
+    set((state) => {
+      const swimlanes = removeSwimlaneHandler.handle(state.swimlanes, new RemoveSwimlaneCommand(id));
+      saveToStorage(state.board, state.links, swimlanes);
+      return { swimlanes };
+    }),
+
+  renameSwimlane: (id, actorName) =>
+    set((state) => {
+      const swimlanes = renameSwimlaneHandler.handle(state.swimlanes, new RenameSwimlaneCommand(id, actorName));
+      saveToStorage(state.board, state.links, swimlanes);
+      return { swimlanes };
+    }),
+
+  reorderSwimlanes: (id, targetIndex) =>
+    set((state) => {
+      const swimlanes = reorderSwimlanesHandler.handle(state.swimlanes, new ReorderSwimlanesCommand(id, targetIndex));
+      saveToStorage(state.board, state.links, swimlanes);
+      return { swimlanes };
+    }),
+
+  changeSwimlaneActorType: (id, actorType) =>
+    set((state) => {
+      const swimlanes = changeSwimlaneActorTypeHandler.handle(state.swimlanes, new ChangeSwimlaneActorTypeCommand(id, actorType));
+      saveToStorage(state.board, state.links, swimlanes);
+      return { swimlanes };
+    }),
+
   exportJSON: () => {
-    const { board, links } = get();
-    return exportJSONHandler.handle(board, links, new ExportJSONQuery());
+    const { board, links, swimlanes } = get();
+    return exportJSONHandler.handle(board, links, swimlanes, new ExportJSONQuery());
   },
 
   exportMarkdown: () => {
@@ -247,6 +330,8 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 export const useBoard = () => useBoardStore((state) => state.board);
 
 export const useLinks = () => useBoardStore((state) => state.links);
+
+export const useSwimlanes = () => useBoardStore((state) => state.swimlanes);
 
 export const useBoardActions = () =>
   useBoardStore(
@@ -263,5 +348,16 @@ export const useBoardActions = () =>
       removeLink: state.removeLink,
       exportJSON: state.exportJSON,
       exportMarkdown: state.exportMarkdown,
+    }))
+  );
+
+export const useSwimlaneActions = () =>
+  useBoardStore(
+    useShallow((state) => ({
+      addSwimlane: state.addSwimlane,
+      removeSwimlane: state.removeSwimlane,
+      renameSwimlane: state.renameSwimlane,
+      reorderSwimlanes: state.reorderSwimlanes,
+      changeSwimlaneActorType: state.changeSwimlaneActorType,
     }))
   );
