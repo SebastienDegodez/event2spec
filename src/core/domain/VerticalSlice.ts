@@ -41,4 +41,9 @@ export class VerticalSlice {
     const scenarios = this.scenarios.filter((_, i) => i !== index);
     return new VerticalSlice(this.id, this.name, this.commandId, this.eventIds, this.readModelId, scenarios);
   }
+
+  updateScenario(index: number, scenario: Scenario): VerticalSlice {
+    const scenarios = this.scenarios.map((s, i) => (i === index ? scenario : s));
+    return new VerticalSlice(this.id, this.name, this.commandId, this.eventIds, this.readModelId, scenarios);
+  }
 }

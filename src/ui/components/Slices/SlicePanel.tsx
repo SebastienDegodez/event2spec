@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useSlices, useSliceActions, useBoard, useLinks } from '../../../core/store/useBoardStore';
+import { useSlices, useSliceActions, useBoard } from '../../../core/store/useBoardStore';
 import { type VerticalSliceProjection, type ScenarioProjection } from '../../../core/domain/VerticalSliceProjection';
 import { type BoardProjection } from '../../../core/domain/BoardProjection';
 import { ScenarioDialog } from './ScenarioDialog';
@@ -22,16 +22,10 @@ interface SlicePanelEntry {
 export function SlicePanel() {
   const slices = useSlices();
   const board = useBoard();
-  const links = useLinks();
-  const { createSlice, renameSlice, deleteSlice, addScenarioToSlice, removeScenarioFromSlice } = useSliceActions();
+  const { renameSlice, deleteSlice, addScenarioToSlice, removeScenarioFromSlice } = useSliceActions();
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [newName, setNewName] = useState('');
-  const [newCommandId, setNewCommandId] = useState('');
-  const [newEventIds, setNewEventIds] = useState<string[]>([]);
-  const [newReadModelId, setNewReadModelId] = useState('');
   const [expandedSlice, setExpandedSlice] = useState<string | null>(null);
   const [scenarioDialogSliceId, setScenarioDialogSliceId] = useState<string | null>(null);
 
@@ -59,29 +53,6 @@ export function SlicePanel() {
     return result;
   }, [board]);
 
-  const commandNodes = useMemo(() => availableNodes.filter((n) => n.kind === 'command'), [availableNodes]);
-  const eventNodes = useMemo(() => availableNodes.filter((n) => n.kind === 'domainEvent'), [availableNodes]);
-  const readModelNodes = useMemo(() => availableNodes.filter((n) => n.kind === 'readModel'), [availableNodes]);
-
-  const autoDetectedEvents = useMemo(() => {
-    if (!newCommandId) return [];
-    return links
-      .filter((l) => l.sourceNodeId === newCommandId && l.connectionType === 'triggers')
-      .map((l) => l.targetNodeId);
-  }, [newCommandId, links]);
-
-  const handleCreate = useCallback(() => {
-    if (!newName.trim() || !newCommandId) return;
-    const eventIds = newEventIds.length > 0 ? newEventIds : autoDetectedEvents;
-    const id = `slice-${crypto.randomUUID()}`;
-    createSlice(id, newName.trim(), newCommandId, eventIds, newReadModelId);
-    setNewName('');
-    setNewCommandId('');
-    setNewEventIds([]);
-    setNewReadModelId('');
-    setShowCreateForm(false);
-  }, [newName, newCommandId, newEventIds, newReadModelId, autoDetectedEvents, createSlice]);
-
   const startEditing = useCallback((id: string, currentName: string) => {
     setEditingId(id);
     setEditingName(currentName);
@@ -100,12 +71,6 @@ export function SlicePanel() {
       setScenarioDialogSliceId(null);
     }
   }, [scenarioDialogSliceId, addScenarioToSlice]);
-
-  const toggleEventId = useCallback((eventId: string) => {
-    setNewEventIds((prev) =>
-      prev.includes(eventId) ? prev.filter((id) => id !== eventId) : [...prev, eventId]
-    );
-  }, []);
 
   const getNode = useCallback((nodeId: string): NodeEntry | undefined => {
     return availableNodes.find((n) => n.id === nodeId);
@@ -246,72 +211,9 @@ export function SlicePanel() {
         </div>
       ))}
 
-      {showCreateForm ? (
-        <div className="slice-create-form">
-          <input
-            className="slice-form-input"
-            placeholder="Slice name"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            autoFocus
-            aria-label="New slice name"
-          />
-          <select
-            className="slice-form-select"
-            value={newCommandId}
-            onChange={(e) => setNewCommandId(e.target.value)}
-            aria-label="Select command"
-          >
-            <option value="">Select command...</option>
-            {commandNodes.map((n) => (
-              <option key={n.id} value={n.id}>{n.label}</option>
-            ))}
-          </select>
-
-          <div className="slice-form-section">
-            <div className="slice-form-label">Events:</div>
-            {eventNodes.map((n) => (
-              <label key={n.id} className="slice-form-checkbox">
-                <input
-                  type="checkbox"
-                  checked={newEventIds.includes(n.id)}
-                  onChange={() => toggleEventId(n.id)}
-                />
-                {n.label}
-              </label>
-            ))}
-            {autoDetectedEvents.length > 0 && newEventIds.length === 0 && (
-              <div className="slice-form-hint">Auto-detected: {autoDetectedEvents.length} event(s) from command links</div>
-            )}
-          </div>
-
-          <select
-            className="slice-form-select"
-            value={newReadModelId}
-            onChange={(e) => setNewReadModelId(e.target.value)}
-            aria-label="Select read model"
-          >
-            <option value="">Select read model...</option>
-            {readModelNodes.map((n) => (
-              <option key={n.id} value={n.id}>{n.label}</option>
-            ))}
-          </select>
-
-          <div className="slice-form-actions">
-            <button className="slice-form-btn slice-form-btn--add" onClick={handleCreate} disabled={!newName.trim() || !newCommandId}>Create</button>
-            <button className="slice-form-btn" onClick={() => setShowCreateForm(false)}>Cancel</button>
-          </div>
-        </div>
-      ) : (
-        <button
-          className="palette-item slice-add-btn"
-          onClick={() => setShowCreateForm(true)}
-          title="Add vertical slice"
-          aria-label="Add vertical slice"
-        >
-          ＋ Add Slice
-        </button>
-      )}
+      <div className="slice-add-hint">
+        Alt+click on the grid to select 1 or 2 columns and create a slice
+      </div>
 
       {scenarioDialogSliceId && (
         <ScenarioDialog
