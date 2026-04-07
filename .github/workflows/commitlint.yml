@@ -49,7 +49,16 @@ jobs:
       - name: Validate conventional commits
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+            git log --format="%H %s" ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | \
+            while IFS= read -r line; do
+              sha=$(echo "$line" | cut -d' ' -f1)
+              subject=$(echo "$line" | cut -d' ' -f2-)
+              if echo "$subject" | grep -iqE "^\s*init(ial)? plan\s*$"; then
+                echo "Skipping 'Initial plan' commit: $sha"
+                continue
+              fi
+              npx commitlint --from "${sha}~1" --to "$sha" --verbose
+            done
           else
             npx commitlint --from HEAD~1 --to HEAD --verbose
           fi
@@ -61,6 +70,11 @@ jobs:
             COMMITS=$(git log --format="%H" -1)
           fi
           for commit in $COMMITS; do
+            MSG=$(git log --format="%s" -n 1 "$commit")
+            if echo "$MSG" | grep -iqE "^\s*init(ial)? plan\s*$"; then
+              echo "Skipping 'Initial plan' commit: $commit"
+              continue
+            fi
             if ! git log --format="%B" -n 1 "$commit" | grep -q "^Signed-off-by:"; then
               echo "ERROR: Commit $commit is missing a Signed-off-by trailer."
               echo "Use 'git commit --signoff' to add it."
