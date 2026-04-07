@@ -107,15 +107,20 @@ export function SlicePanel() {
     );
   }, []);
 
-  const getNodeLabel = useCallback((nodeId: string) => {
-    const node = availableNodes.find((n) => n.id === nodeId);
-    return node ? node.label : nodeId;
+  const getNode = useCallback((nodeId: string): NodeEntry | undefined => {
+    return availableNodes.find((n) => n.id === nodeId);
   }, [availableNodes]);
 
-  const getNodeKind = useCallback((nodeId: string): 'command' | 'domainEvent' | 'readModel' | 'unknown' => {
-    const node = availableNodes.find((n) => n.id === nodeId);
-    return node ? node.kind : 'unknown';
-  }, [availableNodes]);
+  const getNodeLabel = useCallback((nodeId: string) => {
+    return getNode(nodeId)?.label ?? nodeId;
+  }, [getNode]);
+
+  const nodeKindToCss = useCallback((nodeId: string): string => {
+    const kind = getNode(nodeId)?.kind;
+    if (kind === 'domainEvent') return 'event';
+    if (kind === 'command') return 'command';
+    return 'default';
+  }, [getNode]);
 
   return (
     <aside className="slice-panel" aria-label="Vertical slice management">
@@ -189,7 +194,7 @@ export function SlicePanel() {
                           <span className="slice-scenario-keyword">Given</span>
                           <div className="slice-scenario-nodes">
                             {scenario.given.map((g, gi) => (
-                              <span key={gi} className={`mini-postit-inline mini-postit-inline--${getNodeKind(g) === 'domainEvent' ? 'event' : 'default'}`}>
+                              <span key={gi} className={`mini-postit-inline mini-postit-inline--${nodeKindToCss(g)}`}>
                                 {getNodeLabel(g)}
                               </span>
                             ))}
@@ -199,7 +204,7 @@ export function SlicePanel() {
                       <div className="slice-scenario-group">
                         <span className="slice-scenario-keyword">When</span>
                         <div className="slice-scenario-nodes">
-                          <span className={`mini-postit-inline mini-postit-inline--${getNodeKind(scenario.when) === 'command' ? 'command' : 'default'}`}>
+                          <span className={`mini-postit-inline mini-postit-inline--${nodeKindToCss(scenario.when)}`}>
                             {getNodeLabel(scenario.when)}
                           </span>
                         </div>
@@ -209,7 +214,7 @@ export function SlicePanel() {
                           <span className="slice-scenario-keyword">Then</span>
                           <div className="slice-scenario-nodes">
                             {scenario.then.map((t, ti) => (
-                              <span key={ti} className={`mini-postit-inline mini-postit-inline--${getNodeKind(t) === 'domainEvent' ? 'event' : 'default'}`}>
+                              <span key={ti} className={`mini-postit-inline mini-postit-inline--${nodeKindToCss(t)}`}>
                                 {getNodeLabel(t)}
                               </span>
                             ))}
