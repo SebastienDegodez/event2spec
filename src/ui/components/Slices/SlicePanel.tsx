@@ -212,7 +212,7 @@ export function SlicePanel() {
       ))}
 
       <div className="slice-add-hint">
-        Alt+click on the grid to select 1–2 columns and create a slice
+        Alt+click on the grid to select 1 or 2 columns and create a slice
       </div>
 
       {scenarioDialogSliceId && (

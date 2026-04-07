@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useBoard, useLinks, useSlices, useSliceActions, useColumnSelectionActions } from '../../../core/store/useBoardStore';
 import { type BoardProjection } from '../../../core/domain/BoardProjection';
 import { type VerticalSliceProjection, type ScenarioProjection } from '../../../core/domain/VerticalSliceProjection';
@@ -75,20 +75,17 @@ export function SliceEditorView({ selectedColumns }: SliceEditorViewProps) {
     [nodesInColumns],
   );
 
-  // Auto-fill from detected columns when selection changes (only on first render or column change)
-  const [lastColumns, setLastColumns] = useState<number[]>([]);
-  if (
-    selectedColumns.length > 0 &&
-    (selectedColumns.length !== lastColumns.length || selectedColumns.some((c, i) => c !== lastColumns[i]))
-  ) {
-    setLastColumns(selectedColumns);
+  // Auto-fill from detected columns when selection changes
+  useEffect(() => {
+    if (selectedColumns.length === 0) return;
     setCommandId(detectedCommandId);
     setEventIds(detectedEventIds);
     setReadModelId(detectedReadModelId);
     setName('');
     setNewScenario(null);
     setEditingScenarioIndex(null);
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedColumns.join(',')]);
 
   // Auto-detect events from command links
   const autoLinkedEvents = useMemo(() => {
