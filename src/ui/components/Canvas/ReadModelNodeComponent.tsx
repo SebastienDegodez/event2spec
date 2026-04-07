@@ -1,6 +1,8 @@
 import { memo, useCallback, useState } from 'react';
 import { Handle, Position, useReactFlow, type NodeProps } from '@xyflow/react';
 import { useBoardActions } from '../../../core/store/useBoardStore';
+import { useNodeValidationWarning } from '../../hooks/useNodeValidationWarning';
+import { ValidationBadge } from '../Validation/ValidationBadge';
 
 export type ReadModelNodeData = {
   label: string;
@@ -11,6 +13,7 @@ export type ReadModelNodeData = {
 export const ReadModelNodeComponent = memo(({ id, data, selected }: NodeProps) => {
   const nodeData = data as ReadModelNodeData;
   const { updateLabel, removeNode } = useBoardActions();
+  const warningType = useNodeValidationWarning(id);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(nodeData.label);
   const { deleteElements } = useReactFlow();
@@ -77,6 +80,8 @@ export const ReadModelNodeComponent = memo(({ id, data, selected }: NodeProps) =
       >
         ×
       </button>
+
+      {warningType && <ValidationBadge warningType={warningType} />}
 
       <Handle type="source" position={Position.Right} className="read-model-handle" />
     </div>
