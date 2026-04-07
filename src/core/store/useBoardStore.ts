@@ -48,6 +48,8 @@ import { AddScenarioToSliceCommand } from '../usecases/commands/AddScenarioToSli
 import { AddScenarioToSliceCommandHandler } from '../usecases/commands/AddScenarioToSlice/AddScenarioToSliceCommandHandler';
 import { RemoveScenarioFromSliceCommand } from '../usecases/commands/RemoveScenarioFromSlice/RemoveScenarioFromSliceCommand';
 import { RemoveScenarioFromSliceCommandHandler } from '../usecases/commands/RemoveScenarioFromSlice/RemoveScenarioFromSliceCommandHandler';
+import { UpdateScenarioInSliceCommand } from '../usecases/commands/UpdateScenarioInSlice/UpdateScenarioInSliceCommand';
+import { UpdateScenarioInSliceCommandHandler } from '../usecases/commands/UpdateScenarioInSlice/UpdateScenarioInSliceCommandHandler';
 import { ExportJSONQuery } from '../usecases/queries/ExportJSON/ExportJSONQuery';
 import { ExportJSONQueryHandler } from '../usecases/queries/ExportJSON/ExportJSONQueryHandler';
 import { ExportMarkdownQuery } from '../usecases/queries/ExportMarkdown/ExportMarkdownQuery';
@@ -209,6 +211,7 @@ interface BoardStoreState {
   slices: VerticalSliceCollection;
   selectedNode: SelectedNode | null;
   nodeProperties: Record<string, NodeProperties>;
+  selectedColumns: number[];
 }
 
 interface BoardActions {
@@ -258,6 +261,12 @@ interface BoardActions {
   addScenarioToSlice: (sliceId: string, given: string[], when: string, then: string[]) => void;
   /** Remove a scenario from a slice by index. */
   removeScenarioFromSlice: (sliceId: string, scenarioIndex: number) => void;
+  /** Update an existing scenario in a slice by index. */
+  updateScenarioInSlice: (sliceId: string, scenarioIndex: number, given: string[], when: string, then: string[]) => void;
+  /** Set the currently selected columns (for slice creation). */
+  selectColumns: (columns: number[]) => void;
+  /** Clear the column selection. */
+  clearColumnSelection: () => void;
   /** Export the current board as a JSON string conforming to the EventModel schema. */
   exportJSON: () => string;
   /** Export the current board as a Markdown string conforming to the event-modeling skill format. */
@@ -307,6 +316,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
   const deleteSliceHandler = new DeleteSliceCommandHandler(sliceRepository);
   const addScenarioToSliceHandler = new AddScenarioToSliceCommandHandler(sliceRepository);
   const removeScenarioFromSliceHandler = new RemoveScenarioFromSliceCommandHandler(sliceRepository);
+  const updateScenarioInSliceHandler = new UpdateScenarioInSliceCommandHandler(sliceRepository);
 
   return {
     board: initialState.board,
@@ -315,6 +325,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
     slices: initialState.slices,
     selectedNode: null,
     nodeProperties: initialState.nodeProperties,
+    selectedColumns: [],
 
     addDomainEventNode: (id, label, column, row) =>
       set((state) => {
@@ -458,6 +469,14 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       removeScenarioFromSliceHandler.handle(new RemoveScenarioFromSliceCommand(sliceId, scenarioIndex));
     },
 
+    updateScenarioInSlice: (sliceId, scenarioIndex, given, when, then) => {
+      updateScenarioInSliceHandler.handle(new UpdateScenarioInSliceCommand(sliceId, scenarioIndex, given, when, then));
+    },
+
+    selectColumns: (columns) => set({ selectedColumns: columns }),
+
+    clearColumnSelection: () => set({ selectedColumns: [] }),
+
     exportJSON: () => {
       const { board, links, swimlanes, slices, nodeProperties } = get();
       return exportJSONHandler.handle(board, links, swimlanes, slices, nodeProperties, new ExportJSONQuery());
@@ -522,5 +541,16 @@ export const useSliceActions = () =>
       deleteSlice: state.deleteSlice,
       addScenarioToSlice: state.addScenarioToSlice,
       removeScenarioFromSlice: state.removeScenarioFromSlice,
+      updateScenarioInSlice: state.updateScenarioInSlice,
+    }))
+  );
+
+export const useSelectedColumns = () => useBoardStore((state) => state.selectedColumns);
+
+export const useColumnSelectionActions = () =>
+  useBoardStore(
+    useShallow((state) => ({
+      selectColumns: state.selectColumns,
+      clearColumnSelection: state.clearColumnSelection,
     }))
   );

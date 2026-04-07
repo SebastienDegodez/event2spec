@@ -1830,3 +1830,220 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+/* ─── Column selection overlay ──────────────────────────────────────────── */
+
+.column-selection-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 5;
+}
+
+.column-selection-highlight {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(99, 102, 241, 0.18);
+  border-left: 2px solid rgba(99, 102, 241, 0.6);
+  border-right: 2px solid rgba(99, 102, 241, 0.6);
+  pointer-events: none;
+}
+
+/* ─── SliceEditorView panel ─────────────────────────────────────────────── */
+
+.slice-editor-view {
+  width: 300px;
+  min-width: 260px;
+  max-width: 340px;
+  background: rgba(22, 22, 35, 0.97);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 12px;
+  gap: 0;
+}
+
+.slice-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.slice-editor-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #c7c7d9;
+  letter-spacing: 0.03em;
+}
+
+.slice-editor-close {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.slice-editor-close:hover {
+  color: #f87171;
+}
+
+.slice-editor-section {
+  margin-bottom: 12px;
+}
+
+.slice-editor-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+
+.slice-editor-hint {
+  font-size: 11px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.slice-editor-input,
+.slice-editor-select {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: #e5e7eb;
+  font-size: 12px;
+  padding: 6px 10px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.slice-editor-input:focus,
+.slice-editor-select:focus {
+  border-color: rgba(99, 102, 241, 0.5);
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.slice-editor-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #d1d5db;
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+
+.slice-editor-actions {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.slice-editor-btn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: #d1d5db;
+  font-size: 12px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.slice-editor-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.14);
+  color: #f9fafb;
+}
+
+.slice-editor-btn--primary {
+  background: rgba(99, 102, 241, 0.25);
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #a5b4fc;
+}
+
+.slice-editor-btn--primary:hover:not(:disabled) {
+  background: rgba(99, 102, 241, 0.4);
+  color: #e0e7ff;
+}
+
+.slice-editor-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ─── Inline scenario editor ────────────────────────────────────────────── */
+
+.scenario-inline-editor {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.scenario-inline-item {
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.scenario-inline-item:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.scenario-inline-display {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.scenario-inline-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.scenario-inline-btns {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.scenario-inline-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scenario-inline-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* ─── SlicePanel hint ───────────────────────────────────────────────────── */
+
+.slice-add-hint {
+  font-size: 11px;
+  color: #6b7280;
+  font-style: italic;
+  text-align: center;
+  padding: 8px 4px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  margin-top: 8px;
+  line-height: 1.4;
+}

@@ -19,7 +19,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { useBoard, useBoardActions, useLinks, useSwimlanes } from '../../../core/store/useBoardStore';
+import { useBoard, useBoardActions, useLinks, useSwimlanes, useSelectedColumns, useColumnSelectionActions } from '../../../core/store/useBoardStore';
 import { type BoardProjection } from '../../../core/domain/BoardProjection';
 import { type SwimlaneProjection } from '../../../core/domain/SwimlaneProjection';
 import { type ActorType } from '../../../core/domain/ActorType';
@@ -63,6 +63,8 @@ function GridCanvasInner() {
   const { screenToFlowPosition } = useReactFlow();
   const viewport = useViewport();
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
+  const selectedColumns = useSelectedColumns();
+  const { selectColumns, clearColumnSelection } = useColumnSelectionActions();
 
   // Collect swimlane background nodes AND label entries in a single projection pass
   const swimlaneRenderData = useMemo(() => {
@@ -205,11 +207,25 @@ function GridCanvasInner() {
     [selectNode]
   );
 
-  // Click on the pane: close context menu and deselect node
-  const onPaneClick = useCallback(() => {
+  // Click on the pane: close context menu and deselect node (or toggle column selection with Alt key)
+  const onPaneClick = useCallback((event: React.MouseEvent) => {
     setContextMenu(null);
+    if (event.altKey) {
+      const flowPosition = screenToFlowPosition({ x: event.clientX, y: event.clientY });
+      const { column } = pixelToGrid(flowPosition.x, flowPosition.y);
+      const already = selectedColumns.includes(column);
+      if (already) {
+        selectColumns(selectedColumns.filter((c) => c !== column));
+      } else if (selectedColumns.length < 2) {
+        selectColumns([...selectedColumns, column]);
+      } else {
+        selectColumns([selectedColumns[1], column]);
+      }
+      return;
+    }
+    clearColumnSelection();
     deselectNode();
-  }, [deselectNode]);
+  }, [deselectNode, screenToFlowPosition, selectedColumns, selectColumns, clearColumnSelection]);
 
   // Double-click on the pane: create a new Domain Event at the clicked grid cell
   const onPaneDoubleClick = useCallback(
@@ -323,6 +339,21 @@ function GridCanvasInner() {
           position="bottom-left"
         />
       </ReactFlow>
+      {selectedColumns.length > 0 && (
+        <div className="column-selection-overlay" aria-hidden="true">
+          {selectedColumns.map((col) => {
+            const x = col * GRID_SIZE * viewport.zoom + viewport.x;
+            const width = GRID_SIZE * viewport.zoom;
+            return (
+              <div
+                key={col}
+                className="column-selection-highlight"
+                style={{ left: x, width }}
+              />
+            );
+          })}
+        </div>
+      )}
       {!swimlanes.isEmpty() && (
         <div className="swimlane-labels-overlay" aria-hidden="true">
           {swimlaneRenderData.labels.map((entry) => {

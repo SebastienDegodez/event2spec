@@ -40,6 +40,12 @@ export class VerticalSliceCollection {
     );
   }
 
+  updateScenario(id: string, scenarioIndex: number, scenario: Scenario): VerticalSliceCollection {
+    return new VerticalSliceCollection(
+      this.slices.map((s) => (s.id === id ? s.updateScenario(scenarioIndex, scenario) : s)),
+    );
+  }
+
   isEmpty(): boolean {
     return this.slices.length === 0;
   }
