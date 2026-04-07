@@ -10,6 +10,8 @@ import { UIScreenNode } from '../domain/UIScreenNode';
 import { SwimlaneCollection } from '../domain/SwimlaneCollection';
 import { type SwimlaneRepository } from '../domain/SwimlaneRepository';
 import { type ActorType } from '../domain/ActorType';
+import { type NodeKind } from '../domain/NodeKind';
+import { type NodeProperties, createDefaultNodeProperties } from '../domain/NodeProperties';
 import { AddDomainEventNodeCommand } from '../usecases/commands/AddDomainEventNode/AddDomainEventNodeCommand';
 import { AddDomainEventNodeCommandHandler } from '../usecases/commands/AddDomainEventNode/AddDomainEventNodeCommandHandler';
 import { MoveNodeCommand } from '../usecases/commands/MoveNode/MoveNodeCommand';
@@ -46,6 +48,14 @@ import { Swimlane } from '../domain/Swimlane';
 
 export type { NodeLink };
 export type { ConnectionType };
+export type { NodeProperties };
+
+/** Information about the currently selected node. */
+export interface SelectedNode {
+  id: string;
+  type: NodeKind;
+  label: string;
+}
 
 /** Serialisable representation of a node for localStorage persistence. */
 interface PersistedNode {
@@ -68,14 +78,15 @@ interface PersistedState {
   nodes: PersistedNode[];
   links: NodeLink[];
   swimlanes?: PersistedSwimlane[];
+  nodeProperties?: Record<string, NodeProperties>;
 }
 
 const STORAGE_KEY = 'event2spec-board';
 
-function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; swimlanes: SwimlaneCollection } {
+function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; swimlanes: SwimlaneCollection; nodeProperties: Record<string, NodeProperties> } {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { board: GridBoard.empty(), links: [], swimlanes: SwimlaneCollection.empty() };
+    if (!raw) return { board: GridBoard.empty(), links: [], swimlanes: SwimlaneCollection.empty(), nodeProperties: {} };
     const parsed = JSON.parse(raw) as PersistedState;
     const { nodes } = parsed;
     let board = GridBoard.empty();
@@ -103,13 +114,13 @@ function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; 
     for (const s of parsed.swimlanes ?? []) {
       swimlanes = swimlanes.add(Swimlane.create(s.id, s.actorName, s.actorType));
     }
-    return { board, links, swimlanes };
+    return { board, links, swimlanes, nodeProperties: parsed.nodeProperties ?? {} };
   } catch {
-    return { board: GridBoard.empty(), links: [], swimlanes: SwimlaneCollection.empty() };
+    return { board: GridBoard.empty(), links: [], swimlanes: SwimlaneCollection.empty(), nodeProperties: {} };
   }
 }
 
-function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlanes: SwimlaneCollection): void {
+function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlanes: SwimlaneCollection, nodeProperties: Record<string, NodeProperties>): void {
   const nodes: PersistedNode[] = [];
   const projection: BoardProjection = {
     onDomainEventNode(id, label, column, row) {
@@ -135,20 +146,22 @@ function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlan
       persistedSwimlanes.push({ id, actorName, actorType });
     },
   });
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ nodes, links, swimlanes: persistedSwimlanes }));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ nodes, links, swimlanes: persistedSwimlanes, nodeProperties }));
 }
 
 interface BoardStoreState {
   board: GridBoard;
   links: ReadonlyArray<NodeLink>;
   swimlanes: SwimlaneCollection;
+  selectedNode: SelectedNode | null;
+  nodeProperties: Record<string, NodeProperties>;
 }
 
 interface BoardActions {
   /** Add a new domain event node at the given grid position. */
   addDomainEventNode: (id: string, label: string, column: number, row: number) => void;
-  /** Add a command node linked to an existing domain event. */
-  addCommandNode: (id: string, label: string, column: number, row: number, linkedEventId: string) => void;
+  /** Add a command node, optionally linked to an existing domain event. */
+  addCommandNode: (id: string, label: string, column: number, row: number, linkedEventId?: string) => void;
   /** Add a read model node at the given grid position. */
   addReadModelNode: (id: string, label: string, column: number, row: number) => void;
   /** Add a policy node at the given grid position. */
@@ -165,6 +178,12 @@ interface BoardActions {
   addLink: (sourceNodeId: string, targetNodeId: string, connectionType: ConnectionType) => void;
   /** Remove a link by its source and target node ids. */
   removeLink: (sourceNodeId: string, targetNodeId: string) => void;
+  /** Select a node by id, type and label (opens properties panel). */
+  selectNode: (id: string, type: NodeKind, label: string) => void;
+  /** Deselect the currently selected node (closes properties panel). */
+  deselectNode: () => void;
+  /** Update the properties of a node. */
+  updateNodeProperties: (id: string, properties: NodeProperties) => void;
   /** Add a new swimlane. */
   addSwimlane: (id: string, actorName: string, actorType: ActorType) => void;
   /** Remove a swimlane by id. */
@@ -198,8 +217,8 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
   const swimlaneRepository: SwimlaneRepository = {
     load: () => get().swimlanes,
     save: (swimlanes) => {
-      const { board, links } = get();
-      saveToStorage(board, links, swimlanes);
+      const { board, links, nodeProperties } = get();
+      saveToStorage(board, links, swimlanes, nodeProperties);
       set({ swimlanes });
     },
   };
@@ -214,63 +233,76 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
     board: initialState.board,
     links: initialState.links,
     swimlanes: initialState.swimlanes,
+    selectedNode: null,
+    nodeProperties: initialState.nodeProperties,
 
     addDomainEventNode: (id, label, column, row) =>
       set((state) => {
         const board = addDomainEventNodeHandler.handle(state.board, new AddDomainEventNodeCommand(id, label, column, row));
-        saveToStorage(board, state.links, state.swimlanes);
-        return { board };
+        const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('domainEvent') };
+        saveToStorage(board, state.links, state.swimlanes, nodeProperties);
+        return { board, nodeProperties };
       }),
 
     addCommandNode: (id, label, column, row, linkedEventId) =>
       set((state) => {
-        const board = addCommandNodeHandler.handle(state.board, new AddCommandNodeCommand(id, label, column, row, linkedEventId));
-        const links = [...state.links, { sourceNodeId: id, targetNodeId: linkedEventId, connectionType: 'triggers' as const }];
-        saveToStorage(board, links, state.swimlanes);
-        return { board, links };
+        const board = addCommandNodeHandler.handle(state.board, new AddCommandNodeCommand(id, label, column, row, linkedEventId ?? ''));
+        const links = linkedEventId
+          ? [...state.links, { sourceNodeId: id, targetNodeId: linkedEventId, connectionType: 'triggers' as const }]
+          : state.links;
+        const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('command') };
+        saveToStorage(board, links, state.swimlanes, nodeProperties);
+        return { board, links, nodeProperties };
       }),
 
     addReadModelNode: (id, label, column, row) =>
       set((state) => {
         const board = addReadModelNodeHandler.handle(state.board, new AddReadModelNodeCommand(id, label, column, row));
-        saveToStorage(board, state.links, state.swimlanes);
-        return { board };
+        const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('readModel') };
+        saveToStorage(board, state.links, state.swimlanes, nodeProperties);
+        return { board, nodeProperties };
       }),
 
     addPolicyNode: (id, label, column, row) =>
       set((state) => {
         const board = addPolicyNodeHandler.handle(state.board, new AddPolicyNodeCommand(id, label, column, row));
-        saveToStorage(board, state.links, state.swimlanes);
-        return { board };
+        const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('policy') };
+        saveToStorage(board, state.links, state.swimlanes, nodeProperties);
+        return { board, nodeProperties };
       }),
 
     addUIScreenNode: (id, label, column, row) =>
       set((state) => {
         const board = addUIScreenNodeHandler.handle(state.board, new AddUIScreenNodeCommand(id, label, column, row));
-        saveToStorage(board, state.links, state.swimlanes);
-        return { board };
+        const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('uiScreen') };
+        saveToStorage(board, state.links, state.swimlanes, nodeProperties);
+        return { board, nodeProperties };
       }),
 
     moveNode: (id, column, row) =>
       set((state) => {
         const board = moveNodeHandler.handle(state.board, new MoveNodeCommand(id, column, row));
-        saveToStorage(board, state.links, state.swimlanes);
+        saveToStorage(board, state.links, state.swimlanes, state.nodeProperties);
         return { board };
       }),
 
     updateLabel: (id, label) =>
       set((state) => {
         const board = updateLabelHandler.handle(state.board, new UpdateNodeLabelCommand(id, label));
-        saveToStorage(board, state.links, state.swimlanes);
-        return { board };
+        saveToStorage(board, state.links, state.swimlanes, state.nodeProperties);
+        const selectedNode = state.selectedNode?.id === id ? { ...state.selectedNode, label } : state.selectedNode;
+        return { board, selectedNode };
       }),
 
     removeNode: (id) =>
       set((state) => {
         const board = removeNodeHandler.handle(state.board, new RemoveNodeCommand(id));
         const links = state.links.filter((link) => link.sourceNodeId !== id && link.targetNodeId !== id);
-        saveToStorage(board, links, state.swimlanes);
-        return { board, links };
+        const { [id]: _, ...nodeProperties } = state.nodeProperties;
+        void _;
+        saveToStorage(board, links, state.swimlanes, nodeProperties);
+        const selectedNode = state.selectedNode?.id === id ? null : state.selectedNode;
+        return { board, links, nodeProperties, selectedNode };
       }),
 
     addLink: (sourceNodeId, targetNodeId, connectionType) =>
@@ -280,7 +312,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         );
         if (alreadyExists) return state;
         const links = [...state.links, { sourceNodeId, targetNodeId, connectionType }];
-        saveToStorage(state.board, links, state.swimlanes);
+        saveToStorage(state.board, links, state.swimlanes, state.nodeProperties);
         return { links };
       }),
 
@@ -289,8 +321,21 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         const links = state.links.filter(
           (link) => !(link.sourceNodeId === sourceNodeId && link.targetNodeId === targetNodeId)
         );
-        saveToStorage(state.board, links, state.swimlanes);
+        saveToStorage(state.board, links, state.swimlanes, state.nodeProperties);
         return { links };
+      }),
+
+    selectNode: (id, type, label) =>
+      set({ selectedNode: { id, type, label } }),
+
+    deselectNode: () =>
+      set({ selectedNode: null }),
+
+    updateNodeProperties: (id, properties) =>
+      set((state) => {
+        const nodeProperties = { ...state.nodeProperties, [id]: properties };
+        saveToStorage(state.board, state.links, state.swimlanes, nodeProperties);
+        return { nodeProperties };
       }),
 
     addSwimlane: (id, actorName, actorType) => {
@@ -314,8 +359,8 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
     },
 
     exportJSON: () => {
-      const { board, links, swimlanes } = get();
-      return exportJSONHandler.handle(board, links, swimlanes, new ExportJSONQuery());
+      const { board, links, swimlanes, nodeProperties } = get();
+      return exportJSONHandler.handle(board, links, swimlanes, nodeProperties, new ExportJSONQuery());
     },
 
     exportMarkdown: () => {
@@ -331,6 +376,10 @@ export const useLinks = () => useBoardStore((state) => state.links);
 
 export const useSwimlanes = () => useBoardStore((state) => state.swimlanes);
 
+export const useSelectedNode = () => useBoardStore((state) => state.selectedNode);
+
+export const useNodeProperties = () => useBoardStore((state) => state.nodeProperties);
+
 export const useBoardActions = () =>
   useBoardStore(
     useShallow((state) => ({
@@ -344,6 +393,9 @@ export const useBoardActions = () =>
       removeNode: state.removeNode,
       addLink: state.addLink,
       removeLink: state.removeLink,
+      selectNode: state.selectNode,
+      deselectNode: state.deselectNode,
+      updateNodeProperties: state.updateNodeProperties,
       exportJSON: state.exportJSON,
       exportMarkdown: state.exportMarkdown,
     }))
