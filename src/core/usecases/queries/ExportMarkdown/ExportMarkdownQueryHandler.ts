@@ -1,6 +1,7 @@
 import { GridBoard } from '../../../domain/GridBoard';
 import { type BoardProjection } from '../../../domain/BoardProjection';
 import { type NodeLink } from '../../../domain/NodeLink';
+import { VerticalSliceCollection } from '../../../domain/VerticalSliceCollection';
 import { ExportMarkdownQuery } from './ExportMarkdownQuery';
 
 interface NamedEntry {
@@ -9,7 +10,7 @@ interface NamedEntry {
 }
 
 export class ExportMarkdownQueryHandler {
-  handle(board: GridBoard, links: ReadonlyArray<NodeLink>, query: ExportMarkdownQuery): string {
+  handle(board: GridBoard, links: ReadonlyArray<NodeLink>, slices: VerticalSliceCollection, query: ExportMarkdownQuery): string {
     void query;
 
     const domainEvents: NamedEntry[] = [];
@@ -121,7 +122,44 @@ export class ExportMarkdownQueryHandler {
       });
     }
 
-    lines.push('', '## Vertical Slices', '', '*(No vertical slices defined yet)*');
+    lines.push('', '## Vertical Slices', '');
+
+    interface SliceEntry {
+      name: string;
+      commandId: string;
+      eventIds: ReadonlyArray<string>;
+      readModelId: string;
+      scenarios: ReadonlyArray<{ given: ReadonlyArray<string>; when: string; then: ReadonlyArray<string> }>;
+    }
+    const sliceEntries: SliceEntry[] = [];
+    slices.describeTo({
+      onSlice(_id, name, commandId, eventIds, readModelId, scenarios) {
+        sliceEntries.push({ name, commandId, eventIds, readModelId, scenarios });
+      },
+    });
+
+    if (sliceEntries.length === 0) {
+      lines.push('*(No vertical slices defined yet)*');
+    } else {
+      sliceEntries.forEach((entry) => {
+        lines.push(`### ${entry.name}`);
+        lines.push('');
+        lines.push(`- **Command**: \`${entry.commandId}\``);
+        lines.push(`- **Events**: ${entry.eventIds.map((e) => `\`${e}\``).join(', ')}`);
+        lines.push(`- **Read Model**: \`${entry.readModelId}\``);
+        if (entry.scenarios.length > 0) {
+          lines.push('');
+          lines.push('**Scenarios:**');
+          entry.scenarios.forEach((scenario) => {
+            lines.push('');
+            scenario.given.forEach((g) => lines.push(`- **Given** ${g}`));
+            lines.push(`- **When** ${scenario.when}`);
+            scenario.then.forEach((t) => lines.push(`- **Then** ${t}`));
+          });
+        }
+        lines.push('');
+      });
+    }
     lines.push('', '## Bounded Contexts', '', '*(No bounded contexts defined yet)*');
     lines.push('', '## Decisions', '', '*(No decisions recorded yet)*');
     lines.push('', '## Open Questions', '', '*(No open questions recorded yet)*');

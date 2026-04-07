@@ -38,6 +38,16 @@ import { ReorderSwimlanesCommand } from '../usecases/commands/ReorderSwimlanes/R
 import { ReorderSwimlanesCommandHandler } from '../usecases/commands/ReorderSwimlanes/ReorderSwimlanesCommandHandler';
 import { ChangeSwimlaneActorTypeCommand } from '../usecases/commands/ChangeSwimlaneActorType/ChangeSwimlaneActorTypeCommand';
 import { ChangeSwimlaneActorTypeCommandHandler } from '../usecases/commands/ChangeSwimlaneActorType/ChangeSwimlaneActorTypeCommandHandler';
+import { CreateSliceCommand } from '../usecases/commands/CreateSlice/CreateSliceCommand';
+import { CreateSliceCommandHandler } from '../usecases/commands/CreateSlice/CreateSliceCommandHandler';
+import { RenameSliceCommand } from '../usecases/commands/RenameSlice/RenameSliceCommand';
+import { RenameSliceCommandHandler } from '../usecases/commands/RenameSlice/RenameSliceCommandHandler';
+import { DeleteSliceCommand } from '../usecases/commands/DeleteSlice/DeleteSliceCommand';
+import { DeleteSliceCommandHandler } from '../usecases/commands/DeleteSlice/DeleteSliceCommandHandler';
+import { AddScenarioToSliceCommand } from '../usecases/commands/AddScenarioToSlice/AddScenarioToSliceCommand';
+import { AddScenarioToSliceCommandHandler } from '../usecases/commands/AddScenarioToSlice/AddScenarioToSliceCommandHandler';
+import { RemoveScenarioFromSliceCommand } from '../usecases/commands/RemoveScenarioFromSlice/RemoveScenarioFromSliceCommand';
+import { RemoveScenarioFromSliceCommandHandler } from '../usecases/commands/RemoveScenarioFromSlice/RemoveScenarioFromSliceCommandHandler';
 import { ExportJSONQuery } from '../usecases/queries/ExportJSON/ExportJSONQuery';
 import { ExportJSONQueryHandler } from '../usecases/queries/ExportJSON/ExportJSONQueryHandler';
 import { ExportMarkdownQuery } from '../usecases/queries/ExportMarkdown/ExportMarkdownQuery';
@@ -45,6 +55,10 @@ import { ExportMarkdownQueryHandler } from '../usecases/queries/ExportMarkdown/E
 import { type NodeLink } from '../domain/NodeLink';
 import { type ConnectionType } from '../domain/ConnectionType';
 import { Swimlane } from '../domain/Swimlane';
+import { VerticalSliceCollection } from '../domain/VerticalSliceCollection';
+import { type VerticalSliceRepository } from '../domain/VerticalSliceRepository';
+import { VerticalSlice } from '../domain/VerticalSlice';
+import { Scenario } from '../domain/Scenario';
 
 export type { NodeLink };
 export type { ConnectionType };
@@ -73,20 +87,38 @@ interface PersistedSwimlane {
   actorType: ActorType;
 }
 
+/** Serialisable representation of a scenario for localStorage persistence. */
+interface PersistedScenario {
+  given: string[];
+  when: string;
+  then: string[];
+}
+
+/** Serialisable representation of a vertical slice for localStorage persistence. */
+interface PersistedSlice {
+  id: string;
+  name: string;
+  commandId: string;
+  eventIds: string[];
+  readModelId: string;
+  scenarios: PersistedScenario[];
+}
+
 /** Shape of the data persisted in localStorage. */
 interface PersistedState {
   nodes: PersistedNode[];
   links: NodeLink[];
   swimlanes?: PersistedSwimlane[];
+  slices?: PersistedSlice[];
   nodeProperties?: Record<string, NodeProperties>;
 }
 
 const STORAGE_KEY = 'event2spec-board';
 
-function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; swimlanes: SwimlaneCollection; nodeProperties: Record<string, NodeProperties> } {
+function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; swimlanes: SwimlaneCollection; slices: VerticalSliceCollection; nodeProperties: Record<string, NodeProperties> } {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { board: GridBoard.empty(), links: [], swimlanes: SwimlaneCollection.empty(), nodeProperties: {} };
+    if (!raw) return { board: GridBoard.empty(), links: [], swimlanes: SwimlaneCollection.empty(), slices: VerticalSliceCollection.empty(), nodeProperties: {} };
     const parsed = JSON.parse(raw) as PersistedState;
     const { nodes } = parsed;
     let board = GridBoard.empty();
@@ -114,13 +146,21 @@ function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; 
     for (const s of parsed.swimlanes ?? []) {
       swimlanes = swimlanes.add(Swimlane.create(s.id, s.actorName, s.actorType));
     }
-    return { board, links, swimlanes, nodeProperties: parsed.nodeProperties ?? {} };
+    let slices = VerticalSliceCollection.empty();
+    for (const ps of parsed.slices ?? []) {
+      let slice = VerticalSlice.create(ps.id, ps.name, ps.commandId, ps.eventIds, ps.readModelId);
+      for (const sc of ps.scenarios) {
+        slice = slice.addScenario(Scenario.create(sc.given, sc.when, sc.then));
+      }
+      slices = slices.add(slice);
+    }
+    return { board, links, swimlanes, slices, nodeProperties: parsed.nodeProperties ?? {} };
   } catch {
-    return { board: GridBoard.empty(), links: [], swimlanes: SwimlaneCollection.empty(), nodeProperties: {} };
+    return { board: GridBoard.empty(), links: [], swimlanes: SwimlaneCollection.empty(), slices: VerticalSliceCollection.empty(), nodeProperties: {} };
   }
 }
 
-function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlanes: SwimlaneCollection, nodeProperties: Record<string, NodeProperties>): void {
+function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlanes: SwimlaneCollection, slices: VerticalSliceCollection, nodeProperties: Record<string, NodeProperties>): void {
   const nodes: PersistedNode[] = [];
   const projection: BoardProjection = {
     onDomainEventNode(id, label, column, row) {
@@ -146,13 +186,27 @@ function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlan
       persistedSwimlanes.push({ id, actorName, actorType });
     },
   });
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ nodes, links, swimlanes: persistedSwimlanes, nodeProperties }));
+  const persistedSlices: PersistedSlice[] = [];
+  slices.describeTo({
+    onSlice(id, name, commandId, eventIds, readModelId, scenarios) {
+      persistedSlices.push({
+        id,
+        name,
+        commandId,
+        eventIds: [...eventIds],
+        readModelId,
+        scenarios: scenarios.map((s) => ({ given: [...s.given], when: s.when, then: [...s.then] })),
+      });
+    },
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ nodes, links, swimlanes: persistedSwimlanes, slices: persistedSlices, nodeProperties }));
 }
 
 interface BoardStoreState {
   board: GridBoard;
   links: ReadonlyArray<NodeLink>;
   swimlanes: SwimlaneCollection;
+  slices: VerticalSliceCollection;
   selectedNode: SelectedNode | null;
   nodeProperties: Record<string, NodeProperties>;
 }
@@ -194,6 +248,16 @@ interface BoardActions {
   reorderSwimlanes: (id: string, targetIndex: number) => void;
   /** Change the actor type of a swimlane. */
   changeSwimlaneActorType: (id: string, actorType: ActorType) => void;
+  /** Create a new vertical slice. */
+  createSlice: (id: string, name: string, commandId: string, eventIds: string[], readModelId: string) => void;
+  /** Rename a vertical slice. */
+  renameSlice: (id: string, name: string) => void;
+  /** Delete a vertical slice. */
+  deleteSlice: (id: string) => void;
+  /** Add a scenario (Given/When/Then) to a slice. */
+  addScenarioToSlice: (sliceId: string, given: string[], when: string, then: string[]) => void;
+  /** Remove a scenario from a slice by index. */
+  removeScenarioFromSlice: (sliceId: string, scenarioIndex: number) => void;
   /** Export the current board as a JSON string conforming to the EventModel schema. */
   exportJSON: () => string;
   /** Export the current board as a Markdown string conforming to the event-modeling skill format. */
@@ -217,8 +281,8 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
   const swimlaneRepository: SwimlaneRepository = {
     load: () => get().swimlanes,
     save: (swimlanes) => {
-      const { board, links, nodeProperties } = get();
-      saveToStorage(board, links, swimlanes, nodeProperties);
+      const { board, links, slices, nodeProperties } = get();
+      saveToStorage(board, links, swimlanes, slices, nodeProperties);
       set({ swimlanes });
     },
   };
@@ -229,10 +293,26 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
   const reorderSwimlanesHandler = new ReorderSwimlanesCommandHandler(swimlaneRepository);
   const changeSwimlaneActorTypeHandler = new ChangeSwimlaneActorTypeCommandHandler(swimlaneRepository);
 
+  const sliceRepository: VerticalSliceRepository = {
+    load: () => get().slices,
+    save: (slices) => {
+      const { board, links, swimlanes, nodeProperties } = get();
+      saveToStorage(board, links, swimlanes, slices, nodeProperties);
+      set({ slices });
+    },
+  };
+
+  const createSliceHandler = new CreateSliceCommandHandler(sliceRepository);
+  const renameSliceHandler = new RenameSliceCommandHandler(sliceRepository);
+  const deleteSliceHandler = new DeleteSliceCommandHandler(sliceRepository);
+  const addScenarioToSliceHandler = new AddScenarioToSliceCommandHandler(sliceRepository);
+  const removeScenarioFromSliceHandler = new RemoveScenarioFromSliceCommandHandler(sliceRepository);
+
   return {
     board: initialState.board,
     links: initialState.links,
     swimlanes: initialState.swimlanes,
+    slices: initialState.slices,
     selectedNode: null,
     nodeProperties: initialState.nodeProperties,
 
@@ -240,7 +320,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       set((state) => {
         const board = addDomainEventNodeHandler.handle(state.board, new AddDomainEventNodeCommand(id, label, column, row));
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('domainEvent') };
-        saveToStorage(board, state.links, state.swimlanes, nodeProperties);
+        saveToStorage(board, state.links, state.swimlanes, state.slices, nodeProperties);
         return { board, nodeProperties };
       }),
 
@@ -251,7 +331,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
           ? [...state.links, { sourceNodeId: id, targetNodeId: linkedEventId, connectionType: 'triggers' as const }]
           : state.links;
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('command') };
-        saveToStorage(board, links, state.swimlanes, nodeProperties);
+        saveToStorage(board, links, state.swimlanes, state.slices, nodeProperties);
         return { board, links, nodeProperties };
       }),
 
@@ -259,7 +339,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       set((state) => {
         const board = addReadModelNodeHandler.handle(state.board, new AddReadModelNodeCommand(id, label, column, row));
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('readModel') };
-        saveToStorage(board, state.links, state.swimlanes, nodeProperties);
+        saveToStorage(board, state.links, state.swimlanes, state.slices, nodeProperties);
         return { board, nodeProperties };
       }),
 
@@ -267,7 +347,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       set((state) => {
         const board = addPolicyNodeHandler.handle(state.board, new AddPolicyNodeCommand(id, label, column, row));
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('policy') };
-        saveToStorage(board, state.links, state.swimlanes, nodeProperties);
+        saveToStorage(board, state.links, state.swimlanes, state.slices, nodeProperties);
         return { board, nodeProperties };
       }),
 
@@ -275,21 +355,21 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       set((state) => {
         const board = addUIScreenNodeHandler.handle(state.board, new AddUIScreenNodeCommand(id, label, column, row));
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('uiScreen') };
-        saveToStorage(board, state.links, state.swimlanes, nodeProperties);
+        saveToStorage(board, state.links, state.swimlanes, state.slices, nodeProperties);
         return { board, nodeProperties };
       }),
 
     moveNode: (id, column, row) =>
       set((state) => {
         const board = moveNodeHandler.handle(state.board, new MoveNodeCommand(id, column, row));
-        saveToStorage(board, state.links, state.swimlanes, state.nodeProperties);
+        saveToStorage(board, state.links, state.swimlanes, state.slices, state.nodeProperties);
         return { board };
       }),
 
     updateLabel: (id, label) =>
       set((state) => {
         const board = updateLabelHandler.handle(state.board, new UpdateNodeLabelCommand(id, label));
-        saveToStorage(board, state.links, state.swimlanes, state.nodeProperties);
+        saveToStorage(board, state.links, state.swimlanes, state.slices, state.nodeProperties);
         const selectedNode = state.selectedNode?.id === id ? { ...state.selectedNode, label } : state.selectedNode;
         return { board, selectedNode };
       }),
@@ -300,7 +380,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         const links = state.links.filter((link) => link.sourceNodeId !== id && link.targetNodeId !== id);
         const { [id]: _, ...nodeProperties } = state.nodeProperties;
         void _;
-        saveToStorage(board, links, state.swimlanes, nodeProperties);
+        saveToStorage(board, links, state.swimlanes, state.slices, nodeProperties);
         const selectedNode = state.selectedNode?.id === id ? null : state.selectedNode;
         return { board, links, nodeProperties, selectedNode };
       }),
@@ -312,7 +392,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         );
         if (alreadyExists) return state;
         const links = [...state.links, { sourceNodeId, targetNodeId, connectionType }];
-        saveToStorage(state.board, links, state.swimlanes, state.nodeProperties);
+        saveToStorage(state.board, links, state.swimlanes, state.slices, state.nodeProperties);
         return { links };
       }),
 
@@ -321,7 +401,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         const links = state.links.filter(
           (link) => !(link.sourceNodeId === sourceNodeId && link.targetNodeId === targetNodeId)
         );
-        saveToStorage(state.board, links, state.swimlanes, state.nodeProperties);
+        saveToStorage(state.board, links, state.swimlanes, state.slices, state.nodeProperties);
         return { links };
       }),
 
@@ -334,7 +414,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
     updateNodeProperties: (id, properties) =>
       set((state) => {
         const nodeProperties = { ...state.nodeProperties, [id]: properties };
-        saveToStorage(state.board, state.links, state.swimlanes, nodeProperties);
+        saveToStorage(state.board, state.links, state.swimlanes, state.slices, nodeProperties);
         return { nodeProperties };
       }),
 
@@ -358,14 +438,34 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       changeSwimlaneActorTypeHandler.handle(new ChangeSwimlaneActorTypeCommand(id, actorType));
     },
 
+    createSlice: (id, name, commandId, eventIds, readModelId) => {
+      createSliceHandler.handle(new CreateSliceCommand(id, name, commandId, eventIds, readModelId));
+    },
+
+    renameSlice: (id, name) => {
+      renameSliceHandler.handle(new RenameSliceCommand(id, name));
+    },
+
+    deleteSlice: (id) => {
+      deleteSliceHandler.handle(new DeleteSliceCommand(id));
+    },
+
+    addScenarioToSlice: (sliceId, given, when, then) => {
+      addScenarioToSliceHandler.handle(new AddScenarioToSliceCommand(sliceId, given, when, then));
+    },
+
+    removeScenarioFromSlice: (sliceId, scenarioIndex) => {
+      removeScenarioFromSliceHandler.handle(new RemoveScenarioFromSliceCommand(sliceId, scenarioIndex));
+    },
+
     exportJSON: () => {
-      const { board, links, swimlanes, nodeProperties } = get();
-      return exportJSONHandler.handle(board, links, swimlanes, nodeProperties, new ExportJSONQuery());
+      const { board, links, swimlanes, slices, nodeProperties } = get();
+      return exportJSONHandler.handle(board, links, swimlanes, slices, nodeProperties, new ExportJSONQuery());
     },
 
     exportMarkdown: () => {
-      const { board, links } = get();
-      return exportMarkdownHandler.handle(board, links, new ExportMarkdownQuery());
+      const { board, links, slices } = get();
+      return exportMarkdownHandler.handle(board, links, slices, new ExportMarkdownQuery());
     },
   };
 });
@@ -375,6 +475,8 @@ export const useBoard = () => useBoardStore((state) => state.board);
 export const useLinks = () => useBoardStore((state) => state.links);
 
 export const useSwimlanes = () => useBoardStore((state) => state.swimlanes);
+
+export const useSlices = () => useBoardStore((state) => state.slices);
 
 export const useSelectedNode = () => useBoardStore((state) => state.selectedNode);
 
@@ -409,5 +511,16 @@ export const useSwimlaneActions = () =>
       renameSwimlane: state.renameSwimlane,
       reorderSwimlanes: state.reorderSwimlanes,
       changeSwimlaneActorType: state.changeSwimlaneActorType,
+    }))
+  );
+
+export const useSliceActions = () =>
+  useBoardStore(
+    useShallow((state) => ({
+      createSlice: state.createSlice,
+      renameSlice: state.renameSlice,
+      deleteSlice: state.deleteSlice,
+      addScenarioToSlice: state.addScenarioToSlice,
+      removeScenarioFromSlice: state.removeScenarioFromSlice,
     }))
   );

@@ -5,14 +5,16 @@ import { CommandNode } from '../../../../src/core/domain/CommandNode';
 import { ReadModelNode } from '../../../../src/core/domain/ReadModelNode';
 import { PolicyNode } from '../../../../src/core/domain/PolicyNode';
 import { UIScreenNode } from '../../../../src/core/domain/UIScreenNode';
+import { VerticalSliceCollection } from '../../../../src/core/domain/VerticalSliceCollection';
 import { ExportMarkdownQuery } from '../../../../src/core/usecases/queries/ExportMarkdown/ExportMarkdownQuery';
 import { ExportMarkdownQueryHandler } from '../../../../src/core/usecases/queries/ExportMarkdown/ExportMarkdownQueryHandler';
 
 const handler = new ExportMarkdownQueryHandler();
+const emptySlices = VerticalSliceCollection.empty();
 
 describe('ExportMarkdownQueryHandler', () => {
   it('includes the expected section headings', () => {
-    const result = handler.handle(GridBoard.empty(), [], new ExportMarkdownQuery());
+    const result = handler.handle(GridBoard.empty(), [], emptySlices, new ExportMarkdownQuery());
 
     expect(result).toContain('# Event Model');
     expect(result).toContain('## Domain Events');
@@ -31,7 +33,7 @@ describe('ExportMarkdownQueryHandler', () => {
       DomainEventNode.create('e1', 'OrderPlaced', 0, 0)
     );
 
-    const result = handler.handle(board, [], new ExportMarkdownQuery());
+    const result = handler.handle(board, [], emptySlices, new ExportMarkdownQuery());
 
     expect(result).toContain('OrderPlaced');
   });
@@ -42,7 +44,7 @@ describe('ExportMarkdownQueryHandler', () => {
       .insertNode(CommandNode.create('c1', 'PlaceOrder', 0, 1));
     const links = [{ sourceNodeId: 'c1', targetNodeId: 'e1', connectionType: 'triggers' as const }];
 
-    const result = handler.handle(board, links, new ExportMarkdownQuery());
+    const result = handler.handle(board, links, emptySlices, new ExportMarkdownQuery());
 
     expect(result).toContain('PlaceOrder');
     expect(result).toContain('e1');
@@ -54,7 +56,7 @@ describe('ExportMarkdownQueryHandler', () => {
       .insertNode(ReadModelNode.create('rm1', 'Order Summary', 1, 0));
     const links = [{ sourceNodeId: 'e1', targetNodeId: 'rm1', connectionType: 'feeds' as const }];
 
-    const result = handler.handle(board, links, new ExportMarkdownQuery());
+    const result = handler.handle(board, links, emptySlices, new ExportMarkdownQuery());
 
     expect(result).toContain('Order Summary');
     expect(result).toContain('e1');
@@ -70,7 +72,7 @@ describe('ExportMarkdownQueryHandler', () => {
       { sourceNodeId: 'p1', targetNodeId: 'c1', connectionType: 'executes' as const },
     ];
 
-    const result = handler.handle(board, links, new ExportMarkdownQuery());
+    const result = handler.handle(board, links, emptySlices, new ExportMarkdownQuery());
 
     expect(result).toContain('AutoConfirm');
     expect(result).toContain('e1');
@@ -83,7 +85,7 @@ describe('ExportMarkdownQueryHandler', () => {
       .insertNode(CommandNode.create('c1', 'PlaceOrder', 1, 0));
     const links = [{ sourceNodeId: 'ui1', targetNodeId: 'c1', connectionType: 'user action' as const }];
 
-    const result = handler.handle(board, links, new ExportMarkdownQuery());
+    const result = handler.handle(board, links, emptySlices, new ExportMarkdownQuery());
 
     expect(result).toContain('Order Form');
     expect(result).toContain('c1');
@@ -94,13 +96,13 @@ describe('ExportMarkdownQueryHandler', () => {
       ReadModelNode.create('rm1', 'Order Summary', 0, 0)
     );
 
-    const result = handler.handle(board, [], new ExportMarkdownQuery());
+    const result = handler.handle(board, [], emptySlices, new ExportMarkdownQuery());
 
     expect(result).toContain('Order Summary');
   });
 
   it('shows placeholder text when sections are empty', () => {
-    const result = handler.handle(GridBoard.empty(), [], new ExportMarkdownQuery());
+    const result = handler.handle(GridBoard.empty(), [], emptySlices, new ExportMarkdownQuery());
 
     expect(result).toContain('*(No domain events defined yet)*');
     expect(result).toContain('*(No commands defined yet)*');
