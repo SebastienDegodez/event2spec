@@ -3,6 +3,7 @@ import { ExportToolbar } from './ui/components/Toolbar/ExportToolbar';
 import { NodePalette } from './ui/components/Toolbar/NodePalette';
 import { SwimlanePanel } from './ui/components/Toolbar/SwimlanePanel';
 import { PropertiesPanel } from './ui/components/PropertiesPanel/PropertiesPanel';
+import { ValidationCounter } from './ui/components/Validation/ValidationCounter';
 import './App.css';
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
         <div className="app-hint">
           Right-click · Double-click to add · Click + to add Command · Double-click label to edit · Drag to move
         </div>
+        <ValidationCounter />
         <ExportToolbar />
       </header>
       <div className="app-workspace">
