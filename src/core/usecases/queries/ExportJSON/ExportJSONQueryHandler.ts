@@ -1,13 +1,14 @@
 import { GridBoard } from '../../../domain/GridBoard';
 import { type BoardProjection } from '../../../domain/BoardProjection';
-import { type EventModel, type DomainEventEntry, type CommandEntry, type ReadModelEntry, type PolicyEntry, type UIScreenEntry } from '../../../domain/EventModelSchema';
+import { type EventModel, type DomainEventEntry, type CommandEntry, type ReadModelEntry, type PolicyEntry, type UIScreenEntry, type VerticalSlice as VerticalSliceSchema, type Scenario as ScenarioSchema } from '../../../domain/EventModelSchema';
 import { type NodeLink } from '../../../domain/NodeLink';
 import { type NodeProperties } from '../../../domain/NodeProperties';
 import { SwimlaneCollection } from '../../../domain/SwimlaneCollection';
+import { VerticalSliceCollection } from '../../../domain/VerticalSliceCollection';
 import { ExportJSONQuery } from './ExportJSONQuery';
 
 export class ExportJSONQueryHandler {
-  handle(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlanes: SwimlaneCollection, nodeProperties: Record<string, NodeProperties>, query: ExportJSONQuery): string {
+  handle(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlanes: SwimlaneCollection, slices: VerticalSliceCollection, nodeProperties: Record<string, NodeProperties>, query: ExportJSONQuery): string {
     void query;
 
     const domainEvents: DomainEventEntry[] = [];
@@ -104,6 +105,24 @@ export class ExportJSONQueryHandler {
       },
     });
 
+    const exportedSlices: VerticalSliceSchema[] = [];
+    slices.describeTo({
+      onSlice(_id, name, commandId, eventIds, readModelId, scenarios) {
+        const exportedScenarios: ScenarioSchema[] = scenarios.map((s) => ({
+          given: [...s.given],
+          when: s.when,
+          then: [...s.then],
+        }));
+        exportedSlices.push({
+          name,
+          command: commandId,
+          events: [...eventIds],
+          readModel: readModelId,
+          scenarios: exportedScenarios,
+        });
+      },
+    });
+
     const model: EventModel = {
       name: 'Event Model',
       version: '1.0.0',
@@ -115,7 +134,7 @@ export class ExportJSONQueryHandler {
       readModels,
       policies,
       uiScreens,
-      verticalSlices: [],
+      verticalSlices: exportedSlices,
       boundedContexts: [],
       decisions: [],
       openQuestions: [],

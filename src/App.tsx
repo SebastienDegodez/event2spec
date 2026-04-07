@@ -2,6 +2,7 @@ import { GridCanvas } from './ui/components/Canvas/GridCanvas';
 import { ExportToolbar } from './ui/components/Toolbar/ExportToolbar';
 import { NodePalette } from './ui/components/Toolbar/NodePalette';
 import { SwimlanePanel } from './ui/components/Toolbar/SwimlanePanel';
+import { SlicePanel } from './ui/components/Slices/SlicePanel';
 import { PropertiesPanel } from './ui/components/PropertiesPanel/PropertiesPanel';
 import { ValidationCounter } from './ui/components/Validation/ValidationCounter';
 import './App.css';
@@ -24,6 +25,7 @@ export default function App() {
         <div className="app-sidebar">
           <NodePalette />
           <SwimlanePanel />
+          <SlicePanel />
         </div>
         <main className="app-canvas">
           <GridCanvas />
