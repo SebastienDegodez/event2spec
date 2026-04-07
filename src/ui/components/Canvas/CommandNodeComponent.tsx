@@ -33,7 +33,8 @@ export const CommandNodeComponent = memo(({ id, data, selected }: NodeProps) => 
       data-id={id}
       data-column={nodeData.column}
       data-row={nodeData.row}
-      onDoubleClick={() => {
+      onDoubleClick={(e) => {
+        e.stopPropagation();
         setDraft(nodeData.label);
         setEditing(true);
       }}

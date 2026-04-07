@@ -59,7 +59,7 @@ function GridCanvasInner() {
   const board = useBoard();
   const links = useLinks();
   const swimlanes = useSwimlanes();
-  const { addDomainEventNode, moveNode, addLink, removeLink } = useBoardActions();
+  const { addDomainEventNode, moveNode, addLink, removeLink, selectNode, deselectNode } = useBoardActions();
   const { screenToFlowPosition } = useReactFlow();
   const viewport = useViewport();
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
@@ -195,9 +195,27 @@ function GridCanvasInner() {
 
   const closeContextMenu = useCallback(() => setContextMenu(null), []);
 
+  // Click on a node: select it to open the properties panel
+  const onNodeClick = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      if (node.type === 'swimlane') return;
+      const nodeData = node.data as DomainEventNodeData;
+      selectNode(node.id, node.type as NodeKind, nodeData.label);
+    },
+    [selectNode]
+  );
+
+  // Click on the pane: close context menu and deselect node
+  const onPaneClick = useCallback(() => {
+    setContextMenu(null);
+    deselectNode();
+  }, [deselectNode]);
+
   // Double-click on the pane: create a new Domain Event at the clicked grid cell
   const onPaneDoubleClick = useCallback(
     (event: React.MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (target.closest('.react-flow__node')) return;
       const flowPosition = screenToFlowPosition({ x: event.clientX, y: event.clientY });
       const { column, row } = pixelToGrid(flowPosition.x, flowPosition.y);
       addDomainEventNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
@@ -270,9 +288,10 @@ function GridCanvasInner() {
         onConnect={onConnect}
         isValidConnection={isValidConnection}
         onNodeDragStop={onNodeDragStop}
+        onNodeClick={onNodeClick}
         onNodeContextMenu={onNodeContextMenu}
         onPaneContextMenu={onPaneContextMenu}
-        onPaneClick={closeContextMenu}
+        onPaneClick={onPaneClick}
         onDoubleClick={onPaneDoubleClick}
         onMoveStart={closeContextMenu}
         nodeTypes={nodeTypes}
