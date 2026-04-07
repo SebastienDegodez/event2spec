@@ -28,6 +28,8 @@ import { type NodeKind } from '../../../core/domain/NodeKind';
 import { type BoardMode } from '../../../core/domain/BoardMode';
 import { type SwimlaneCategory, SWIMLANE_CATEGORIES, ROWS_PER_SWIMLANE } from '../../../core/domain/SwimlaneCategory';
 import { resolveConnectionType } from '../../../core/domain/resolveConnectionType';
+import { gridRowToSwimlane } from '../../../core/domain/SwimlaneLayout';
+import { cellNodeOptions } from '../../../core/domain/CellNodeOptions';
 import { DomainEventNode, type DomainEventNodeData } from './DomainEventNode';
 import { CommandNodeComponent, type CommandNodeData } from './CommandNodeComponent';
 import { ReadModelNodeComponent, type ReadModelNodeData } from './ReadModelNodeComponent';
@@ -69,7 +71,7 @@ function GridCanvasInner() {
   const links = useLinks();
   const swimlanes = useSwimlanes();
   const boardMode = useBoardMode();
-  const { addDomainEventNode, moveNode, addLink, removeLink, selectNode, deselectNode } = useBoardActions();
+  const { addDomainEventNode, addNodeWithAutoLinks, moveNode, addLink, removeLink, selectNode, deselectNode } = useBoardActions();
   const { screenToFlowPosition } = useReactFlow();
   const viewport = useViewport();
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
@@ -254,16 +256,41 @@ function GridCanvasInner() {
     deselectNode();
   }, [deselectNode, screenToFlowPosition, selectedColumns, selectColumns, clearColumnSelection]);
 
-  // Double-click on the pane: create a new Domain Event at the clicked grid cell
+  const addEventAtPosition = useCallback(
+    (column: number, row: number) => {
+      addDomainEventNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
+    },
+    [addDomainEventNode]
+  );
+
+  const addNodeAtPosition = useCallback(
+    (kind: NodeKind, label: string, column: number, row: number) => {
+      const id = `${kind}-${crypto.randomUUID()}`;
+      addNodeWithAutoLinks(id, kind, label, column, row);
+    },
+    [addNodeWithAutoLinks]
+  );
+
+  // Double-click on the pane: create a node at the clicked grid cell
+  // In swimlane mode: create the first allowed node type for the category
   const onPaneDoubleClick = useCallback(
     (event: React.MouseEvent) => {
       const target = event.target as HTMLElement;
       if (target.closest('.react-flow__node')) return;
       const flowPosition = screenToFlowPosition({ x: event.clientX, y: event.clientY });
       const { column, row } = pixelToGrid(flowPosition.x, flowPosition.y);
-      addDomainEventNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
+      if (boardMode === 'swimlane') {
+        const { category } = gridRowToSwimlane(row);
+        const options = cellNodeOptions(category);
+        if (options.length > 0) {
+          const first = options[0];
+          addNodeAtPosition(first.kind, first.label, column, row);
+        }
+      } else {
+        addDomainEventNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
+      }
     },
-    [addDomainEventNode, screenToFlowPosition]
+    [addDomainEventNode, addNodeAtPosition, screenToFlowPosition, boardMode]
   );
 
   // Right-click on a node: show insert before / insert after options
@@ -298,15 +325,19 @@ function GridCanvasInner() {
     [screenToFlowPosition]
   );
 
-  const addEventAtPosition = useCallback(
-    (column: number, row: number) => {
-      addDomainEventNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
-    },
-    [addDomainEventNode]
-  );
-
   const contextMenuItems = useMemo(() => {
     if (!contextMenu) return [];
+
+    // In swimlane mode: offer category-specific node types
+    if (boardMode === 'swimlane' && !contextMenu.nodeId) {
+      const { category } = gridRowToSwimlane(contextMenu.row);
+      const options = cellNodeOptions(category);
+      return options.map((opt) => ({
+        label: `Add ${opt.label}`,
+        onClick: () => addNodeAtPosition(opt.kind, opt.label, contextMenu.column, contextMenu.row),
+      }));
+    }
+
     if (contextMenu.nodeId) {
       return [
         { label: 'Insert event before', onClick: () => addEventAtPosition(contextMenu.column, contextMenu.row) },
@@ -316,7 +347,7 @@ function GridCanvasInner() {
     return [
       { label: 'Add domain event', onClick: () => addEventAtPosition(contextMenu.column, contextMenu.row) },
     ];
-  }, [contextMenu, addEventAtPosition]);
+  }, [contextMenu, addEventAtPosition, addNodeAtPosition, boardMode]);
 
   return (
     <div
