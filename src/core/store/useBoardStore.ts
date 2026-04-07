@@ -62,6 +62,7 @@ import { VerticalSliceCollection } from '../domain/VerticalSliceCollection';
 import { type VerticalSliceRepository } from '../domain/VerticalSliceRepository';
 import { VerticalSlice } from '../domain/VerticalSlice';
 import { Scenario } from '../domain/Scenario';
+import { resolveAutoLinks, type BoardNodeSummary } from '../domain/resolveAutoLinks';
 
 export type { NodeLink };
 export type { ConnectionType };
@@ -207,6 +208,20 @@ function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlan
   localStorage.setItem(STORAGE_KEY, JSON.stringify({ nodes, links, swimlanes: persistedSwimlanes, slices: persistedSlices, nodeProperties, boardMode }));
 }
 
+/** Collects all board nodes as summaries for auto-link resolution. */
+function collectBoardNodeSummaries(board: GridBoard): BoardNodeSummary[] {
+  const summaries: BoardNodeSummary[] = [];
+  const projection: BoardProjection = {
+    onDomainEventNode(id, _label, column, row) { summaries.push({ id, kind: 'domainEvent', column, row }); },
+    onCommandNode(id, _label, column, row) { summaries.push({ id, kind: 'command', column, row }); },
+    onReadModelNode(id, _label, column, row) { summaries.push({ id, kind: 'readModel', column, row }); },
+    onPolicyNode(id, _label, column, row) { summaries.push({ id, kind: 'policy', column, row }); },
+    onUIScreenNode(id, _label, column, row) { summaries.push({ id, kind: 'uiScreen', column, row }); },
+  };
+  board.describeTo(projection);
+  return summaries;
+}
+
 interface BoardStoreState {
   board: GridBoard;
   links: ReadonlyArray<NodeLink>;
@@ -273,6 +288,8 @@ interface BoardActions {
   clearColumnSelection: () => void;
   /** Switch the board display mode (classic or swimlane). */
   setBoardMode: (mode: BoardMode) => void;
+  /** Add a node at a grid position and automatically create links with adjacent nodes. */
+  addNodeWithAutoLinks: (id: string, kind: NodeKind, label: string, column: number, row: number) => void;
   /** Export the current board as a JSON string conforming to the EventModel schema. */
   exportJSON: () => string;
   /** Export the current board as a Markdown string conforming to the event-modeling skill format. */
@@ -490,6 +507,33 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         return { boardMode: mode };
       }),
 
+    addNodeWithAutoLinks: (id, kind, label, column, row) =>
+      set((state) => {
+        let board = state.board;
+        if (kind === 'domainEvent') {
+          board = addDomainEventNodeHandler.handle(board, new AddDomainEventNodeCommand(id, label, column, row));
+        } else if (kind === 'command') {
+          board = addCommandNodeHandler.handle(board, new AddCommandNodeCommand(id, label, column, row, ''));
+        } else if (kind === 'readModel') {
+          board = addReadModelNodeHandler.handle(board, new AddReadModelNodeCommand(id, label, column, row));
+        } else if (kind === 'policy') {
+          board = addPolicyNodeHandler.handle(board, new AddPolicyNodeCommand(id, label, column, row));
+        } else if (kind === 'uiScreen') {
+          board = addUIScreenNodeHandler.handle(board, new AddUIScreenNodeCommand(id, label, column, row));
+        }
+        const existingNodes = collectBoardNodeSummaries(state.board);
+        const autoLinks = resolveAutoLinks(id, kind, column, row, existingNodes);
+        const newLinks: NodeLink[] = autoLinks.map((al) => ({
+          sourceNodeId: al.sourceNodeId,
+          targetNodeId: al.targetNodeId,
+          connectionType: al.connectionType,
+        }));
+        const links = [...state.links, ...newLinks];
+        const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties(kind) };
+        saveToStorage(board, links, state.swimlanes, state.slices, nodeProperties, state.boardMode);
+        return { board, links, nodeProperties };
+      }),
+
     exportJSON: () => {
       const { board, links, swimlanes, slices, nodeProperties } = get();
       return exportJSONHandler.handle(board, links, swimlanes, slices, nodeProperties, new ExportJSONQuery());
@@ -535,6 +579,7 @@ export const useBoardActions = () =>
       exportJSON: state.exportJSON,
       exportMarkdown: state.exportMarkdown,
       setBoardMode: state.setBoardMode,
+      addNodeWithAutoLinks: state.addNodeWithAutoLinks,
     }))
   );
 
