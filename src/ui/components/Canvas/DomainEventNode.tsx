@@ -1,6 +1,8 @@
 import { memo, useCallback, useState } from 'react';
 import { Handle, Position, useReactFlow, type NodeProps } from '@xyflow/react';
 import { useBoardActions } from '../../../core/store/useBoardStore';
+import { useNodeValidationWarning } from '../../hooks/useNodeValidationWarning';
+import { ValidationBadge } from '../Validation/ValidationBadge';
 
 export type DomainEventNodeData = {
   label: string;
@@ -11,6 +13,7 @@ export type DomainEventNodeData = {
 export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
   const nodeData = data as DomainEventNodeData;
   const { updateLabel, removeNode, addCommandNode } = useBoardActions();
+  const warningType = useNodeValidationWarning(id);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(nodeData.label);
   const { deleteElements } = useReactFlow();
@@ -91,6 +94,8 @@ export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
       >
         +
       </button>
+
+      {warningType && <ValidationBadge warningType={warningType} />}
 
       <Handle type="source" position={Position.Right} className="event-handle" />
     </div>
