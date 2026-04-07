@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useSlices, useSliceActions, useBoard, useLinks } from '../../../core/store/useBoardStore';
 import { type VerticalSliceProjection, type ScenarioProjection } from '../../../core/domain/VerticalSliceProjection';
 import { type BoardProjection } from '../../../core/domain/BoardProjection';
+import { ScenarioDialog } from './ScenarioDialog';
 
 interface NodeEntry {
   id: string;
@@ -32,10 +33,7 @@ export function SlicePanel() {
   const [newEventIds, setNewEventIds] = useState<string[]>([]);
   const [newReadModelId, setNewReadModelId] = useState('');
   const [expandedSlice, setExpandedSlice] = useState<string | null>(null);
-  const [scenarioSliceId, setScenarioSliceId] = useState<string | null>(null);
-  const [scenarioGiven, setScenarioGiven] = useState('');
-  const [scenarioWhen, setScenarioWhen] = useState('');
-  const [scenarioThen, setScenarioThen] = useState('');
+  const [scenarioDialogSliceId, setScenarioDialogSliceId] = useState<string | null>(null);
 
   const entries = useMemo<SlicePanelEntry[]>(() => {
     const result: SlicePanelEntry[] = [];
@@ -96,16 +94,12 @@ export function SlicePanel() {
     setEditingId(null);
   }, [editingId, editingName, renameSlice]);
 
-  const handleAddScenario = useCallback(() => {
-    if (!scenarioSliceId || !scenarioWhen.trim()) return;
-    const given = scenarioGiven.split('\n').map((s) => s.trim()).filter(Boolean);
-    const then = scenarioThen.split('\n').map((s) => s.trim()).filter(Boolean);
-    addScenarioToSlice(scenarioSliceId, given, scenarioWhen.trim(), then);
-    setScenarioGiven('');
-    setScenarioWhen('');
-    setScenarioThen('');
-    setScenarioSliceId(null);
-  }, [scenarioSliceId, scenarioGiven, scenarioWhen, scenarioThen, addScenarioToSlice]);
+  const handleScenarioConfirm = useCallback((given: string[], when: string, then: string[]) => {
+    if (scenarioDialogSliceId) {
+      addScenarioToSlice(scenarioDialogSliceId, given, when, then);
+      setScenarioDialogSliceId(null);
+    }
+  }, [scenarioDialogSliceId, addScenarioToSlice]);
 
   const toggleEventId = useCallback((eventId: string) => {
     setNewEventIds((prev) =>
@@ -116,6 +110,11 @@ export function SlicePanel() {
   const getNodeLabel = useCallback((nodeId: string) => {
     const node = availableNodes.find((n) => n.id === nodeId);
     return node ? node.label : nodeId;
+  }, [availableNodes]);
+
+  const getNodeKind = useCallback((nodeId: string): 'command' | 'domainEvent' | 'readModel' | 'unknown' => {
+    const node = availableNodes.find((n) => n.id === nodeId);
+    return node ? node.kind : 'unknown';
   }, [availableNodes]);
 
   return (
@@ -185,13 +184,38 @@ export function SlicePanel() {
                 {entry.scenarios.map((scenario, idx) => (
                   <div key={idx} className="slice-scenario">
                     <div className="slice-scenario-content">
-                      {scenario.given.map((g, gi) => (
-                        <div key={gi} className="slice-scenario-line"><strong>Given</strong> {g}</div>
-                      ))}
-                      <div className="slice-scenario-line"><strong>When</strong> {scenario.when}</div>
-                      {scenario.then.map((t, ti) => (
-                        <div key={ti} className="slice-scenario-line"><strong>Then</strong> {t}</div>
-                      ))}
+                      {scenario.given.length > 0 && (
+                        <div className="slice-scenario-group">
+                          <span className="slice-scenario-keyword">Given</span>
+                          <div className="slice-scenario-nodes">
+                            {scenario.given.map((g, gi) => (
+                              <span key={gi} className={`mini-postit-inline mini-postit-inline--${getNodeKind(g) === 'domainEvent' ? 'event' : 'default'}`}>
+                                {getNodeLabel(g)}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      <div className="slice-scenario-group">
+                        <span className="slice-scenario-keyword">When</span>
+                        <div className="slice-scenario-nodes">
+                          <span className={`mini-postit-inline mini-postit-inline--${getNodeKind(scenario.when) === 'command' ? 'command' : 'default'}`}>
+                            {getNodeLabel(scenario.when)}
+                          </span>
+                        </div>
+                      </div>
+                      {scenario.then.length > 0 && (
+                        <div className="slice-scenario-group">
+                          <span className="slice-scenario-keyword">Then</span>
+                          <div className="slice-scenario-nodes">
+                            {scenario.then.map((t, ti) => (
+                              <span key={ti} className={`mini-postit-inline mini-postit-inline--${getNodeKind(t) === 'domainEvent' ? 'event' : 'default'}`}>
+                                {getNodeLabel(t)}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <button
                       className="slice-action-btn slice-action-btn--delete"
@@ -204,45 +228,13 @@ export function SlicePanel() {
                   </div>
                 ))}
 
-                {scenarioSliceId === entry.id ? (
-                  <div className="slice-scenario-form">
-                    <textarea
-                      className="slice-scenario-input"
-                      placeholder="Given (one per line)"
-                      value={scenarioGiven}
-                      onChange={(e) => setScenarioGiven(e.target.value)}
-                      rows={2}
-                      aria-label="Scenario given"
-                    />
-                    <input
-                      className="slice-scenario-input"
-                      placeholder="When"
-                      value={scenarioWhen}
-                      onChange={(e) => setScenarioWhen(e.target.value)}
-                      aria-label="Scenario when"
-                    />
-                    <textarea
-                      className="slice-scenario-input"
-                      placeholder="Then (one per line)"
-                      value={scenarioThen}
-                      onChange={(e) => setScenarioThen(e.target.value)}
-                      rows={2}
-                      aria-label="Scenario then"
-                    />
-                    <div className="slice-scenario-form-actions">
-                      <button className="slice-form-btn slice-form-btn--add" onClick={handleAddScenario}>Add</button>
-                      <button className="slice-form-btn" onClick={() => setScenarioSliceId(null)}>Cancel</button>
-                    </div>
-                  </div>
-                ) : (
-                  <button
-                    className="slice-add-scenario-btn"
-                    onClick={() => setScenarioSliceId(entry.id)}
-                    aria-label="Add scenario"
-                  >
-                    ＋ Add Scenario
-                  </button>
-                )}
+                <button
+                  className="slice-add-scenario-btn"
+                  onClick={() => setScenarioDialogSliceId(entry.id)}
+                  aria-label="Add scenario"
+                >
+                  ＋ Add Scenario
+                </button>
               </div>
             </div>
           )}
@@ -314,6 +306,13 @@ export function SlicePanel() {
         >
           ＋ Add Slice
         </button>
+      )}
+
+      {scenarioDialogSliceId && (
+        <ScenarioDialog
+          onConfirm={handleScenarioConfirm}
+          onClose={() => setScenarioDialogSliceId(null)}
+        />
       )}
     </aside>
   );
