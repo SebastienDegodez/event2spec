@@ -33,6 +33,7 @@ const COLOR_SUBROW: Record<SwimlaneColor, string> = {
 
 export const SwimlaneBackgroundNode = memo(({ data }: NodeProps) => {
   const nodeData = data as SwimlaneBackgroundNodeData;
+  // Defensive default: persisted data from before the rowSpan field was introduced may lack this value
   const rowSpan = nodeData.rowSpan ?? 1;
   const height = GRID_SIZE * rowSpan;
   const subRowBorder = rowSpan > 1

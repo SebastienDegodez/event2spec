@@ -521,7 +521,8 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         } else if (kind === 'uiScreen') {
           board = addUIScreenNodeHandler.handle(board, new AddUIScreenNodeCommand(id, label, column, row));
         }
-        const existingNodes = collectBoardNodeSummaries(state.board);
+        // Resolve auto-links using the updated board (after insertion and collision shifts)
+        const existingNodes = collectBoardNodeSummaries(board);
         const autoLinks = resolveAutoLinks(id, kind, column, row, existingNodes);
         const newLinks: NodeLink[] = autoLinks.map((al) => ({
           sourceNodeId: al.sourceNodeId,
