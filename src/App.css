@@ -1246,3 +1246,329 @@
   font-size: 12px;
   color: var(--text-secondary, #aaa);
 }
+
+/* ─── Slice Panel ────────────────────────────────────── */
+.slice-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 10px;
+  overflow-y: auto;
+}
+
+.slice-item {
+  border-radius: 6px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 3px solid rgba(139, 92, 246, 0.7);
+  background: rgba(255, 255, 255, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.slice-item-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.slice-name {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.slice-name:hover {
+  color: var(--accent);
+}
+
+.slice-name-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 4px;
+  outline: none;
+  min-width: 0;
+}
+
+.slice-item-actions {
+  display: flex;
+  gap: 2px;
+}
+
+.slice-action-btn {
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  border-radius: 3px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.1s, color 0.1s;
+}
+
+.slice-action-btn:hover:not(:disabled) {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.slice-action-btn--delete:hover:not(:disabled) {
+  background: rgba(220, 38, 38, 0.3);
+  color: #f87171;
+}
+
+.slice-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.slice-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.slice-badge--command {
+  background: rgba(96, 165, 250, 0.15);
+  color: #93c5fd;
+}
+
+.slice-badge--event {
+  background: rgba(253, 224, 71, 0.15);
+  color: #fde047;
+}
+
+.slice-badge--readmodel {
+  background: rgba(74, 222, 128, 0.15);
+  color: #86efac;
+}
+
+.slice-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.slice-detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.slice-detail-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.slice-detail-value {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+  padding-left: 8px;
+}
+
+.slice-scenario {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+  padding: 6px;
+}
+
+.slice-scenario-content {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.slice-scenario-line strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.slice-scenario-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.slice-scenario-input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 4px 6px;
+  outline: none;
+  resize: vertical;
+}
+
+.slice-scenario-input:focus {
+  border-color: var(--accent);
+}
+
+.slice-scenario-form-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.slice-add-scenario-btn {
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-size: 10px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: color 0.1s, border-color 0.1s;
+}
+
+.slice-add-scenario-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.slice-create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 6px;
+  background: rgba(139, 92, 246, 0.05);
+}
+
+.slice-form-input,
+.slice-form-select {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 4px 6px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.slice-form-input:focus,
+.slice-form-select:focus {
+  border-color: var(--accent);
+}
+
+.slice-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.slice-form-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.slice-form-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.slice-form-checkbox input[type="checkbox"] {
+  accent-color: var(--accent);
+}
+
+.slice-form-hint {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.slice-form-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.slice-form-btn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-size: 10px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.slice-form-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+}
+
+.slice-form-btn--add {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: #c4b5fd;
+}
+
+.slice-form-btn--add:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.35);
+  color: #ddd6fe;
+}
+
+.slice-form-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.slice-add-btn {
+  margin-top: 4px;
+  border-left: 3px solid rgba(139, 92, 246, 0.7) !important;
+  color: #c4b5fd !important;
+  font-size: 11px;
+}

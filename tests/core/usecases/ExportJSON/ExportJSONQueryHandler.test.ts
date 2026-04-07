@@ -7,17 +7,21 @@ import { PolicyNode } from '../../../../src/core/domain/PolicyNode';
 import { UIScreenNode } from '../../../../src/core/domain/UIScreenNode';
 import { SwimlaneCollection } from '../../../../src/core/domain/SwimlaneCollection';
 import { Swimlane } from '../../../../src/core/domain/Swimlane';
+import { VerticalSliceCollection } from '../../../../src/core/domain/VerticalSliceCollection';
+import { VerticalSlice } from '../../../../src/core/domain/VerticalSlice';
+import { Scenario } from '../../../../src/core/domain/Scenario';
 import { type NodeProperties } from '../../../../src/core/domain/NodeProperties';
 import { ExportJSONQuery } from '../../../../src/core/usecases/queries/ExportJSON/ExportJSONQuery';
 import { ExportJSONQueryHandler } from '../../../../src/core/usecases/queries/ExportJSON/ExportJSONQueryHandler';
 
 const handler = new ExportJSONQueryHandler();
 const emptySwimlanes = SwimlaneCollection.empty();
+const emptySlices = VerticalSliceCollection.empty();
 const emptyProperties: Record<string, NodeProperties> = {};
 
 describe('ExportJSONQueryHandler', () => {
   it('exports an empty board as a valid EventModel JSON with empty arrays', () => {
-    const result = handler.handle(GridBoard.empty(), [], emptySwimlanes, emptyProperties, new ExportJSONQuery());
+    const result = handler.handle(GridBoard.empty(), [], emptySwimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
     const model = JSON.parse(result);
 
     expect(model.name).toBe('Event Model');
@@ -34,7 +38,7 @@ describe('ExportJSONQueryHandler', () => {
       DomainEventNode.create('e1', 'OrderPlaced', 2, 0)
     );
 
-    const result = handler.handle(board, [], emptySwimlanes, emptyProperties, new ExportJSONQuery());
+    const result = handler.handle(board, [], emptySwimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
     const model = JSON.parse(result);
 
     expect(model.domainEvents).toHaveLength(1);
@@ -49,7 +53,7 @@ describe('ExportJSONQueryHandler', () => {
       .insertNode(CommandNode.create('c1', 'PlaceOrder', 2, 1));
     const links = [{ sourceNodeId: 'c1', targetNodeId: 'e1', connectionType: 'triggers' as const }];
 
-    const result = handler.handle(board, links, emptySwimlanes, emptyProperties, new ExportJSONQuery());
+    const result = handler.handle(board, links, emptySwimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
     const model = JSON.parse(result);
 
     expect(model.commands).toHaveLength(1);
@@ -63,7 +67,7 @@ describe('ExportJSONQueryHandler', () => {
       .insertNode(ReadModelNode.create('rm1', 'Order Summary', 3, 0));
     const links = [{ sourceNodeId: 'e1', targetNodeId: 'rm1', connectionType: 'feeds' as const }];
 
-    const result = handler.handle(board, links, emptySwimlanes, emptyProperties, new ExportJSONQuery());
+    const result = handler.handle(board, links, emptySwimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
     const model = JSON.parse(result);
 
     expect(model.readModels[0].fedBy).toContain('e1');
@@ -75,7 +79,7 @@ describe('ExportJSONQueryHandler', () => {
       .insertNode(CommandNode.create('c1', 'ConfirmOrder', 4, 0));
     const links = [{ sourceNodeId: 'p1', targetNodeId: 'c1', connectionType: 'executes' as const }];
 
-    const result = handler.handle(board, links, emptySwimlanes, emptyProperties, new ExportJSONQuery());
+    const result = handler.handle(board, links, emptySwimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
     const model = JSON.parse(result);
 
     expect(model.policies[0].thenCommand).toBe('c1');
@@ -87,7 +91,7 @@ describe('ExportJSONQueryHandler', () => {
       .insertNode(CommandNode.create('c1', 'PlaceOrder', 2, 1));
     const links = [{ sourceNodeId: 'ui1', targetNodeId: 'c1', connectionType: 'user action' as const }];
 
-    const result = handler.handle(board, links, emptySwimlanes, emptyProperties, new ExportJSONQuery());
+    const result = handler.handle(board, links, emptySwimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
     const model = JSON.parse(result);
 
     expect(model.uiScreens[0].triggersCommand).toBe('c1');
@@ -98,7 +102,7 @@ describe('ExportJSONQueryHandler', () => {
       ReadModelNode.create('rm1', 'Order Summary', 3, 0)
     );
 
-    const result = handler.handle(board, [], emptySwimlanes, emptyProperties, new ExportJSONQuery());
+    const result = handler.handle(board, [], emptySwimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
     const model = JSON.parse(result);
 
     expect(model.readModels).toHaveLength(1);
@@ -106,7 +110,7 @@ describe('ExportJSONQueryHandler', () => {
   });
 
   it('produces valid JSON string', () => {
-    const result = handler.handle(GridBoard.empty(), [], emptySwimlanes, emptyProperties, new ExportJSONQuery());
+    const result = handler.handle(GridBoard.empty(), [], emptySwimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
     expect(() => JSON.parse(result)).not.toThrow();
   });
 
@@ -115,7 +119,7 @@ describe('ExportJSONQueryHandler', () => {
       .add(Swimlane.create('s1', 'Customer', 'human'))
       .add(Swimlane.create('s2', 'Order Service', 'internal_system'));
 
-    const result = handler.handle(GridBoard.empty(), [], swimlanes, emptyProperties, new ExportJSONQuery());
+    const result = handler.handle(GridBoard.empty(), [], swimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
     const model = JSON.parse(result);
 
     expect(model.swimlanes).toHaveLength(2);
@@ -124,7 +128,7 @@ describe('ExportJSONQueryHandler', () => {
   });
 
   it('exports empty swimlanes array when no swimlanes exist', () => {
-    const result = handler.handle(GridBoard.empty(), [], emptySwimlanes, emptyProperties, new ExportJSONQuery());
+    const result = handler.handle(GridBoard.empty(), [], emptySwimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
     const model = JSON.parse(result);
     expect(model.swimlanes).toHaveLength(0);
   });
@@ -136,11 +140,36 @@ describe('ExportJSONQueryHandler', () => {
       c1: { type: 'command', actor: 'Customer', payload: { orderId: 'string' }, guardConditions: ['order must be valid'] },
     };
 
-    const result = handler.handle(board, [], emptySwimlanes, properties, new ExportJSONQuery());
+    const result = handler.handle(board, [], emptySwimlanes, emptySlices, properties, new ExportJSONQuery());
     const model = JSON.parse(result);
 
     expect(model.commands[0].actor).toBe('Customer');
     expect(model.commands[0].payload).toEqual({ orderId: 'string' });
     expect(model.commands[0].guardConditions).toEqual(['order must be valid']);
+  });
+
+  it('exports vertical slices with name, command, events, readModel, and scenarios', () => {
+    const slice = VerticalSlice.create('vs1', 'Place Order', 'c1', ['e1', 'e2'], 'rm1')
+      .addScenario(Scenario.create(['a cart with items'], 'user places order', ['order is confirmed', 'email is sent']));
+    const slices = VerticalSliceCollection.empty().add(slice);
+
+    const result = handler.handle(GridBoard.empty(), [], emptySwimlanes, slices, emptyProperties, new ExportJSONQuery());
+    const model = JSON.parse(result);
+
+    expect(model.verticalSlices).toHaveLength(1);
+    expect(model.verticalSlices[0].name).toBe('Place Order');
+    expect(model.verticalSlices[0].command).toBe('c1');
+    expect(model.verticalSlices[0].events).toEqual(['e1', 'e2']);
+    expect(model.verticalSlices[0].readModel).toBe('rm1');
+    expect(model.verticalSlices[0].scenarios).toHaveLength(1);
+    expect(model.verticalSlices[0].scenarios[0].given).toEqual(['a cart with items']);
+    expect(model.verticalSlices[0].scenarios[0].when).toBe('user places order');
+    expect(model.verticalSlices[0].scenarios[0].then).toEqual(['order is confirmed', 'email is sent']);
+  });
+
+  it('exports empty vertical slices array when no slices exist', () => {
+    const result = handler.handle(GridBoard.empty(), [], emptySwimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
+    const model = JSON.parse(result);
+    expect(model.verticalSlices).toHaveLength(0);
   });
 });
