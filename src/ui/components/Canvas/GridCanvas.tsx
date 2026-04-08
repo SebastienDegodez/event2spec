@@ -85,7 +85,7 @@ function GridCanvasInner() {
   const minColumnPerSwimlane = useMemo(() => {
     const map = new Map<number, number>();
     const isSwimlaneMode = boardMode === 'swimlane';
-    const trackMin = (_id: string, _label: string, column: number, row: number) => {
+    const recordMinimumColumn = (_id: string, _label: string, column: number, row: number) => {
       const swimlaneIndex = isSwimlaneMode ? Math.floor(row / ROWS_PER_SWIMLANE) : row;
       const current = map.get(swimlaneIndex);
       if (current === undefined || column < current) {
@@ -93,11 +93,11 @@ function GridCanvasInner() {
       }
     };
     const projection: BoardProjection = {
-      onDomainEventNode: trackMin,
-      onCommandNode: trackMin,
-      onReadModelNode: trackMin,
-      onPolicyNode: trackMin,
-      onUIScreenNode: trackMin,
+      onDomainEventNode: recordMinimumColumn,
+      onCommandNode: recordMinimumColumn,
+      onReadModelNode: recordMinimumColumn,
+      onPolicyNode: recordMinimumColumn,
+      onUIScreenNode: recordMinimumColumn,
     };
     board.describeTo(projection);
     return map;
@@ -111,6 +111,7 @@ function GridCanvasInner() {
     const projection: SwimlaneProjection = {
       onSwimlane(id, actorName, actorType, color, index) {
         const startColumn = minColumnPerSwimlane.get(index);
+        // When a swimlane has no post-its yet, fall back to the far-left offset for full-width coverage
         const startX = startColumn !== undefined ? startColumn * GRID_SIZE : SWIMLANE_LABEL_OFFSET_X;
         if (isSwimlaneMode) {
           // Each swimlane occupies ROWS_PER_SWIMLANE rows in swimlane mode

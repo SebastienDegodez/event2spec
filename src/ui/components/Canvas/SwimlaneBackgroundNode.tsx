@@ -43,11 +43,22 @@ function escapeXml(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 }
 
+const CELL_LABEL_FONT_SIZE = 16;
+const CELL_LABEL_FONT_WEIGHT = 700;
+const CELL_CENTER = GRID_SIZE / 2;
+
 /** Build a data-URI SVG that tiles one cell-sized label. */
 function buildCellLabelSvg(actorName: string, color: SwimlaneColor): string {
   const fill = COLOR_TEXT[color];
   const escaped = escapeXml(actorName);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${GRID_SIZE}" height="${GRID_SIZE}"><text x="${GRID_SIZE / 2}" y="${GRID_SIZE / 2}" dominant-baseline="middle" text-anchor="middle" fill="${fill}" font-size="16" font-weight="700" font-family="system-ui,sans-serif">${escaped}</text></svg>`;
+  const svg = [
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${GRID_SIZE}" height="${GRID_SIZE}">`,
+    `<text x="${CELL_CENTER}" y="${CELL_CENTER}"`,
+    ` dominant-baseline="middle" text-anchor="middle"`,
+    ` fill="${fill}" font-size="${CELL_LABEL_FONT_SIZE}" font-weight="${CELL_LABEL_FONT_WEIGHT}"`,
+    ` font-family="system-ui,sans-serif">${escaped}</text>`,
+    `</svg>`,
+  ].join('');
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
 
