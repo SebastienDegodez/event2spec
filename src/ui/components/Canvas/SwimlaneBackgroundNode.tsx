@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import type { NodeProps } from '@xyflow/react';
 import { type SwimlaneColor } from '../../../core/domain/SwimlaneColor';
+import { type SwimlaneCategory, SWIMLANE_CATEGORIES } from '../../../core/domain/SwimlaneCategory';
 import { GRID_SIZE } from './gridConstants';
 
 export type SwimlaneBackgroundNodeData = {
@@ -24,11 +25,18 @@ const COLOR_BORDER: Record<SwimlaneColor, string> = {
   grey: 'rgba(156, 163, 175, 0.25)',
 };
 
-const COLOR_SUBROW: Record<SwimlaneColor, string> = {
-  yellow: 'rgba(253, 224, 71, 0.10)',
-  blue: 'rgba(96, 165, 250, 0.10)',
-  red: 'rgba(248, 113, 113, 0.10)',
-  grey: 'rgba(156, 163, 175, 0.10)',
+/** Category-specific tint overlaid on top of the swimlane base color. */
+const CATEGORY_TINT: Record<SwimlaneCategory, string> = {
+  actor_ui: 'rgba(234, 179, 8, 0.04)',
+  command_readmodel: 'rgba(59, 130, 246, 0.04)',
+  event: 'rgba(245, 158, 11, 0.04)',
+};
+
+/** Subtle left-side accent bar color per category for quick visual identification. */
+const CATEGORY_ACCENT: Record<SwimlaneCategory, string> = {
+  actor_ui: 'rgba(234, 179, 8, 0.35)',
+  command_readmodel: 'rgba(59, 130, 246, 0.35)',
+  event: 'rgba(245, 158, 11, 0.35)',
 };
 
 export const SwimlaneBackgroundNode = memo(({ data }: NodeProps) => {
@@ -36,20 +44,50 @@ export const SwimlaneBackgroundNode = memo(({ data }: NodeProps) => {
   // Defensive default: persisted data from before the rowSpan field was introduced may lack this value
   const rowSpan = nodeData.rowSpan ?? 1;
   const height = GRID_SIZE * rowSpan;
-  const subRowBorder = rowSpan > 1
-    ? `repeating-linear-gradient(to bottom, transparent, transparent ${GRID_SIZE - 1}px, ${COLOR_SUBROW[nodeData.color]} ${GRID_SIZE - 1}px, ${COLOR_SUBROW[nodeData.color]} ${GRID_SIZE}px)`
-    : undefined;
+  const isSwimlaneMode = rowSpan > 1;
+
+  if (!isSwimlaneMode) {
+    return (
+      <div
+        style={{
+          width: '20000px',
+          height: `${height}px`,
+          background: COLOR_BG[nodeData.color],
+          borderBottom: `1px solid ${COLOR_BORDER[nodeData.color]}`,
+          pointerEvents: 'none',
+        }}
+      />
+    );
+  }
+
   return (
     <div
       style={{
         width: '20000px',
         height: `${height}px`,
-        background: COLOR_BG[nodeData.color],
-        backgroundImage: subRowBorder,
         borderBottom: `1px solid ${COLOR_BORDER[nodeData.color]}`,
         pointerEvents: 'none',
+        display: 'flex',
+        flexDirection: 'column',
       }}
-    />
+    >
+      {SWIMLANE_CATEGORIES.map((category, i) => (
+        <div
+          key={category}
+          className={`swimlane-subrow swimlane-subrow--${category}`}
+          style={{
+            width: '100%',
+            height: `${GRID_SIZE}px`,
+            background: `linear-gradient(${CATEGORY_TINT[category]}, ${CATEGORY_TINT[category]}), ${COLOR_BG[nodeData.color]}`,
+            borderBottom: i < SWIMLANE_CATEGORIES.length - 1
+              ? `1px dashed ${COLOR_BORDER[nodeData.color]}`
+              : undefined,
+            borderLeft: `3px solid ${CATEGORY_ACCENT[category]}`,
+            boxSizing: 'border-box',
+          }}
+        />
+      ))}
+    </div>
   );
 });
 

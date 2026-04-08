@@ -51,10 +51,10 @@ interface SwimlaneLabelEntry {
 }
 
 /** Human-readable labels for swimlane categories. */
-const CATEGORY_LABELS: Record<SwimlaneCategory, string> = {
-  actor_ui: 'UI / Actor',
-  command_readmodel: 'Cmd / Read',
-  event: 'Event',
+const CATEGORY_LABELS: Record<SwimlaneCategory, { icon: string; text: string }> = {
+  actor_ui: { icon: '👤', text: 'Actor / UI' },
+  command_readmodel: { icon: '⚡', text: 'Cmd / Read' },
+  event: { icon: '🔶', text: 'Event' },
 };
 
 const nodeTypes = {
@@ -457,13 +457,14 @@ function SwimlaneLabelOverlay({ labels, boardMode, viewport }: {
                 {SWIMLANE_CATEGORIES.map((cat, i) => (
                   <div
                     key={cat}
-                    className="swimlane-category-label"
+                    className={`swimlane-category-label swimlane-category-label--${cat}`}
                     style={{
                       top: i * GRID_SIZE * viewport.zoom,
                       height: GRID_SIZE * viewport.zoom,
                     }}
                   >
-                    {CATEGORY_LABELS[cat]}
+                    <span>{CATEGORY_LABELS[cat].icon}</span>
+                    <span>{CATEGORY_LABELS[cat].text}</span>
                   </div>
                 ))}
               </div>

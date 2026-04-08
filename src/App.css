@@ -678,15 +678,28 @@
   left: 0;
   display: flex;
   align-items: center;
+  gap: 5px;
   padding: 0 8px;
   font-family: var(--font-mono);
   font-size: 9px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.45);
   pointer-events: none;
   z-index: 2;
+}
+
+.swimlane-category-label--actor_ui {
+  color: rgba(234, 179, 8, 0.7);
+}
+
+.swimlane-category-label--command_readmodel {
+  color: rgba(96, 165, 250, 0.7);
+}
+
+.swimlane-category-label--event {
+  color: rgba(245, 158, 11, 0.7);
 }
 
 /* ─── Swimlane Panel ─────────────────────────────────── */
