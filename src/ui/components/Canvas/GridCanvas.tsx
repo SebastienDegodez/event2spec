@@ -19,13 +19,17 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { useBoard, useBoardActions, useLinks, useSwimlanes, useSelectedColumns, useColumnSelectionActions } from '../../../core/store/useBoardStore';
+import { useBoard, useBoardActions, useBoardMode, useLinks, useSwimlanes, useSelectedColumns, useColumnSelectionActions } from '../../../core/store/useBoardStore';
 import { type BoardProjection } from '../../../core/domain/BoardProjection';
 import { type SwimlaneProjection } from '../../../core/domain/SwimlaneProjection';
 import { type ActorType } from '../../../core/domain/ActorType';
 import { type SwimlaneColor } from '../../../core/domain/SwimlaneColor';
 import { type NodeKind } from '../../../core/domain/NodeKind';
+import { type BoardMode } from '../../../core/domain/BoardMode';
+import { type SwimlaneCategory, SWIMLANE_CATEGORIES, ROWS_PER_SWIMLANE } from '../../../core/domain/SwimlaneCategory';
 import { resolveConnectionType } from '../../../core/domain/resolveConnectionType';
+import { gridRowToSwimlane } from '../../../core/domain/SwimlaneLayout';
+import { cellNodeOptions } from '../../../core/domain/CellNodeOptions';
 import { DomainEventNode, type DomainEventNodeData } from './DomainEventNode';
 import { CommandNodeComponent, type CommandNodeData } from './CommandNodeComponent';
 import { ReadModelNodeComponent, type ReadModelNodeData } from './ReadModelNodeComponent';
@@ -46,6 +50,13 @@ interface SwimlaneLabelEntry {
   index: number;
 }
 
+/** Human-readable labels for swimlane categories. */
+const CATEGORY_LABELS: Record<SwimlaneCategory, string> = {
+  actor_ui: 'UI / Actor',
+  command_readmodel: 'Cmd / Read',
+  event: 'Event',
+};
+
 const nodeTypes = {
   domainEvent: DomainEventNode,
   command: CommandNodeComponent,
@@ -59,7 +70,8 @@ function GridCanvasInner() {
   const board = useBoard();
   const links = useLinks();
   const swimlanes = useSwimlanes();
-  const { addDomainEventNode, moveNode, addLink, removeLink, selectNode, deselectNode } = useBoardActions();
+  const boardMode = useBoardMode();
+  const { addDomainEventNode, addNodeWithAutoLinks, moveNode, addLink, removeLink, selectNode, deselectNode } = useBoardActions();
   const { screenToFlowPosition } = useReactFlow();
   const viewport = useViewport();
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
@@ -70,25 +82,42 @@ function GridCanvasInner() {
   const swimlaneRenderData = useMemo(() => {
     const bgNodes: Node<SwimlaneBackgroundNodeData>[] = [];
     const labels: SwimlaneLabelEntry[] = [];
+    const isSwimlaneMode = boardMode === 'swimlane';
     const projection: SwimlaneProjection = {
       onSwimlane(id, actorName, actorType, color, index) {
-        bgNodes.push({
-          id: `swimlane-bg-${id}`,
-          type: 'swimlane',
-          position: { x: SWIMLANE_LABEL_OFFSET_X, y: index * GRID_SIZE },
-          data: { actorName, color },
-          style: { width: 20000, height: GRID_SIZE },
-          draggable: false,
-          selectable: false,
-          focusable: false,
-          zIndex: -1,
-        });
+        if (isSwimlaneMode) {
+          // Each swimlane occupies ROWS_PER_SWIMLANE rows in swimlane mode
+          const baseRow = index * ROWS_PER_SWIMLANE;
+          bgNodes.push({
+            id: `swimlane-bg-${id}`,
+            type: 'swimlane',
+            position: { x: SWIMLANE_LABEL_OFFSET_X, y: baseRow * GRID_SIZE },
+            data: { actorName, color, rowSpan: ROWS_PER_SWIMLANE },
+            style: { width: 20000, height: GRID_SIZE * ROWS_PER_SWIMLANE },
+            draggable: false,
+            selectable: false,
+            focusable: false,
+            zIndex: -1,
+          });
+        } else {
+          bgNodes.push({
+            id: `swimlane-bg-${id}`,
+            type: 'swimlane',
+            position: { x: SWIMLANE_LABEL_OFFSET_X, y: index * GRID_SIZE },
+            data: { actorName, color, rowSpan: 1 },
+            style: { width: 20000, height: GRID_SIZE },
+            draggable: false,
+            selectable: false,
+            focusable: false,
+            zIndex: -1,
+          });
+        }
         labels.push({ id, actorName, actorType, color, index });
       },
     };
     swimlanes.describeTo(projection);
     return { bgNodes, labels };
-  }, [swimlanes]);
+  }, [swimlanes, boardMode]);
 
   // Map domain nodes to React Flow nodes via visitor (column/row to x/y pixels)
   const reactFlowNodes = useMemo<Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData | SwimlaneBackgroundNodeData>[]>(
@@ -227,16 +256,41 @@ function GridCanvasInner() {
     deselectNode();
   }, [deselectNode, screenToFlowPosition, selectedColumns, selectColumns, clearColumnSelection]);
 
-  // Double-click on the pane: create a new Domain Event at the clicked grid cell
+  const addEventAtPosition = useCallback(
+    (column: number, row: number) => {
+      addDomainEventNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
+    },
+    [addDomainEventNode]
+  );
+
+  const addNodeAtPosition = useCallback(
+    (kind: NodeKind, label: string, column: number, row: number) => {
+      const id = `${kind}-${crypto.randomUUID()}`;
+      addNodeWithAutoLinks(id, kind, label, column, row);
+    },
+    [addNodeWithAutoLinks]
+  );
+
+  // Double-click on the pane: create a node at the clicked grid cell
+  // In swimlane mode: create the first allowed node type for the category
   const onPaneDoubleClick = useCallback(
     (event: React.MouseEvent) => {
       const target = event.target as HTMLElement;
       if (target.closest('.react-flow__node')) return;
       const flowPosition = screenToFlowPosition({ x: event.clientX, y: event.clientY });
       const { column, row } = pixelToGrid(flowPosition.x, flowPosition.y);
-      addDomainEventNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
+      if (boardMode === 'swimlane') {
+        const { category } = gridRowToSwimlane(row);
+        const options = cellNodeOptions(category);
+        if (options.length > 0) {
+          const first = options[0];
+          addNodeAtPosition(first.kind, first.label, column, row);
+        }
+      } else {
+        addDomainEventNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
+      }
     },
-    [addDomainEventNode, screenToFlowPosition]
+    [addDomainEventNode, addNodeAtPosition, screenToFlowPosition, boardMode]
   );
 
   // Right-click on a node: show insert before / insert after options
@@ -271,15 +325,19 @@ function GridCanvasInner() {
     [screenToFlowPosition]
   );
 
-  const addEventAtPosition = useCallback(
-    (column: number, row: number) => {
-      addDomainEventNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
-    },
-    [addDomainEventNode]
-  );
-
   const contextMenuItems = useMemo(() => {
     if (!contextMenu) return [];
+
+    // In swimlane mode: offer category-specific node types
+    if (boardMode === 'swimlane' && !contextMenu.nodeId) {
+      const { category } = gridRowToSwimlane(contextMenu.row);
+      const options = cellNodeOptions(category);
+      return options.map((opt) => ({
+        label: `Add ${opt.label}`,
+        onClick: () => addNodeAtPosition(opt.kind, opt.label, contextMenu.column, contextMenu.row),
+      }));
+    }
+
     if (contextMenu.nodeId) {
       return [
         { label: 'Insert event before', onClick: () => addEventAtPosition(contextMenu.column, contextMenu.row) },
@@ -289,7 +347,7 @@ function GridCanvasInner() {
     return [
       { label: 'Add domain event', onClick: () => addEventAtPosition(contextMenu.column, contextMenu.row) },
     ];
-  }, [contextMenu, addEventAtPosition]);
+  }, [contextMenu, addEventAtPosition, addNodeAtPosition, boardMode]);
 
   return (
     <div
@@ -355,22 +413,11 @@ function GridCanvasInner() {
         </div>
       )}
       {!swimlanes.isEmpty() && (
-        <div className="swimlane-labels-overlay" aria-hidden="true">
-          {swimlaneRenderData.labels.map((entry) => {
-            const top = entry.index * GRID_SIZE * viewport.zoom + viewport.y;
-            const height = GRID_SIZE * viewport.zoom;
-            return (
-              <div
-                key={entry.id}
-                className={`swimlane-label swimlane-label--${entry.color}`}
-                style={{ top, height }}
-              >
-                <span className="swimlane-label-text">{entry.actorName}</span>
-                <span className="swimlane-label-type">{entry.actorType.replace('_', ' ')}</span>
-              </div>
-            );
-          })}
-        </div>
+        <SwimlaneLabelOverlay
+          labels={swimlaneRenderData.labels}
+          boardMode={boardMode}
+          viewport={viewport}
+        />
       )}
       {contextMenu && (
         <ContextMenu
@@ -380,6 +427,50 @@ function GridCanvasInner() {
           onClose={closeContextMenu}
         />
       )}
+    </div>
+  );
+}
+
+/** Renders swimlane labels on the left side, adapting to the current board mode. */
+function SwimlaneLabelOverlay({ labels, boardMode, viewport }: {
+  labels: SwimlaneLabelEntry[];
+  boardMode: BoardMode;
+  viewport: { x: number; y: number; zoom: number };
+}) {
+  const isSwimlaneMode = boardMode === 'swimlane';
+  return (
+    <div className="swimlane-labels-overlay" aria-hidden="true">
+      {labels.map((entry) => {
+        const rowMultiplier = isSwimlaneMode ? ROWS_PER_SWIMLANE : 1;
+        const top = entry.index * rowMultiplier * GRID_SIZE * viewport.zoom + viewport.y;
+        const height = rowMultiplier * GRID_SIZE * viewport.zoom;
+        return (
+          <div
+            key={entry.id}
+            className={`swimlane-label swimlane-label--${entry.color}`}
+            style={{ top, height }}
+          >
+            <span className="swimlane-label-text">{entry.actorName}</span>
+            <span className="swimlane-label-type">{entry.actorType.replace('_', ' ')}</span>
+            {isSwimlaneMode && (
+              <div className="swimlane-category-labels">
+                {SWIMLANE_CATEGORIES.map((cat, i) => (
+                  <div
+                    key={cat}
+                    className="swimlane-category-label"
+                    style={{
+                      top: i * GRID_SIZE * viewport.zoom,
+                      height: GRID_SIZE * viewport.zoom,
+                    }}
+                  >
+                    {CATEGORY_LABELS[cat]}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
