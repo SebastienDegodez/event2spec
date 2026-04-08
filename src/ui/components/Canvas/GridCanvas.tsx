@@ -19,7 +19,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { useBoard, useBoardActions, useBoardMode, useLinks, useSwimlanes, useSelectedColumns, useColumnSelectionActions } from '../../../core/store/useBoardStore';
+import { useBoard, useBoardActions, useBoardMode, useLinks, useSwimlanes, useSwimlaneActions, useSelectedColumns, useColumnSelectionActions } from '../../../core/store/useBoardStore';
 import { type BoardProjection } from '../../../core/domain/BoardProjection';
 import { type SwimlaneProjection } from '../../../core/domain/SwimlaneProjection';
 import { type ActorType } from '../../../core/domain/ActorType';
@@ -74,6 +74,7 @@ function GridCanvasInner() {
   const swimlanes = useSwimlanes();
   const boardMode = useBoardMode();
   const { addDomainEventNode, addNodeWithAutoLinks, moveNode, addLink, removeLink, selectNode, deselectNode } = useBoardActions();
+  const { renameSwimlane, addSwimlane } = useSwimlaneActions();
   const { screenToFlowPosition } = useReactFlow();
   const viewport = useViewport();
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
@@ -382,6 +383,7 @@ function GridCanvasInner() {
         nodeTypes={nodeTypes}
         snapToGrid
         snapGrid={[GRID_SIZE, GRID_SIZE]}
+        translateExtent={[[0, 0], [Infinity, Infinity]]}
         zoomOnDoubleClick={false}
         fitView={false}
         minZoom={0.3}
@@ -428,6 +430,8 @@ function GridCanvasInner() {
           labels={swimlaneRenderData.labels}
           boardMode={boardMode}
           viewport={viewport}
+          onRename={renameSwimlane}
+          onAdd={addSwimlane}
         />
       )}
       {contextMenu && (
@@ -442,42 +446,108 @@ function GridCanvasInner() {
   );
 }
 
-/** Renders swimlane labels on the left side, adapting to the current board mode. */
-function SwimlaneLabelOverlay({ labels, boardMode, viewport }: {
+/** Renders swimlane labels on the left side, adapting to the current board mode. Supports inline renaming via ✎ button and adding new swimlanes via + button. */
+function SwimlaneLabelOverlay({ labels, boardMode, viewport, onRename, onAdd }: {
   labels: SwimlaneLabelEntry[];
   boardMode: BoardMode;
   viewport: { x: number; y: number; zoom: number };
+  onRename: (id: string, actorName: string) => void;
+  onAdd: (id: string, actorName: string, actorType: ActorType) => void;
 }) {
   const isSwimlaneMode = boardMode === 'swimlane';
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState('');
+
+  const startEditing = useCallback((id: string, currentName: string) => {
+    setEditingId(id);
+    setEditingName(currentName);
+  }, []);
+
+  const commitEditing = useCallback(() => {
+    if (editingId && editingName.trim()) {
+      onRename(editingId, editingName.trim());
+    }
+    setEditingId(null);
+  }, [editingId, editingName, onRename]);
+
+  const handleEditKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') commitEditing();
+    if (e.key === 'Escape') setEditingId(null);
+  }, [commitEditing]);
+
+  const handleAdd = useCallback(() => {
+    const id = `swimlane-${crypto.randomUUID()}`;
+    onAdd(id, 'New Lane', 'human');
+  }, [onAdd]);
+
   return (
-    <div className="swimlane-labels-overlay" aria-hidden="true">
-      {labels.map((entry) => {
+    <div className="swimlane-labels-overlay" aria-label="Swimlane labels">
+      {labels.map((entry, i) => {
         const rowMultiplier = isSwimlaneMode ? ROWS_PER_SWIMLANE : 1;
         const top = entry.index * rowMultiplier * GRID_SIZE * viewport.zoom + viewport.y;
         const height = rowMultiplier * GRID_SIZE * viewport.zoom;
         return (
-          <div
-            key={entry.id}
-            className={`swimlane-label swimlane-label--${entry.color}`}
-            style={{ top, height }}
-          >
-            <span className="swimlane-label-text">{entry.actorName}</span>
-            <span className="swimlane-label-type">{entry.actorType.replace('_', ' ')}</span>
-            {isSwimlaneMode && (
-              <div className="swimlane-category-labels">
-                {SWIMLANE_CATEGORIES.map((cat, i) => (
-                  <div
-                    key={cat}
-                    className="swimlane-category-label"
-                    style={{
-                      top: i * GRID_SIZE * viewport.zoom,
-                      height: GRID_SIZE * viewport.zoom,
-                    }}
-                  >
-                    {CATEGORY_LABELS[cat]}
-                  </div>
-                ))}
+          <div key={entry.id}>
+            <div
+              className={`swimlane-label swimlane-label--${entry.color}`}
+              style={{ top, height }}
+            >
+              <div className="swimlane-label-header">
+                <button
+                  className="swimlane-label-edit-btn"
+                  onClick={() => startEditing(entry.id, entry.actorName)}
+                  title="Rename swimlane"
+                  aria-label={`Rename swimlane ${entry.actorName}`}
+                >
+                  ✎
+                </button>
+                <div className="swimlane-label-info">
+                  {editingId === entry.id ? (
+                    <input
+                      className="swimlane-label-input"
+                      value={editingName}
+                      autoFocus
+                      onChange={(e) => setEditingName(e.target.value)}
+                      onBlur={commitEditing}
+                      onKeyDown={handleEditKeyDown}
+                      aria-label="Swimlane name"
+                    />
+                  ) : (
+                    <span className="swimlane-label-text">{entry.actorName}</span>
+                  )}
+                  <span className="swimlane-label-type">{entry.actorType.replace('_', ' ')}</span>
+                </div>
               </div>
+              {isSwimlaneMode && (
+                <div className="swimlane-category-labels">
+                  {SWIMLANE_CATEGORIES.map((cat, catIdx) => (
+                    <div
+                      key={cat}
+                      className="swimlane-category-label"
+                      style={{
+                        top: catIdx * GRID_SIZE * viewport.zoom,
+                        height: GRID_SIZE * viewport.zoom,
+                      }}
+                    >
+                      {CATEGORY_LABELS[cat]}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            {i < labels.length - 1 && (
+              <button
+                className="swimlane-label-add-btn"
+                style={{
+                  top: top + height,
+                  height: Math.max(20, 4 * viewport.zoom),
+                }}
+                onClick={handleAdd}
+                title="Add swimlane"
+                aria-label="Add swimlane between"
+              >
+                ＋
+              </button>
             )}
           </div>
         );
