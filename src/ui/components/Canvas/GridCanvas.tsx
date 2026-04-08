@@ -19,7 +19,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { useBoard, useBoardActions, useBoardMode, useLinks, useSwimlanes, useSelectedColumns, useColumnSelectionActions } from '../../../core/store/useBoardStore';
+import { useBoard, useBoardActions, useBoardMode, useLinks, useSwimlanes, useSwimlaneActions, useSelectedColumns, useColumnSelectionActions } from '../../../core/store/useBoardStore';
 import { type BoardProjection } from '../../../core/domain/BoardProjection';
 import { type SwimlaneProjection } from '../../../core/domain/SwimlaneProjection';
 import { type ActorType } from '../../../core/domain/ActorType';
@@ -74,6 +74,7 @@ function GridCanvasInner() {
   const swimlanes = useSwimlanes();
   const boardMode = useBoardMode();
   const { addDomainEventNode, addNodeWithAutoLinks, moveNode, addLink, removeLink, selectNode, deselectNode } = useBoardActions();
+  const { renameSwimlane } = useSwimlaneActions();
   const { screenToFlowPosition } = useReactFlow();
   const viewport = useViewport();
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
@@ -428,6 +429,7 @@ function GridCanvasInner() {
           labels={swimlaneRenderData.labels}
           boardMode={boardMode}
           viewport={viewport}
+          onRename={renameSwimlane}
         />
       )}
       {contextMenu && (
@@ -442,15 +444,31 @@ function GridCanvasInner() {
   );
 }
 
-/** Renders swimlane labels on the left side, adapting to the current board mode. */
-function SwimlaneLabelOverlay({ labels, boardMode, viewport }: {
+/** Renders swimlane labels on the left side, adapting to the current board mode. Supports inline renaming. */
+function SwimlaneLabelOverlay({ labels, boardMode, viewport, onRename }: {
   labels: SwimlaneLabelEntry[];
   boardMode: BoardMode;
   viewport: { x: number; y: number; zoom: number };
+  onRename: (id: string, actorName: string) => void;
 }) {
   const isSwimlaneMode = boardMode === 'swimlane';
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState('');
+
+  const startEditing = useCallback((id: string, currentName: string) => {
+    setEditingId(id);
+    setEditingName(currentName);
+  }, []);
+
+  const commitEditing = useCallback(() => {
+    if (editingId && editingName.trim()) {
+      onRename(editingId, editingName.trim());
+    }
+    setEditingId(null);
+  }, [editingId, editingName, onRename]);
+
   return (
-    <div className="swimlane-labels-overlay" aria-hidden="true">
+    <div className="swimlane-labels-overlay" aria-label="Swimlane labels">
       {labels.map((entry) => {
         const rowMultiplier = isSwimlaneMode ? ROWS_PER_SWIMLANE : 1;
         const top = entry.index * rowMultiplier * GRID_SIZE * viewport.zoom + viewport.y;
@@ -461,7 +479,25 @@ function SwimlaneLabelOverlay({ labels, boardMode, viewport }: {
             className={`swimlane-label swimlane-label--${entry.color}`}
             style={{ top, height }}
           >
-            <span className="swimlane-label-text">{entry.actorName}</span>
+            {editingId === entry.id ? (
+              <input
+                className="swimlane-label-input"
+                value={editingName}
+                autoFocus
+                onChange={(e) => setEditingName(e.target.value)}
+                onBlur={commitEditing}
+                onKeyDown={(e) => { if (e.key === 'Enter') commitEditing(); if (e.key === 'Escape') setEditingId(null); }}
+                aria-label="Swimlane name"
+              />
+            ) : (
+              <span
+                className="swimlane-label-text"
+                onDoubleClick={() => startEditing(entry.id, entry.actorName)}
+                title="Double-click to rename"
+              >
+                {entry.actorName}
+              </span>
+            )}
             <span className="swimlane-label-type">{entry.actorType.replace('_', ' ')}</span>
             {isSwimlaneMode && (
               <div className="swimlane-category-labels">

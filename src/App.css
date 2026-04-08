@@ -852,8 +852,9 @@
   top: 0;
   left: 0;
   width: 120px;
+  height: 100%;
   pointer-events: none;
-  z-index: 5;
+  z-index: 10;
   overflow: hidden;
 }
 
@@ -868,6 +869,7 @@
   background: rgba(13, 14, 22, 0.88);
   border-right: 2px solid;
   overflow: hidden;
+  pointer-events: auto;
 }
 
 .swimlane-label--yellow { border-right-color: rgba(253, 224, 71, 0.6); }
@@ -883,6 +885,26 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.swimlane-label-text:hover {
+  color: var(--accent);
+}
+
+.swimlane-label-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 4px;
+  outline: none;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .swimlane-label-type {
