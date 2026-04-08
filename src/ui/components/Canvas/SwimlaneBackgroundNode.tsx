@@ -1,13 +1,13 @@
 import { memo } from 'react';
 import type { NodeProps } from '@xyflow/react';
 import { type SwimlaneColor } from '../../../core/domain/SwimlaneColor';
-import { type SwimlaneCategory, SWIMLANE_CATEGORIES } from '../../../core/domain/SwimlaneCategory';
+import { type SwimlaneCategory, SWIMLANE_CATEGORIES, ROWS_PER_SWIMLANE } from '../../../core/domain/SwimlaneCategory';
 import { GRID_SIZE } from './gridConstants';
 
 export type SwimlaneBackgroundNodeData = {
   actorName: string;
   color: SwimlaneColor;
-  /** Number of grid rows this swimlane background spans (1 in classic mode, 3 in swimlane mode). */
+  /** Number of grid rows this swimlane background spans (always ROWS_PER_SWIMLANE = 3). */
   rowSpan: number;
 };
 
@@ -44,24 +44,7 @@ const CATEGORY_ACCENT: Record<SwimlaneCategory, string> = Object.fromEntries(
 
 export const SwimlaneBackgroundNode = memo(({ data }: NodeProps) => {
   const nodeData = data as SwimlaneBackgroundNodeData;
-  // Defensive default: persisted data from before the rowSpan field was introduced may lack this value
-  const rowSpan = nodeData.rowSpan ?? 1;
-  const height = GRID_SIZE * rowSpan;
-  const isSwimlaneMode = rowSpan > 1;
-
-  if (!isSwimlaneMode) {
-    return (
-      <div
-        style={{
-          width: '20000px',
-          height: `${height}px`,
-          background: COLOR_BG[nodeData.color],
-          borderBottom: `1px solid ${COLOR_BORDER[nodeData.color]}`,
-          pointerEvents: 'none',
-        }}
-      />
-    );
-  }
+  const height = GRID_SIZE * ROWS_PER_SWIMLANE;
 
   return (
     <div

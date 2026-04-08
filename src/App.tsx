@@ -2,7 +2,6 @@ import { GridCanvas } from './ui/components/Canvas/GridCanvas';
 import { ExportToolbar } from './ui/components/Toolbar/ExportToolbar';
 import { NodePalette } from './ui/components/Toolbar/NodePalette';
 import { SwimlanePanel } from './ui/components/Toolbar/SwimlanePanel';
-import { BoardModeToggle } from './ui/components/Toolbar/BoardModeToggle';
 import { SlicePanel } from './ui/components/Slices/SlicePanel';
 import { SliceEditorView } from './ui/components/Slices/SliceEditorView';
 import { PropertiesPanel } from './ui/components/PropertiesPanel/PropertiesPanel';
@@ -24,7 +23,6 @@ export default function App() {
           Right-click · Double-click to add · Click + to add Command · Double-click label to edit · Drag to move · Alt+click to select column
         </div>
         <ValidationCounter />
-        <BoardModeToggle />
         <ExportToolbar />
       </header>
       <div className="app-workspace">

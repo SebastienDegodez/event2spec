@@ -649,30 +649,7 @@
   color: var(--accent);
 }
 
-/* ─── Board Mode Toggle ─────────────────────────────── */
-.board-mode-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text-secondary);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
-  white-space: nowrap;
-}
-
-.board-mode-toggle:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: var(--text-primary);
-}
-
-/* ─── Swimlane Category Labels (swimlane mode) ──────── */
+/* ─── Swimlane Category Labels ──────────────────────── */
 .swimlane-category-label {
   position: absolute;
   left: 0;
