@@ -1,4 +1,4 @@
-import { memo, useCallback, useState, useEffect } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { Handle, Position, useReactFlow, type NodeProps } from '@xyflow/react';
 import { useBoardActions } from '../../../core/store/useBoardStore';
 import { useNodeValidationWarning } from '../../hooks/useNodeValidationWarning';
@@ -24,8 +24,7 @@ export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
     setEditing(true);
   }, [nodeData.label]);
 
-  const shouldAutoEdit = useAutoEdit(id, startEditing);
-  useEffect(() => { if (shouldAutoEdit) startEditing(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useAutoEdit(id, startEditing);
 
   const commitEdit = useCallback(() => {
     const trimmed = draft.trim();

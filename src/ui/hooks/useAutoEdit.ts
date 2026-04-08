@@ -3,8 +3,9 @@ import { useAutoEditNodeId, useBoardStore } from '../../core/store/useBoardStore
 
 /**
  * Hook that checks whether a newly mounted node should start in
- * editing mode. Returns `true` on the first render if this node
- * matches the autoEditNodeId in the store (and clears it).
+ * editing mode. Uses a synchronous store read on first render to
+ * detect if this node matches autoEditNodeId, then triggers
+ * `startEditing` via a mount effect.
  *
  * Also watches for subsequent autoEditNodeId changes via useEffect,
  * calling `startEditing` when matched.
@@ -12,23 +13,31 @@ import { useAutoEditNodeId, useBoardStore } from '../../core/store/useBoardStore
 export function useAutoEdit(
   nodeId: string,
   startEditing: () => void,
-): boolean {
+): void {
   const autoEditNodeId = useAutoEditNodeId();
   const startEditingRef = useRef(startEditing);
   startEditingRef.current = startEditing;
 
-  // Synchronous check during first render — handles the case where
-  // the node mounts after autoEditNodeId was already set
+  // Synchronous check during first render — detects if this node
+  // should auto-edit on mount (before effects from other components
+  // have a chance to clear autoEditNodeId)
   const initialAutoEditRef = useRef<boolean | null>(null);
   if (initialAutoEditRef.current === null) {
     const state = useBoardStore.getState();
     if (state.autoEditNodeId === nodeId) {
       initialAutoEditRef.current = true;
       state.clearAutoEditNodeId();
-    } else {
-      initialAutoEditRef.current = false;
     }
+    initialAutoEditRef.current ??= false;
   }
+
+  // Mount effect: trigger editing if this node matched autoEditNodeId
+  // on its first render. Uses [] deps because the check already ran
+  // synchronously above — this just defers the state update.
+  const initialFlag = initialAutoEditRef.current;
+  useEffect(() => {
+    if (initialFlag) startEditingRef.current();
+  }, [initialFlag]);
 
   // Effect-based check for when autoEditNodeId changes after mount
   useEffect(() => {
@@ -37,6 +46,4 @@ export function useAutoEdit(
       useBoardStore.getState().clearAutoEditNodeId();
     }
   }, [autoEditNodeId, nodeId]);
-
-  return initialAutoEditRef.current;
 }
