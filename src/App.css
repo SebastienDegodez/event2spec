@@ -865,7 +865,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 0 10px;
+  padding: 0 6px;
   background: rgba(13, 14, 22, 0.88);
   border-right: 2px solid;
   overflow: hidden;
@@ -877,6 +877,41 @@
 .swimlane-label--red    { border-right-color: rgba(248, 113, 113, 0.6); }
 .swimlane-label--grey   { border-right-color: rgba(156, 163, 175, 0.6); }
 
+.swimlane-label-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.swimlane-label-edit-btn {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+  border-radius: 3px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.1s, color 0.1s;
+}
+
+.swimlane-label-edit-btn:hover {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.swimlane-label-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .swimlane-label-text {
   font-family: var(--font-display);
   font-size: 11px;
@@ -885,11 +920,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  cursor: pointer;
-}
-
-.swimlane-label-text:hover {
-  color: var(--accent);
 }
 
 .swimlane-label-input {
@@ -905,6 +935,34 @@
   outline: none;
   min-width: 0;
   box-sizing: border-box;
+}
+
+.swimlane-label-add-btn {
+  position: absolute;
+  left: 0;
+  width: 120px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s, color 0.15s;
+}
+
+.swimlane-label-add-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--accent);
+}
+
+.swimlane-labels-overlay:hover .swimlane-label-add-btn {
+  opacity: 0.5;
 }
 
 .swimlane-label-type {
