@@ -869,7 +869,7 @@
   background: rgba(13, 14, 22, 0.88);
   border-right: 2px solid;
   overflow: hidden;
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .swimlane-label--yellow { border-right-color: rgba(253, 224, 71, 0.6); }
@@ -897,6 +897,7 @@
   align-items: center;
   justify-content: center;
   padding: 0;
+  pointer-events: auto;
   transition: background 0.1s, color 0.1s;
 }
 
@@ -935,6 +936,7 @@
   outline: none;
   min-width: 0;
   box-sizing: border-box;
+  pointer-events: auto;
 }
 
 .swimlane-label-add-btn {
