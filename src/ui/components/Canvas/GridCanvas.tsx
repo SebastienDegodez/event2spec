@@ -467,6 +467,11 @@ function SwimlaneLabelOverlay({ labels, boardMode, viewport, onRename }: {
     setEditingId(null);
   }, [editingId, editingName, onRename]);
 
+  const handleEditKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') commitEditing();
+    if (e.key === 'Escape') setEditingId(null);
+  }, [commitEditing]);
+
   return (
     <div className="swimlane-labels-overlay" aria-label="Swimlane labels">
       {labels.map((entry) => {
@@ -486,7 +491,7 @@ function SwimlaneLabelOverlay({ labels, boardMode, viewport, onRename }: {
                 autoFocus
                 onChange={(e) => setEditingName(e.target.value)}
                 onBlur={commitEditing}
-                onKeyDown={(e) => { if (e.key === 'Enter') commitEditing(); if (e.key === 'Escape') setEditingId(null); }}
+                onKeyDown={handleEditKeyDown}
                 aria-label="Swimlane name"
               />
             ) : (
