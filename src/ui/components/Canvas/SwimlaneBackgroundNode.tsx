@@ -25,19 +25,22 @@ const COLOR_BORDER: Record<SwimlaneColor, string> = {
   grey: 'rgba(156, 163, 175, 0.25)',
 };
 
-/** Category-specific tint overlaid on top of the swimlane base color. */
-const CATEGORY_TINT: Record<SwimlaneCategory, string> = {
-  actor_ui: 'rgba(234, 179, 8, 0.04)',
-  command_readmodel: 'rgba(59, 130, 246, 0.04)',
-  event: 'rgba(245, 158, 11, 0.04)',
+/** Base RGB values per category (without alpha), used to derive tint and accent colors. */
+const CATEGORY_BASE_RGB: Record<SwimlaneCategory, string> = {
+  actor_ui: '234, 179, 8',
+  command_readmodel: '59, 130, 246',
+  event: '245, 158, 11',
 };
 
+/** Category-specific tint overlaid on top of the swimlane base color. */
+const CATEGORY_TINT: Record<SwimlaneCategory, string> = Object.fromEntries(
+  Object.entries(CATEGORY_BASE_RGB).map(([k, rgb]) => [k, `rgba(${rgb}, 0.04)`])
+) as Record<SwimlaneCategory, string>;
+
 /** Subtle left-side accent bar color per category for quick visual identification. */
-const CATEGORY_ACCENT: Record<SwimlaneCategory, string> = {
-  actor_ui: 'rgba(234, 179, 8, 0.35)',
-  command_readmodel: 'rgba(59, 130, 246, 0.35)',
-  event: 'rgba(245, 158, 11, 0.35)',
-};
+const CATEGORY_ACCENT: Record<SwimlaneCategory, string> = Object.fromEntries(
+  Object.entries(CATEGORY_BASE_RGB).map(([k, rgb]) => [k, `rgba(${rgb}, 0.35)`])
+) as Record<SwimlaneCategory, string>;
 
 export const SwimlaneBackgroundNode = memo(({ data }: NodeProps) => {
   const nodeData = data as SwimlaneBackgroundNodeData;
