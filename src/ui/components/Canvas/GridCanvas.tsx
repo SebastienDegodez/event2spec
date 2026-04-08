@@ -129,11 +129,13 @@ function GridCanvasInner() {
       ];
 
       const occupiedCells = new Set<string>();
+      let maxColumn = 0;
 
       const createFlowNode = (id: string, label: string, column: number, row: number, type: 'domainEvent' | 'command' | 'readModel' | 'policy' | 'uiScreen') => {
         const position = domainNodeToPixelPosition({ column, row });
         result.push({ id, type, position, data: { label, column, row }, style: { width: NOTE_SIZE, height: NOTE_SIZE } });
         occupiedCells.add(`${column},${row}`);
+        if (column > maxColumn) maxColumn = column;
       };
 
       const projection: BoardProjection = {
@@ -148,12 +150,6 @@ function GridCanvasInner() {
 
       // In swimlane mode, add quick-add placeholder nodes for empty cells
       if (boardMode === 'swimlane' && swimlaneRenderData.labels.length > 0) {
-        // Determine column range: 0 to maxColumn + 1
-        let maxColumn = 0;
-        occupiedCells.forEach((key) => {
-          const col = parseInt(key.split(',')[0], 10);
-          if (col > maxColumn) maxColumn = col;
-        });
         const columnCount = Math.max(maxColumn + 2, 1);
 
         for (const entry of swimlaneRenderData.labels) {

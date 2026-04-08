@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAutoEditNodeId, useBoardActions } from '../../core/store/useBoardStore';
 
 /**
@@ -12,11 +12,13 @@ export function useAutoEdit(
 ): void {
   const autoEditNodeId = useAutoEditNodeId();
   const { clearAutoEditNodeId } = useBoardActions();
+  const startEditingRef = useRef(startEditing);
+  startEditingRef.current = startEditing;
 
   useEffect(() => {
     if (autoEditNodeId === nodeId) {
-      startEditing();
+      startEditingRef.current();
       clearAutoEditNodeId();
     }
-  }, [autoEditNodeId, nodeId, startEditing, clearAutoEditNodeId]);
+  }, [autoEditNodeId, nodeId, clearAutoEditNodeId]);
 }
