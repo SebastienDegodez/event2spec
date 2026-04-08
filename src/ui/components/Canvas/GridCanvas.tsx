@@ -81,6 +81,28 @@ function GridCanvasInner() {
   const selectedColumns = useSelectedColumns();
   const { selectColumns, clearColumnSelection } = useColumnSelectionActions();
 
+  // Compute the minimum column per swimlane index from board nodes
+  const minColumnPerSwimlane = useMemo(() => {
+    const map = new Map<number, number>();
+    const isSwimlaneMode = boardMode === 'swimlane';
+    const trackMin = (_id: string, _label: string, column: number, row: number) => {
+      const swimlaneIndex = isSwimlaneMode ? Math.floor(row / ROWS_PER_SWIMLANE) : row;
+      const current = map.get(swimlaneIndex);
+      if (current === undefined || column < current) {
+        map.set(swimlaneIndex, column);
+      }
+    };
+    const projection: BoardProjection = {
+      onDomainEventNode: trackMin,
+      onCommandNode: trackMin,
+      onReadModelNode: trackMin,
+      onPolicyNode: trackMin,
+      onUIScreenNode: trackMin,
+    };
+    board.describeTo(projection);
+    return map;
+  }, [board, boardMode]);
+
   // Collect swimlane background nodes AND label entries in a single projection pass
   const swimlaneRenderData = useMemo(() => {
     const bgNodes: Node<SwimlaneBackgroundNodeData>[] = [];
@@ -88,13 +110,15 @@ function GridCanvasInner() {
     const isSwimlaneMode = boardMode === 'swimlane';
     const projection: SwimlaneProjection = {
       onSwimlane(id, actorName, actorType, color, index) {
+        const startColumn = minColumnPerSwimlane.get(index);
+        const startX = startColumn !== undefined ? startColumn * GRID_SIZE : SWIMLANE_LABEL_OFFSET_X;
         if (isSwimlaneMode) {
           // Each swimlane occupies ROWS_PER_SWIMLANE rows in swimlane mode
           const baseRow = index * ROWS_PER_SWIMLANE;
           bgNodes.push({
             id: `swimlane-bg-${id}`,
             type: 'swimlane',
-            position: { x: SWIMLANE_LABEL_OFFSET_X, y: baseRow * GRID_SIZE },
+            position: { x: startX, y: baseRow * GRID_SIZE },
             data: { actorName, color, rowSpan: ROWS_PER_SWIMLANE },
             style: { width: 20000, height: GRID_SIZE * ROWS_PER_SWIMLANE },
             draggable: false,
@@ -106,7 +130,7 @@ function GridCanvasInner() {
           bgNodes.push({
             id: `swimlane-bg-${id}`,
             type: 'swimlane',
-            position: { x: SWIMLANE_LABEL_OFFSET_X, y: index * GRID_SIZE },
+            position: { x: startX, y: index * GRID_SIZE },
             data: { actorName, color, rowSpan: 1 },
             style: { width: 20000, height: GRID_SIZE },
             draggable: false,
@@ -120,7 +144,7 @@ function GridCanvasInner() {
     };
     swimlanes.describeTo(projection);
     return { bgNodes, labels };
-  }, [swimlanes, boardMode]);
+  }, [swimlanes, boardMode, minColumnPerSwimlane]);
 
   // Map domain nodes to React Flow nodes via visitor (column/row to x/y pixels)
   const reactFlowNodes = useMemo<Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData | SwimlaneBackgroundNodeData | CellQuickAddNodeData>[]>(
