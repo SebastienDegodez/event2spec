@@ -42,9 +42,11 @@ export class ExportJSONQueryHandler {
     }
 
     const swimlaneIndexToId = new Map<number, string>();
+    const exportedSwimlanes: EventModel['swimlanes'] = [];
     swimlanes.describeTo({
-      onSwimlane(id, _actorName, _actorType, _color, index) {
+      onSwimlane(id, actorName, actorType, color, index) {
         swimlaneIndexToId.set(index, id);
+        exportedSwimlanes.push({ id, actorName, actorType, order: index, color });
       },
     });
 
@@ -117,13 +119,6 @@ export class ExportJSONQueryHandler {
     };
 
     board.describeTo(projection);
-
-    const exportedSwimlanes: EventModel['swimlanes'] = [];
-    swimlanes.describeTo({
-      onSwimlane(id, actorName, actorType, color, index) {
-        exportedSwimlanes.push({ id, actorName, actorType, order: index, color });
-      },
-    });
 
     const exportedSlices: VerticalSliceSchema[] = [];
     slices.describeTo({

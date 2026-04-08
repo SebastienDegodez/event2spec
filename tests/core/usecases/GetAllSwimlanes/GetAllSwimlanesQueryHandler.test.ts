@@ -21,7 +21,7 @@ describe('GetAllSwimlanesQueryHandler', () => {
       },
     };
 
-    handler.handle(collection, projection, new GetAllSwimlanesQuery());
+    handler.handle(collection, new GetAllSwimlanesQuery(), projection);
 
     expect(found).toHaveLength(2);
     expect(found[0]).toMatchObject({ id: 's1', actorName: 'Customer', actorType: 'human', color: 'yellow', isFirst: true, isLast: false });
@@ -38,7 +38,7 @@ describe('GetAllSwimlanesQueryHandler', () => {
       },
     };
 
-    handler.handle(collection, projection, new GetAllSwimlanesQuery());
+    handler.handle(collection, new GetAllSwimlanesQuery(), projection);
 
     expect(found).toHaveLength(0);
   });
