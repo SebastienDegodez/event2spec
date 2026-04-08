@@ -36,6 +36,7 @@ import { ReadModelNodeComponent, type ReadModelNodeData } from './ReadModelNodeC
 import { PolicyNodeComponent, type PolicyNodeData } from './PolicyNodeComponent';
 import { UIScreenNodeComponent, type UIScreenNodeData } from './UIScreenNodeComponent';
 import { SwimlaneBackgroundNode, type SwimlaneBackgroundNodeData } from './SwimlaneBackgroundNode';
+import { CellQuickAddNode, type CellQuickAddNodeData } from './CellQuickAddNode';
 import { ContextMenu } from './ContextMenu';
 import { type ContextMenuState } from './ContextMenuState';
 import { GRID_SIZE, NOTE_SIZE, COMMAND_NODE_COLOR, DOMAIN_EVENT_NODE_COLOR, READ_MODEL_NODE_COLOR, POLICY_NODE_COLOR, UI_SCREEN_NODE_COLOR, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
@@ -64,6 +65,7 @@ const nodeTypes = {
   policy: PolicyNodeComponent,
   uiScreen: UIScreenNodeComponent,
   swimlane: SwimlaneBackgroundNode,
+  cellQuickAdd: CellQuickAddNode,
 };
 
 function GridCanvasInner() {
@@ -120,15 +122,18 @@ function GridCanvasInner() {
   }, [swimlanes, boardMode]);
 
   // Map domain nodes to React Flow nodes via visitor (column/row to x/y pixels)
-  const reactFlowNodes = useMemo<Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData | SwimlaneBackgroundNodeData>[]>(
+  const reactFlowNodes = useMemo<Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData | SwimlaneBackgroundNodeData | CellQuickAddNodeData>[]>(
     () => {
-      const result: Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData | SwimlaneBackgroundNodeData>[] = [
+      const result: Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData | SwimlaneBackgroundNodeData | CellQuickAddNodeData>[] = [
         ...swimlaneRenderData.bgNodes,
       ];
+
+      const occupiedCells = new Set<string>();
 
       const createFlowNode = (id: string, label: string, column: number, row: number, type: 'domainEvent' | 'command' | 'readModel' | 'policy' | 'uiScreen') => {
         const position = domainNodeToPixelPosition({ column, row });
         result.push({ id, type, position, data: { label, column, row }, style: { width: NOTE_SIZE, height: NOTE_SIZE } });
+        occupiedCells.add(`${column},${row}`);
       };
 
       const projection: BoardProjection = {
@@ -140,9 +145,42 @@ function GridCanvasInner() {
       };
 
       board.describeTo(projection);
+
+      // In swimlane mode, add quick-add placeholder nodes for empty cells
+      if (boardMode === 'swimlane' && swimlaneRenderData.labels.length > 0) {
+        // Determine column range: 0 to maxColumn + 1
+        let maxColumn = 0;
+        occupiedCells.forEach((key) => {
+          const col = parseInt(key.split(',')[0], 10);
+          if (col > maxColumn) maxColumn = col;
+        });
+        const columnCount = Math.max(maxColumn + 2, 1);
+
+        for (const entry of swimlaneRenderData.labels) {
+          for (const cat of SWIMLANE_CATEGORIES) {
+            const row = entry.index * ROWS_PER_SWIMLANE + SWIMLANE_CATEGORIES.indexOf(cat);
+            const options = cellNodeOptions(cat);
+            for (let col = 0; col < columnCount; col++) {
+              if (occupiedCells.has(`${col},${row}`)) continue;
+              const position = domainNodeToPixelPosition({ column: col, row });
+              result.push({
+                id: `quick-add-${col}-${row}`,
+                type: 'cellQuickAdd',
+                position,
+                data: { column: col, row, options },
+                style: { width: NOTE_SIZE, height: NOTE_SIZE },
+                draggable: false,
+                selectable: false,
+                focusable: false,
+              });
+            }
+          }
+        }
+      }
+
       return result;
     },
-    [board, swimlaneRenderData]
+    [board, swimlaneRenderData, boardMode]
   );
 
   // Create edges from links
@@ -214,10 +252,10 @@ function GridCanvasInner() {
     [nodes, addLink]
   );
 
-  // On drag stop: convert pixel position back to grid coordinates and dispatch (skip swimlane bands)
-  const onNodeDragStop: OnNodeDrag<Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData | SwimlaneBackgroundNodeData>> = useCallback(
+  // On drag stop: convert pixel position back to grid coordinates and dispatch (skip swimlane bands and quick-add placeholders)
+  const onNodeDragStop: OnNodeDrag<Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData | SwimlaneBackgroundNodeData | CellQuickAddNodeData>> = useCallback(
     (_event, node) => {
-      if (node.type === 'swimlane') return;
+      if (node.type === 'swimlane' || node.type === 'cellQuickAdd') return;
       const { column, row } = pixelToGrid(node.position.x, node.position.y);
       moveNode(node.id, column, row);
     },

@@ -568,6 +568,49 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
+/* ─── Cell Quick-Add Buttons ─────────────────────────── */
+.cell-quick-add {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.cell-quick-add:hover {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cell-quick-add-btn {
+  width: 36px;
+  height: 36px;
+  border: 2px solid currentColor;
+  background: var(--board-bg);
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s, transform 0.15s, box-shadow 0.15s;
+  padding: 0;
+  pointer-events: auto;
+}
+
+.cell-quick-add-btn:hover {
+  background: currentColor;
+  color: #fff !important;
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 /* ─── Node Palette ───────────────────────────────────── */
 .node-palette {
   flex-shrink: 0;

@@ -2,6 +2,7 @@ import { memo, useCallback, useState } from 'react';
 import { Handle, Position, useReactFlow, type NodeProps } from '@xyflow/react';
 import { useBoardActions } from '../../../core/store/useBoardStore';
 import { useNodeValidationWarning } from '../../hooks/useNodeValidationWarning';
+import { useAutoEdit } from '../../hooks/useAutoEdit';
 import { ValidationBadge } from '../Validation/ValidationBadge';
 
 export type ReadModelNodeData = {
@@ -17,6 +18,13 @@ export const ReadModelNodeComponent = memo(({ id, data, selected }: NodeProps) =
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(nodeData.label);
   const { deleteElements } = useReactFlow();
+
+  const startEditing = useCallback(() => {
+    setDraft(nodeData.label);
+    setEditing(true);
+  }, [nodeData.label]);
+
+  useAutoEdit(id, startEditing);
 
   const commitEdit = useCallback(() => {
     const trimmed = draft.trim();
@@ -38,8 +46,7 @@ export const ReadModelNodeComponent = memo(({ id, data, selected }: NodeProps) =
       data-row={nodeData.row}
       onDoubleClick={(e) => {
         e.stopPropagation();
-        setDraft(nodeData.label);
-        setEditing(true);
+        startEditing();
       }}
     >
       <Handle type="target" position={Position.Left} className="read-model-handle" />
