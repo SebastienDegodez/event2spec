@@ -578,12 +578,10 @@
   gap: 8px;
   opacity: 0;
   transition: opacity 0.2s ease;
-  pointer-events: none;
 }
 
 .cell-quick-add:hover {
   opacity: 1;
-  pointer-events: auto;
 }
 
 .cell-quick-add-btn {
@@ -601,7 +599,6 @@
   justify-content: center;
   transition: background 0.15s, color 0.15s, transform 0.15s, box-shadow 0.15s;
   padding: 0;
-  pointer-events: auto;
 }
 
 .cell-quick-add-btn:hover {
