@@ -305,28 +305,6 @@ function GridCanvasInner() {
     [addNodeWithAutoLinks]
   );
 
-  // Double-click on the pane: create a node at the clicked grid cell
-  // In swimlane mode: create the first allowed node type for the category
-  const onPaneDoubleClick = useCallback(
-    (event: React.MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (target.closest('.react-flow__node')) return;
-      const flowPosition = screenToFlowPosition({ x: event.clientX, y: event.clientY });
-      const { column, row } = pixelToGrid(flowPosition.x, flowPosition.y);
-      if (boardMode === 'swimlane') {
-        const { category } = gridRowToSwimlane(row);
-        const options = cellNodeOptions(category);
-        if (options.length > 0) {
-          const first = options[0];
-          addNodeAtPosition(first.kind, first.label, column, row);
-        }
-      } else {
-        addDomainEventNode(`domain-event-${crypto.randomUUID()}`, 'Domain Event', column, row);
-      }
-    },
-    [addDomainEventNode, addNodeAtPosition, screenToFlowPosition, boardMode]
-  );
-
   // Right-click on a node: show insert before / insert after options
   const onNodeContextMenu = useCallback(
     (event: React.MouseEvent, node: Node) => {
@@ -400,7 +378,6 @@ function GridCanvasInner() {
         onNodeContextMenu={onNodeContextMenu}
         onPaneContextMenu={onPaneContextMenu}
         onPaneClick={onPaneClick}
-        onDoubleClick={onPaneDoubleClick}
         onMoveStart={closeContextMenu}
         nodeTypes={nodeTypes}
         snapToGrid

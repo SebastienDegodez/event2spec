@@ -143,14 +143,6 @@
   transform: translateY(-2px);
 }
 
-/* Editing state */
-.domain-event-node.editing {
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.6), 0 8px 32px rgba(245, 158, 11, 0.25);
-  transform: translateY(-2px) scale(1.03);
-  z-index: 10;
-  cursor: default;
-}
-
 /* Dog-ear fold */
 .note-fold {
   position: absolute;

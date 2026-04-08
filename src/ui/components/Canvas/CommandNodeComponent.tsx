@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useState, useEffect } from 'react';
 import { Handle, Position, useReactFlow, type NodeProps } from '@xyflow/react';
 import { useBoardActions } from '../../../core/store/useBoardStore';
 import { useNodeValidationWarning } from '../../hooks/useNodeValidationWarning';
@@ -24,7 +24,8 @@ export const CommandNodeComponent = memo(({ id, data, selected }: NodeProps) => 
     setEditing(true);
   }, [nodeData.label]);
 
-  useAutoEdit(id, startEditing);
+  const shouldAutoEdit = useAutoEdit(id, startEditing);
+  useEffect(() => { if (shouldAutoEdit) startEditing(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const commitEdit = useCallback(() => {
     const trimmed = draft.trim();
@@ -44,10 +45,6 @@ export const CommandNodeComponent = memo(({ id, data, selected }: NodeProps) => 
       data-id={id}
       data-column={nodeData.column}
       data-row={nodeData.row}
-      onDoubleClick={(e) => {
-        e.stopPropagation();
-        startEditing();
-      }}
     >
       <Handle type="target" position={Position.Left} className="command-handle" />
 
