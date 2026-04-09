@@ -5,7 +5,8 @@
       {
         "type": "command",
         "command": ".github/hooks/snip-rewrite.sh",
-        "async": false
+        "async": false,
+        "bash": "true"
       }
     ]
   }

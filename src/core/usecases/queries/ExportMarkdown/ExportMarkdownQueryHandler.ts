@@ -133,7 +133,7 @@ export class ExportMarkdownQueryHandler {
     }
     const sliceEntries: SliceEntry[] = [];
     slices.describeTo({
-      onSlice(_id, name, commandId, eventIds, readModelId, scenarios) {
+      onSlice(_id, name, commandId, eventIds, readModelId, scenarios, _boundedContextId) {
         sliceEntries.push({ name, commandId, eventIds, readModelId, scenarios });
       },
     });

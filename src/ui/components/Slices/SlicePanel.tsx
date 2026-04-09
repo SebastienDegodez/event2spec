@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useSlices, useSliceActions, useBoard } from '../../../core/store/useBoardStore';
+import { useSlices, useSliceActions, useBoard, useBoundedContexts, useBoundedContextActions } from '../../../core/store/useBoardStore';
 import { type VerticalSliceProjection, type ScenarioProjection } from '../../../core/domain/VerticalSliceProjection';
+import { type BoundedContextProjection } from '../../../core/domain/BoundedContextProjection';
 import { type BoardProjection } from '../../../core/domain/BoardProjection';
 import { ScenarioDialog } from './ScenarioDialog';
 
@@ -17,12 +18,20 @@ interface SlicePanelEntry {
   eventIds: ReadonlyArray<string>;
   readModelId: string;
   scenarios: ReadonlyArray<ScenarioProjection>;
+  boundedContextId: string | undefined;
+}
+
+interface BCEntry {
+  id: string;
+  name: string;
 }
 
 export function SlicePanel() {
   const slices = useSlices();
   const board = useBoard();
+  const boundedContexts = useBoundedContexts();
   const { renameSlice, deleteSlice, addScenarioToSlice, removeScenarioFromSlice } = useSliceActions();
+  const { assignSliceToBoundedContext } = useBoundedContextActions();
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
@@ -32,13 +41,22 @@ export function SlicePanel() {
   const entries = useMemo<SlicePanelEntry[]>(() => {
     const result: SlicePanelEntry[] = [];
     const projection: VerticalSliceProjection = {
-      onSlice(id, name, commandId, eventIds, readModelId, scenarios) {
-        result.push({ id, name, commandId, eventIds, readModelId, scenarios });
+      onSlice(id, name, commandId, eventIds, readModelId, scenarios, boundedContextId) {
+        result.push({ id, name, commandId, eventIds, readModelId, scenarios, boundedContextId });
       },
     };
     slices.describeTo(projection);
     return result;
   }, [slices]);
+
+  const bcEntries = useMemo<BCEntry[]>(() => {
+    const result: BCEntry[] = [];
+    const projection: BoundedContextProjection = {
+      onBoundedContext(id, name) { result.push({ id, name }); },
+    };
+    boundedContexts.describeTo(projection);
+    return result;
+  }, [boundedContexts]);
 
   const availableNodes = useMemo<NodeEntry[]>(() => {
     const result: NodeEntry[] = [];
@@ -138,6 +156,19 @@ export function SlicePanel() {
             <span className="slice-badge slice-badge--command">⌘ {getNodeLabel(entry.commandId)}</span>
             <span className="slice-badge slice-badge--event">⚡ {entry.eventIds.length} event{entry.eventIds.length !== 1 ? 's' : ''}</span>
             {entry.readModelId && <span className="slice-badge slice-badge--readmodel">📊 {getNodeLabel(entry.readModelId)}</span>}
+            {bcEntries.length > 0 && (
+              <select
+                className="slice-bc-select"
+                value={entry.boundedContextId ?? ''}
+                onChange={(e) => assignSliceToBoundedContext(entry.id, e.target.value || undefined)}
+                aria-label="Bounded context"
+              >
+                <option value="">— no bounded context —</option>
+                {bcEntries.map((bc) => (
+                  <option key={bc.id} value={bc.id}>{bc.name}</option>
+                ))}
+              </select>
+            )}
           </div>
 
           {expandedSlice === entry.id && (

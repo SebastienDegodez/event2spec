@@ -7,13 +7,14 @@ export interface CollectedNode {
   column: number;
   row: number;
   type: 'domainEvent' | 'command' | 'readModel' | 'policy' | 'uiScreen';
+  boundedContextId?: string;
 }
 
 export function collectNodes(board: GridBoard): CollectedNode[] {
   const nodes: CollectedNode[] = [];
   const projection: BoardProjection = {
-    onDomainEventNode(id, label, column, row) {
-      nodes.push({ id, label, column, row, type: 'domainEvent' });
+    onDomainEventNode(id, label, column, row, boundedContextId) {
+      nodes.push({ id, label, column, row, type: 'domainEvent', boundedContextId });
     },
     onCommandNode(id, label, column, row) {
       nodes.push({ id, label, column, row, type: 'command' });

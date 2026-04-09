@@ -45,7 +45,7 @@ export const UIScreenNodeComponent = memo(({ id, data, selected }: NodeProps) =>
       data-column={nodeData.column}
       data-row={nodeData.row}
     >
-      <Handle type="target" position={Position.Left} className="ui-screen-handle" />
+      <Handle type="target" id="bottom"     position={Position.Bottom} className="ui-screen-handle" />
 
       <div className="note-fold ui-screen-fold" />
 
@@ -86,7 +86,7 @@ export const UIScreenNodeComponent = memo(({ id, data, selected }: NodeProps) =>
 
       {warningType && <ValidationBadge warningType={warningType} />}
 
-      <Handle type="source" position={Position.Right} className="ui-screen-handle" />
+      <Handle type="source" id="bottom-out" position={Position.Bottom} style={{ left: '70%' }} className="ui-screen-handle" />
     </div>
   );
 });

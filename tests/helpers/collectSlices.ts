@@ -8,13 +8,14 @@ export interface CollectedSlice {
   eventIds: ReadonlyArray<string>;
   readModelId: string;
   scenarios: ReadonlyArray<ScenarioProjection>;
+  boundedContextId: string | undefined;
 }
 
 export function collectSlices(collection: VerticalSliceCollection): CollectedSlice[] {
   const result: CollectedSlice[] = [];
   const projection: VerticalSliceProjection = {
-    onSlice(id, name, commandId, eventIds, readModelId, scenarios) {
-      result.push({ id, name, commandId, eventIds, readModelId, scenarios });
+    onSlice(id, name, commandId, eventIds, readModelId, scenarios, boundedContextId) {
+      result.push({ id, name, commandId, eventIds, readModelId, scenarios, boundedContextId });
     },
   };
   collection.describeTo(projection);

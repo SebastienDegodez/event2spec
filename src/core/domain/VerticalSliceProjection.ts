@@ -14,5 +14,6 @@ export interface VerticalSliceProjection {
     eventIds: ReadonlyArray<string>,
     readModelId: string,
     scenarios: ReadonlyArray<ScenarioProjection>,
+    boundedContextId: string | undefined,
   ): void;
 }

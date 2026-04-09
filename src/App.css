@@ -2200,3 +2200,32 @@
   margin-top: 8px;
   line-height: 1.4;
 }
+
+/* Bounded context selector inside slice summary */
+.slice-bc-select {
+  width: 100%;
+  margin-top: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 3px 6px;
+  outline: none;
+  cursor: pointer;
+}
+.slice-bc-select:focus {
+  border-color: var(--accent);
+}
+
+/* Bounded context creation row */
+.bc-create-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: 8px;
+}
+.bc-create-row .slice-name-input {
+  flex: 1;
+}

@@ -7,6 +7,19 @@ import { collectNodes } from '../../../helpers/collectNodes';
 const handler = new AddDomainEventNodeCommandHandler();
 
 describe('AddDomainEventNodeCommandHandler', () => {
+  it('stores boundedContextId on created domain event', () => {
+    const result = handler.handle(
+      GridBoard.empty(),
+      new AddDomainEventNodeCommand('e1', 'OrderPlaced', 2, 2, 'bc-1')
+    );
+
+    const nodes = collectNodes(result);
+
+    expect(nodes).toHaveLength(1);
+    expect(nodes[0].type).toBe('domainEvent');
+    expect(nodes[0].boundedContextId).toBe('bc-1');
+  });
+
   it('places a node on an empty board at the requested position', () => {
     const board = GridBoard.empty();
     const result = handler.handle(board, new AddDomainEventNodeCommand('e1', 'OrderPlaced', 2, 0));

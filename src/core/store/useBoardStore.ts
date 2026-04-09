@@ -7,9 +7,6 @@ import { CommandNode } from '../domain/CommandNode';
 import { ReadModelNode } from '../domain/ReadModelNode';
 import { PolicyNode } from '../domain/PolicyNode';
 import { UIScreenNode } from '../domain/UIScreenNode';
-import { SwimlaneCollection } from '../domain/SwimlaneCollection';
-import { type SwimlaneRepository } from '../domain/SwimlaneRepository';
-import { type ActorType } from '../domain/ActorType';
 import { type NodeKind } from '../domain/NodeKind';
 import { type NodeProperties, createDefaultNodeProperties } from '../domain/NodeProperties';
 import { AddDomainEventNodeCommand } from '../usecases/commands/AddDomainEventNode/AddDomainEventNodeCommand';
@@ -28,20 +25,18 @@ import { AddPolicyNodeCommand } from '../usecases/commands/AddPolicyNode/AddPoli
 import { AddPolicyNodeCommandHandler } from '../usecases/commands/AddPolicyNode/AddPolicyNodeCommandHandler';
 import { AddUIScreenNodeCommand } from '../usecases/commands/AddUIScreenNode/AddUIScreenNodeCommand';
 import { AddUIScreenNodeCommandHandler } from '../usecases/commands/AddUIScreenNode/AddUIScreenNodeCommandHandler';
-import { AddSwimlaneCommand } from '../usecases/commands/AddSwimlane/AddSwimlaneCommand';
-import { AddSwimlaneCommandHandler } from '../usecases/commands/AddSwimlane/AddSwimlaneCommandHandler';
-import { RemoveSwimlaneCommand } from '../usecases/commands/RemoveSwimlane/RemoveSwimlaneCommand';
-import { RemoveSwimlaneCommandHandler } from '../usecases/commands/RemoveSwimlane/RemoveSwimlaneCommandHandler';
-import { RenameSwimlaneCommand } from '../usecases/commands/RenameSwimlane/RenameSwimlaneCommand';
-import { RenameSwimlaneCommandHandler } from '../usecases/commands/RenameSwimlane/RenameSwimlaneCommandHandler';
-import { ReorderSwimlanesCommand } from '../usecases/commands/ReorderSwimlanes/ReorderSwimlanesCommand';
-import { ReorderSwimlanesCommandHandler } from '../usecases/commands/ReorderSwimlanes/ReorderSwimlanesCommandHandler';
-import { ChangeSwimlaneActorTypeCommand } from '../usecases/commands/ChangeSwimlaneActorType/ChangeSwimlaneActorTypeCommand';
-import { ChangeSwimlaneActorTypeCommandHandler } from '../usecases/commands/ChangeSwimlaneActorType/ChangeSwimlaneActorTypeCommandHandler';
 import { CreateSliceCommand } from '../usecases/commands/CreateSlice/CreateSliceCommand';
 import { CreateSliceCommandHandler } from '../usecases/commands/CreateSlice/CreateSliceCommandHandler';
 import { RenameSliceCommand } from '../usecases/commands/RenameSlice/RenameSliceCommand';
 import { RenameSliceCommandHandler } from '../usecases/commands/RenameSlice/RenameSliceCommandHandler';
+import { CreateBoundedContextCommand } from '../usecases/commands/CreateBoundedContext/CreateBoundedContextCommand';
+import { CreateBoundedContextCommandHandler } from '../usecases/commands/CreateBoundedContext/CreateBoundedContextCommandHandler';
+import { DeleteBoundedContextCommand } from '../usecases/commands/DeleteBoundedContext/DeleteBoundedContextCommand';
+import { DeleteBoundedContextCommandHandler } from '../usecases/commands/DeleteBoundedContext/DeleteBoundedContextCommandHandler';
+import { RenameBoundedContextCommand } from '../usecases/commands/RenameBoundedContext/RenameBoundedContextCommand';
+import { RenameBoundedContextCommandHandler } from '../usecases/commands/RenameBoundedContext/RenameBoundedContextCommandHandler';
+import { AssignSliceToBoundedContextCommand } from '../usecases/commands/AssignSliceToBoundedContext/AssignSliceToBoundedContextCommand';
+import { AssignSliceToBoundedContextCommandHandler } from '../usecases/commands/AssignSliceToBoundedContext/AssignSliceToBoundedContextCommandHandler';
 import { DeleteSliceCommand } from '../usecases/commands/DeleteSlice/DeleteSliceCommand';
 import { DeleteSliceCommandHandler } from '../usecases/commands/DeleteSlice/DeleteSliceCommandHandler';
 import { AddScenarioToSliceCommand } from '../usecases/commands/AddScenarioToSlice/AddScenarioToSliceCommand';
@@ -56,11 +51,13 @@ import { ExportMarkdownQuery } from '../usecases/queries/ExportMarkdown/ExportMa
 import { ExportMarkdownQueryHandler } from '../usecases/queries/ExportMarkdown/ExportMarkdownQueryHandler';
 import { type NodeLink } from '../domain/NodeLink';
 import { type ConnectionType } from '../domain/ConnectionType';
-import { Swimlane } from '../domain/Swimlane';
 import { VerticalSliceCollection } from '../domain/VerticalSliceCollection';
 import { type VerticalSliceRepository } from '../domain/VerticalSliceRepository';
 import { VerticalSlice } from '../domain/VerticalSlice';
 import { Scenario } from '../domain/Scenario';
+import { BoundedContextCollection } from '../domain/BoundedContextCollection';
+import { type BoundedContextRepository } from '../domain/BoundedContextRepository';
+import { BoundedContext } from '../domain/BoundedContext';
 import { resolveAutoLinks, type BoardNodeSummary } from '../domain/resolveAutoLinks';
 
 export type { NodeLink };
@@ -83,13 +80,6 @@ interface PersistedNode {
   type: 'domainEvent' | 'command' | 'readModel' | 'policy' | 'uiScreen';
 }
 
-/** Serialisable representation of a swimlane for localStorage persistence. */
-interface PersistedSwimlane {
-  id: string;
-  actorName: string;
-  actorType: ActorType;
-}
-
 /** Serialisable representation of a scenario for localStorage persistence. */
 interface PersistedScenario {
   given: string[];
@@ -105,25 +95,38 @@ interface PersistedSlice {
   eventIds: string[];
   readModelId: string;
   scenarios: PersistedScenario[];
+  boundedContextId?: string;
+}
+
+/** Serialisable representation of a bounded context for localStorage persistence. */
+interface PersistedBoundedContext {
+  id: string;
+  name: string;
 }
 
 /** Shape of the data persisted in localStorage. */
 interface PersistedState {
+  version: 2;
   nodes: PersistedNode[];
   links: NodeLink[];
-  swimlanes?: PersistedSwimlane[];
-  slices?: PersistedSlice[];
-  nodeProperties?: Record<string, NodeProperties>;
+  slices: PersistedSlice[];
+  boundedContexts: PersistedBoundedContext[];
+  nodeProperties: Record<string, NodeProperties>;
 }
 
 const STORAGE_KEY = 'event2spec-board';
 
-function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; swimlanes: SwimlaneCollection; slices: VerticalSliceCollection; nodeProperties: Record<string, NodeProperties> } {
+function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; slices: VerticalSliceCollection; boundedContexts: BoundedContextCollection; nodeProperties: Record<string, NodeProperties> } {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { board: GridBoard.empty(), links: [], swimlanes: SwimlaneCollection.empty(), slices: VerticalSliceCollection.empty(), nodeProperties: {} };
-    const parsed = JSON.parse(raw) as PersistedState;
-    const { nodes } = parsed;
+    if (!raw) return { board: GridBoard.empty(), links: [], slices: VerticalSliceCollection.empty(), boundedContexts: BoundedContextCollection.empty(), nodeProperties: {} };
+    const parsed = JSON.parse(raw) as Partial<PersistedState>;
+    if (parsed.version !== 2) {
+      localStorage.removeItem(STORAGE_KEY);
+      return { board: GridBoard.empty(), links: [], slices: VerticalSliceCollection.empty(), boundedContexts: BoundedContextCollection.empty(), nodeProperties: {} };
+    }
+    const persisted = parsed as PersistedState;
+    const { nodes } = persisted;
     let board = GridBoard.empty();
     for (const node of nodes) {
       if (node.type === 'domainEvent') {
@@ -138,32 +141,35 @@ function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; 
         board = board.insertNode(UIScreenNode.create(node.id, node.label, node.column, node.row));
       }
     }
-    const rawLinks = parsed.links as Array<NodeLink | { commandNodeId: string; eventNodeId: string }>;
+    const rawLinks = persisted.links as Array<NodeLink | { commandNodeId: string; eventNodeId: string }>;
     const links: NodeLink[] = rawLinks.map((link) => {
       if ('commandNodeId' in link) {
         return { sourceNodeId: link.commandNodeId, targetNodeId: link.eventNodeId, connectionType: 'triggers' as const };
       }
       return link as NodeLink;
     });
-    let swimlanes = SwimlaneCollection.empty();
-    for (const s of parsed.swimlanes ?? []) {
-      swimlanes = swimlanes.add(Swimlane.create(s.id, s.actorName, s.actorType));
-    }
     let slices = VerticalSliceCollection.empty();
-    for (const ps of parsed.slices ?? []) {
+    for (const ps of persisted.slices) {
       let slice = VerticalSlice.create(ps.id, ps.name, ps.commandId, ps.eventIds, ps.readModelId);
       for (const sc of ps.scenarios) {
         slice = slice.addScenario(Scenario.create(sc.given, sc.when, sc.then));
       }
+      if (ps.boundedContextId) {
+        slice = slice.withBoundedContext(ps.boundedContextId);
+      }
       slices = slices.add(slice);
     }
-    return { board, links, swimlanes, slices, nodeProperties: parsed.nodeProperties ?? {} };
+    let boundedContexts = BoundedContextCollection.empty();
+    for (const bc of persisted.boundedContexts) {
+      boundedContexts = boundedContexts.add(BoundedContext.create(bc.id, bc.name));
+    }
+    return { board, links, slices, boundedContexts, nodeProperties: persisted.nodeProperties };
   } catch {
-    return { board: GridBoard.empty(), links: [], swimlanes: SwimlaneCollection.empty(), slices: VerticalSliceCollection.empty(), nodeProperties: {} };
+    return { board: GridBoard.empty(), links: [], slices: VerticalSliceCollection.empty(), boundedContexts: BoundedContextCollection.empty(), nodeProperties: {} };
   }
 }
 
-function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlanes: SwimlaneCollection, slices: VerticalSliceCollection, nodeProperties: Record<string, NodeProperties>): void {
+function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, slices: VerticalSliceCollection, boundedContexts: BoundedContextCollection, nodeProperties: Record<string, NodeProperties>): void {
   const nodes: PersistedNode[] = [];
   const projection: BoardProjection = {
     onDomainEventNode(id, label, column, row) {
@@ -183,15 +189,9 @@ function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlan
     },
   };
   board.describeTo(projection);
-  const persistedSwimlanes: PersistedSwimlane[] = [];
-  swimlanes.describeTo({
-    onSwimlane(id, actorName, actorType) {
-      persistedSwimlanes.push({ id, actorName, actorType });
-    },
-  });
   const persistedSlices: PersistedSlice[] = [];
   slices.describeTo({
-    onSlice(id, name, commandId, eventIds, readModelId, scenarios) {
+    onSlice(id, name, commandId, eventIds, readModelId, scenarios, boundedContextId) {
       persistedSlices.push({
         id,
         name,
@@ -199,10 +199,17 @@ function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlan
         eventIds: [...eventIds],
         readModelId,
         scenarios: scenarios.map((s) => ({ given: [...s.given], when: s.when, then: [...s.then] })),
+        boundedContextId,
       });
     },
   });
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ nodes, links, swimlanes: persistedSwimlanes, slices: persistedSlices, nodeProperties }));
+  const persistedBoundedContexts: PersistedBoundedContext[] = [];
+  boundedContexts.describeTo({
+    onBoundedContext(id, name) {
+      persistedBoundedContexts.push({ id, name });
+    },
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 2, nodes, links, slices: persistedSlices, boundedContexts: persistedBoundedContexts, nodeProperties }));
 }
 
 /** Collects all board nodes as summaries for auto-link resolution. */
@@ -222,8 +229,8 @@ function collectBoardNodeSummaries(board: GridBoard): BoardNodeSummary[] {
 interface BoardStoreState {
   board: GridBoard;
   links: ReadonlyArray<NodeLink>;
-  swimlanes: SwimlaneCollection;
   slices: VerticalSliceCollection;
+  boundedContexts: BoundedContextCollection;
   selectedNode: SelectedNode | null;
   nodeProperties: Record<string, NodeProperties>;
   selectedColumns: number[];
@@ -258,16 +265,6 @@ interface BoardActions {
   deselectNode: () => void;
   /** Update the properties of a node. */
   updateNodeProperties: (id: string, properties: NodeProperties) => void;
-  /** Add a new swimlane. */
-  addSwimlane: (id: string, actorName: string, actorType: ActorType) => void;
-  /** Remove a swimlane by id. */
-  removeSwimlane: (id: string) => void;
-  /** Rename a swimlane. */
-  renameSwimlane: (id: string, actorName: string) => void;
-  /** Reorder a swimlane to a target index. */
-  reorderSwimlanes: (id: string, targetIndex: number) => void;
-  /** Change the actor type of a swimlane. */
-  changeSwimlaneActorType: (id: string, actorType: ActorType) => void;
   /** Create a new vertical slice. */
   createSlice: (id: string, name: string, commandId: string, eventIds: string[], readModelId: string) => void;
   /** Rename a vertical slice. */
@@ -280,6 +277,14 @@ interface BoardActions {
   removeScenarioFromSlice: (sliceId: string, scenarioIndex: number) => void;
   /** Update an existing scenario in a slice by index. */
   updateScenarioInSlice: (sliceId: string, scenarioIndex: number, given: string[], when: string, then: string[]) => void;
+  /** Create a new bounded context. */
+  createBoundedContext: (id: string, name: string) => void;
+  /** Delete a bounded context (and unassign its slices). */
+  deleteBoundedContext: (id: string) => void;
+  /** Rename a bounded context. */
+  renameBoundedContext: (id: string, name: string) => void;
+  /** Assign a vertical slice to a bounded context (or unassign if boundedContextId is undefined). */
+  assignSliceToBoundedContext: (sliceId: string, boundedContextId: string | undefined) => void;
   /** Set the currently selected columns (for slice creation). */
   selectColumns: (columns: number[]) => void;
   /** Clear the column selection. */
@@ -308,26 +313,11 @@ const exportMarkdownHandler = new ExportMarkdownQueryHandler();
 const initialState = loadFromStorage();
 
 export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) => {
-  const swimlaneRepository: SwimlaneRepository = {
-    load: () => get().swimlanes,
-    save: (swimlanes) => {
-      const { board, links, slices, nodeProperties } = get();
-      saveToStorage(board, links, swimlanes, slices, nodeProperties);
-      set({ swimlanes });
-    },
-  };
-
-  const addSwimlaneHandler = new AddSwimlaneCommandHandler(swimlaneRepository);
-  const removeSwimlaneHandler = new RemoveSwimlaneCommandHandler(swimlaneRepository);
-  const renameSwimlaneHandler = new RenameSwimlaneCommandHandler(swimlaneRepository);
-  const reorderSwimlanesHandler = new ReorderSwimlanesCommandHandler(swimlaneRepository);
-  const changeSwimlaneActorTypeHandler = new ChangeSwimlaneActorTypeCommandHandler(swimlaneRepository);
-
   const sliceRepository: VerticalSliceRepository = {
     load: () => get().slices,
     save: (slices) => {
-      const { board, links, swimlanes, nodeProperties } = get();
-      saveToStorage(board, links, swimlanes, slices, nodeProperties);
+      const { board, links, boundedContexts, nodeProperties } = get();
+      saveToStorage(board, links, slices, boundedContexts, nodeProperties);
       set({ slices });
     },
   };
@@ -339,11 +329,25 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
   const removeScenarioFromSliceHandler = new RemoveScenarioFromSliceCommandHandler(sliceRepository);
   const updateScenarioInSliceHandler = new UpdateScenarioInSliceCommandHandler(sliceRepository);
 
+  const boundedContextRepository: BoundedContextRepository = {
+    load: () => get().boundedContexts,
+    save: (boundedContexts) => {
+      const { board, links, slices, nodeProperties } = get();
+      saveToStorage(board, links, slices, boundedContexts, nodeProperties);
+      set({ boundedContexts });
+    },
+  };
+
+  const createBoundedContextHandler = new CreateBoundedContextCommandHandler(boundedContextRepository);
+  const deleteBoundedContextHandler = new DeleteBoundedContextCommandHandler(boundedContextRepository, sliceRepository);
+  const renameBoundedContextHandler = new RenameBoundedContextCommandHandler(boundedContextRepository);
+  const assignSliceToBoundedContextHandler = new AssignSliceToBoundedContextCommandHandler(sliceRepository);
+
   return {
     board: initialState.board,
     links: initialState.links,
-    swimlanes: initialState.swimlanes,
     slices: initialState.slices,
+    boundedContexts: initialState.boundedContexts,
     selectedNode: null,
     nodeProperties: initialState.nodeProperties,
     selectedColumns: [],
@@ -353,7 +357,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       set((state) => {
         const board = addDomainEventNodeHandler.handle(state.board, new AddDomainEventNodeCommand(id, label, column, row));
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('domainEvent') };
-        saveToStorage(board, state.links, state.swimlanes, state.slices, nodeProperties);
+        saveToStorage(board, state.links, state.slices, state.boundedContexts, nodeProperties);
         return { board, nodeProperties };
       }),
 
@@ -364,7 +368,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
           ? [...state.links, { sourceNodeId: id, targetNodeId: linkedEventId, connectionType: 'triggers' as const }]
           : state.links;
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('command') };
-        saveToStorage(board, links, state.swimlanes, state.slices, nodeProperties);
+        saveToStorage(board, links, state.slices, state.boundedContexts, nodeProperties);
         return { board, links, nodeProperties };
       }),
 
@@ -372,7 +376,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       set((state) => {
         const board = addReadModelNodeHandler.handle(state.board, new AddReadModelNodeCommand(id, label, column, row));
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('readModel') };
-        saveToStorage(board, state.links, state.swimlanes, state.slices, nodeProperties);
+        saveToStorage(board, state.links, state.slices, state.boundedContexts, nodeProperties);
         return { board, nodeProperties };
       }),
 
@@ -380,7 +384,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       set((state) => {
         const board = addPolicyNodeHandler.handle(state.board, new AddPolicyNodeCommand(id, label, column, row));
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('policy') };
-        saveToStorage(board, state.links, state.swimlanes, state.slices, nodeProperties);
+        saveToStorage(board, state.links, state.slices, state.boundedContexts, nodeProperties);
         return { board, nodeProperties };
       }),
 
@@ -388,21 +392,21 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       set((state) => {
         const board = addUIScreenNodeHandler.handle(state.board, new AddUIScreenNodeCommand(id, label, column, row));
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('uiScreen') };
-        saveToStorage(board, state.links, state.swimlanes, state.slices, nodeProperties);
+        saveToStorage(board, state.links, state.slices, state.boundedContexts, nodeProperties);
         return { board, nodeProperties };
       }),
 
     moveNode: (id, column, row) =>
       set((state) => {
         const board = moveNodeHandler.handle(state.board, new MoveNodeCommand(id, column, row));
-        saveToStorage(board, state.links, state.swimlanes, state.slices, state.nodeProperties);
+        saveToStorage(board, state.links, state.slices, state.boundedContexts, state.nodeProperties);
         return { board };
       }),
 
     updateLabel: (id, label) =>
       set((state) => {
         const board = updateLabelHandler.handle(state.board, new UpdateNodeLabelCommand(id, label));
-        saveToStorage(board, state.links, state.swimlanes, state.slices, state.nodeProperties);
+        saveToStorage(board, state.links, state.slices, state.boundedContexts, state.nodeProperties);
         const selectedNode = state.selectedNode?.id === id ? { ...state.selectedNode, label } : state.selectedNode;
         return { board, selectedNode };
       }),
@@ -413,7 +417,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         const links = state.links.filter((link) => link.sourceNodeId !== id && link.targetNodeId !== id);
         const { [id]: _, ...nodeProperties } = state.nodeProperties;
         void _;
-        saveToStorage(board, links, state.swimlanes, state.slices, nodeProperties);
+        saveToStorage(board, links, state.slices, state.boundedContexts, nodeProperties);
         const selectedNode = state.selectedNode?.id === id ? null : state.selectedNode;
         return { board, links, nodeProperties, selectedNode };
       }),
@@ -425,7 +429,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         );
         if (alreadyExists) return state;
         const links = [...state.links, { sourceNodeId, targetNodeId, connectionType }];
-        saveToStorage(state.board, links, state.swimlanes, state.slices, state.nodeProperties);
+        saveToStorage(state.board, links, state.slices, state.boundedContexts, state.nodeProperties);
         return { links };
       }),
 
@@ -434,7 +438,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         const links = state.links.filter(
           (link) => !(link.sourceNodeId === sourceNodeId && link.targetNodeId === targetNodeId)
         );
-        saveToStorage(state.board, links, state.swimlanes, state.slices, state.nodeProperties);
+        saveToStorage(state.board, links, state.slices, state.boundedContexts, state.nodeProperties);
         return { links };
       }),
 
@@ -447,29 +451,9 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
     updateNodeProperties: (id, properties) =>
       set((state) => {
         const nodeProperties = { ...state.nodeProperties, [id]: properties };
-        saveToStorage(state.board, state.links, state.swimlanes, state.slices, nodeProperties);
+        saveToStorage(state.board, state.links, state.slices, state.boundedContexts, nodeProperties);
         return { nodeProperties };
       }),
-
-    addSwimlane: (id, actorName, actorType) => {
-      addSwimlaneHandler.handle(new AddSwimlaneCommand(id, actorName, actorType));
-    },
-
-    removeSwimlane: (id) => {
-      removeSwimlaneHandler.handle(new RemoveSwimlaneCommand(id));
-    },
-
-    renameSwimlane: (id, actorName) => {
-      renameSwimlaneHandler.handle(new RenameSwimlaneCommand(id, actorName));
-    },
-
-    reorderSwimlanes: (id, targetIndex) => {
-      reorderSwimlanesHandler.handle(new ReorderSwimlanesCommand(id, targetIndex));
-    },
-
-    changeSwimlaneActorType: (id, actorType) => {
-      changeSwimlaneActorTypeHandler.handle(new ChangeSwimlaneActorTypeCommand(id, actorType));
-    },
 
     createSlice: (id, name, commandId, eventIds, readModelId) => {
       createSliceHandler.handle(new CreateSliceCommand(id, name, commandId, eventIds, readModelId));
@@ -493,6 +477,22 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
     updateScenarioInSlice: (sliceId, scenarioIndex, given, when, then) => {
       updateScenarioInSliceHandler.handle(new UpdateScenarioInSliceCommand(sliceId, scenarioIndex, given, when, then));
+    },
+
+    createBoundedContext: (id, name) => {
+      createBoundedContextHandler.handle(new CreateBoundedContextCommand(id, name));
+    },
+
+    deleteBoundedContext: (id) => {
+      deleteBoundedContextHandler.handle(new DeleteBoundedContextCommand(id));
+    },
+
+    renameBoundedContext: (id, name) => {
+      renameBoundedContextHandler.handle(new RenameBoundedContextCommand(id, name));
+    },
+
+    assignSliceToBoundedContext: (sliceId, boundedContextId) => {
+      assignSliceToBoundedContextHandler.handle(new AssignSliceToBoundedContextCommand(sliceId, boundedContextId));
     },
 
     selectColumns: (columns) => set({ selectedColumns: columns }),
@@ -523,15 +523,15 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         }));
         const links = [...state.links, ...newLinks];
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties(kind) };
-        saveToStorage(board, links, state.swimlanes, state.slices, nodeProperties);
+        saveToStorage(board, links, state.slices, state.boundedContexts, nodeProperties);
         return { board, links, nodeProperties, autoEditNodeId: id };
       }),
 
     clearAutoEditNodeId: () => set({ autoEditNodeId: null }),
 
     exportJSON: () => {
-      const { board, links, swimlanes, slices, nodeProperties } = get();
-      return exportJSONHandler.handle(board, links, swimlanes, slices, nodeProperties, new ExportJSONQuery());
+      const { board, links, slices, nodeProperties } = get();
+      return exportJSONHandler.handle(board, links, slices, nodeProperties, new ExportJSONQuery());
     },
 
     exportMarkdown: () => {
@@ -545,9 +545,9 @@ export const useBoard = () => useBoardStore((state) => state.board);
 
 export const useLinks = () => useBoardStore((state) => state.links);
 
-export const useSwimlanes = () => useBoardStore((state) => state.swimlanes);
-
 export const useSlices = () => useBoardStore((state) => state.slices);
+
+export const useBoundedContexts = () => useBoardStore((state) => state.boundedContexts);
 
 export const useSelectedNode = () => useBoardStore((state) => state.selectedNode);
 
@@ -578,17 +578,6 @@ export const useBoardActions = () =>
     }))
   );
 
-export const useSwimlaneActions = () =>
-  useBoardStore(
-    useShallow((state) => ({
-      addSwimlane: state.addSwimlane,
-      removeSwimlane: state.removeSwimlane,
-      renameSwimlane: state.renameSwimlane,
-      reorderSwimlanes: state.reorderSwimlanes,
-      changeSwimlaneActorType: state.changeSwimlaneActorType,
-    }))
-  );
-
 export const useSliceActions = () =>
   useBoardStore(
     useShallow((state) => ({
@@ -598,6 +587,16 @@ export const useSliceActions = () =>
       addScenarioToSlice: state.addScenarioToSlice,
       removeScenarioFromSlice: state.removeScenarioFromSlice,
       updateScenarioInSlice: state.updateScenarioInSlice,
+    }))
+  );
+
+export const useBoundedContextActions = () =>
+  useBoardStore(
+    useShallow((state) => ({
+      createBoundedContext: state.createBoundedContext,
+      deleteBoundedContext: state.deleteBoundedContext,
+      renameBoundedContext: state.renameBoundedContext,
+      assignSliceToBoundedContext: state.assignSliceToBoundedContext,
     }))
   );
 

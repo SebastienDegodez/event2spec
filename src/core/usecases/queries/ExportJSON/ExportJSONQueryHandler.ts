@@ -3,13 +3,11 @@ import { type BoardProjection } from '../../../domain/BoardProjection';
 import { type EventModel, type DomainEventEntry, type CommandEntry, type ReadModelEntry, type PolicyEntry, type UIScreenEntry, type VerticalSlice as VerticalSliceSchema, type Scenario as ScenarioSchema } from '../../../domain/EventModelSchema';
 import { type NodeLink } from '../../../domain/NodeLink';
 import { type NodeProperties } from '../../../domain/NodeProperties';
-import { SwimlaneCollection } from '../../../domain/SwimlaneCollection';
 import { VerticalSliceCollection } from '../../../domain/VerticalSliceCollection';
-import { gridRowToSwimlane } from '../../../domain/SwimlaneLayout';
 import { ExportJSONQuery } from './ExportJSONQuery';
 
 export class ExportJSONQueryHandler {
-  handle(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlanes: SwimlaneCollection, slices: VerticalSliceCollection, nodeProperties: Record<string, NodeProperties>, query: ExportJSONQuery): string {
+  handle(board: GridBoard, links: ReadonlyArray<NodeLink>, slices: VerticalSliceCollection, nodeProperties: Record<string, NodeProperties>, query: ExportJSONQuery): string {
     void query;
 
     const domainEvents: DomainEventEntry[] = [];
@@ -41,27 +39,13 @@ export class ExportJSONQueryHandler {
       }
     }
 
-    const swimlaneIndexToId = new Map<number, string>();
-    const exportedSwimlanes: EventModel['swimlanes'] = [];
-    swimlanes.describeTo({
-      onSwimlane(id, actorName, actorType, color, index) {
-        swimlaneIndexToId.set(index, id);
-        exportedSwimlanes.push({ id, actorName, actorType, order: index, color });
-      },
-    });
-
-    function resolveSwimlaneId(row: number): string {
-      const { swimlaneIndex } = gridRowToSwimlane(row);
-      return swimlaneIndexToId.get(swimlaneIndex) ?? '';
-    }
-
     const projection: BoardProjection = {
       onDomainEventNode(id, label, column, row) {
         const props = nodeProperties[id];
         domainEvents.push({
           id,
           name: label,
-          swimlaneId: resolveSwimlaneId(row),
+          swimlaneId: '',
           triggeredBy: '',
           data: props?.type === 'domainEvent' ? props.data : {},
           timelinePosition: column,
@@ -72,7 +56,7 @@ export class ExportJSONQueryHandler {
         commands.push({
           id,
           name: label,
-          swimlaneId: resolveSwimlaneId(row),
+          swimlaneId: '',
           actor: props?.type === 'command' ? props.actor : '',
           payload: props?.type === 'command' ? props.payload : {},
           resultingEvents: triggersLinks.has(id) ? [triggersLinks.get(id)!] : [],
@@ -85,7 +69,7 @@ export class ExportJSONQueryHandler {
         readModels.push({
           id,
           name: label,
-          swimlaneId: resolveSwimlaneId(row),
+          swimlaneId: '',
           fedBy: feedsLinks.get(id) ?? [],
           consumedBy: props?.type === 'readModel' ? props.consumedBy : readModelScreenLinks.get(id) ?? '',
           data: props?.type === 'readModel' ? props.data : {},
@@ -97,7 +81,7 @@ export class ExportJSONQueryHandler {
         policies.push({
           id,
           name: label,
-          swimlaneId: resolveSwimlaneId(row),
+          swimlaneId: '',
           whenEvent: '',
           thenCommand: policyCommandLinks.get(id) ?? '',
           condition: props?.type === 'policy' ? props.condition : '',
@@ -109,7 +93,7 @@ export class ExportJSONQueryHandler {
         uiScreens.push({
           id,
           name: label,
-          swimlaneId: resolveSwimlaneId(row),
+          swimlaneId: '',
           description: props?.type === 'uiScreen' ? props.description : '',
           triggersCommand: uiScreenCommandLinks.get(id) ?? '',
           displaysReadModel: '',
@@ -122,7 +106,7 @@ export class ExportJSONQueryHandler {
 
     const exportedSlices: VerticalSliceSchema[] = [];
     slices.describeTo({
-      onSlice(_id, name, commandId, eventIds, readModelId, scenarios) {
+      onSlice(_id, name, commandId, eventIds, readModelId, scenarios, _boundedContextId) {
         const exportedScenarios: ScenarioSchema[] = scenarios.map((s) => ({
           given: [...s.given],
           when: s.when,
@@ -143,7 +127,7 @@ export class ExportJSONQueryHandler {
       version: '1.0.0',
       description: '',
       actors: [],
-      swimlanes: exportedSwimlanes,
+      swimlanes: [],
       domainEvents,
       commands,
       readModels,

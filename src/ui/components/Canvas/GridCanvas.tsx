@@ -19,9 +19,11 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { useBoard, useBoardActions, useLinks, useSwimlanes, useSwimlaneActions, useSelectedColumns, useColumnSelectionActions } from '../../../core/store/useBoardStore';
+import { useBoard, useBoardActions, useLinks, useSwimlanes, useSwimlaneActions, useSelectedColumns, useColumnSelectionActions, useSlices, useBoundedContexts } from '../../../core/store/useBoardStore';
 import { type BoardProjection } from '../../../core/domain/BoardProjection';
 import { type SwimlaneProjection } from '../../../core/domain/SwimlaneProjection';
+import { type VerticalSliceProjection } from '../../../core/domain/VerticalSliceProjection';
+import { type BoundedContextProjection } from '../../../core/domain/BoundedContextProjection';
 import { type ActorType } from '../../../core/domain/ActorType';
 import { type SwimlaneColor } from '../../../core/domain/SwimlaneColor';
 import { type NodeKind } from '../../../core/domain/NodeKind';
@@ -36,6 +38,7 @@ import { PolicyNodeComponent, type PolicyNodeData } from './PolicyNodeComponent'
 import { UIScreenNodeComponent, type UIScreenNodeData } from './UIScreenNodeComponent';
 import { SwimlaneBackgroundNode, type SwimlaneBackgroundNodeData } from './SwimlaneBackgroundNode';
 import { CellQuickAddNode, type CellQuickAddNodeData } from './CellQuickAddNode';
+import { BoundedContextOverlayNode, bcColor, bcBorderColor } from './BoundedContextOverlayNode';
 import { ContextMenu } from './ContextMenu';
 import { type ContextMenuState } from './ContextMenuState';
 import { GRID_SIZE, NOTE_SIZE, COMMAND_NODE_COLOR, DOMAIN_EVENT_NODE_COLOR, READ_MODEL_NODE_COLOR, POLICY_NODE_COLOR, UI_SCREEN_NODE_COLOR, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
@@ -65,12 +68,15 @@ const nodeTypes = {
   uiScreen: UIScreenNodeComponent,
   swimlane: SwimlaneBackgroundNode,
   cellQuickAdd: CellQuickAddNode,
+  boundedContextOverlay: BoundedContextOverlayNode,
 };
 
 function GridCanvasInner() {
   const board = useBoard();
   const links = useLinks();
   const swimlanes = useSwimlanes();
+  const slices = useSlices();
+  const boundedContexts = useBoundedContexts();
   const { addDomainEventNode, addNodeWithAutoLinks, moveNode, addLink, removeLink, selectNode, deselectNode } = useBoardActions();
   const { renameSwimlane, addSwimlane } = useSwimlaneActions();
   const { screenToFlowPosition } = useReactFlow();
@@ -128,10 +134,91 @@ function GridCanvasInner() {
     return { bgNodes, labels };
   }, [swimlanes, minColumnPerSwimlane]);
 
-  // Map domain nodes to React Flow nodes via visitor (column/row to x/y pixels)
-  const reactFlowNodes = useMemo<Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData | SwimlaneBackgroundNodeData | CellQuickAddNodeData>[]>(
+  // Compute bounded context totals (swimlane row span)
+  const totalSwimlaneRows = useMemo(() => {
+    const labels = swimlaneRenderData.labels;
+    return labels.length * ROWS_PER_SWIMLANE;
+  }, [swimlaneRenderData.labels]);
+
+  // Collect the column range covered by each slice's nodes, then group by bounded context
+  const bcOverlayNodes = useMemo(() => {
+    // Map sliceId -> boundedContextId
+    const sliceToBc = new Map<string, string>();
+    const sliceProjection: VerticalSliceProjection = {
+      onSlice(id, _name, _cmdId, _eventIds, _rmId, _scenarios, boundedContextId) {
+        if (boundedContextId) sliceToBc.set(id, boundedContextId);
+      },
+    };
+    slices.describeTo(sliceProjection);
+    if (sliceToBc.size === 0) return [];
+
+    // Map nodeId -> column
+    const nodeColumn = new Map<string, number>();
+    const boardProjection: BoardProjection = {
+      onDomainEventNode(id, _l, col) { nodeColumn.set(id, col); },
+      onCommandNode(id, _l, col) { nodeColumn.set(id, col); },
+      onReadModelNode(id, _l, col) { nodeColumn.set(id, col); },
+      onPolicyNode(id, _l, col) { nodeColumn.set(id, col); },
+      onUIScreenNode(id, _l, col) { nodeColumn.set(id, col); },
+    };
+    board.describeTo(boardProjection);
+
+    // Map bcId -> {min, max} column
+    const bcColumns = new Map<string, { min: number; max: number }>();
+    const sliceProjection2: VerticalSliceProjection = {
+      onSlice(id, _name, commandId, eventIds, readModelId, _scenarios, boundedContextId) {
+        if (!boundedContextId) return;
+        const nodeIds = [commandId, ...eventIds, readModelId].filter(Boolean);
+        for (const nodeId of nodeIds) {
+          const col = nodeColumn.get(nodeId);
+          if (col === undefined) continue;
+          const existing = bcColumns.get(boundedContextId);
+          if (!existing) {
+            bcColumns.set(boundedContextId, { min: col, max: col });
+          } else {
+            bcColumns.set(boundedContextId, { min: Math.min(existing.min, col), max: Math.max(existing.max, col) });
+          }
+        }
+      },
+    };
+    slices.describeTo(sliceProjection2);
+
+    if (bcColumns.size === 0) return [];
+
+    // Map bcId -> name & index
+    const bcMeta: { id: string; name: string }[] = [];
+    const bcProjection: BoundedContextProjection = {
+      onBoundedContext(id, name) { bcMeta.push({ id, name }); },
+    };
+    boundedContexts.describeTo(bcProjection);
+
+    const result: Node[] = [];
+    bcMeta.forEach(({ id, name }, idx) => {
+      const range = bcColumns.get(id);
+      if (!range) return;
+      const x = range.min * GRID_SIZE;
+      const width = (range.max - range.min + 1) * GRID_SIZE;
+      const height = totalSwimlaneRows * GRID_SIZE;
+      const color = bcColor(idx);
+      const borderColor = bcBorderColor(idx);
+      result.push({
+        id: `bc-overlay-${id}`,
+        type: 'boundedContextOverlay',
+        position: { x, y: 0 },
+        data: { name, color, borderColor },
+        style: { width, height },
+        draggable: false,
+        selectable: false,
+        focusable: false,
+        zIndex: -2,
+      });
+    });
+    return result;
+  }, [slices, board, boundedContexts, totalSwimlaneRows]);
+  const reactFlowNodes = useMemo<Node[]>(
     () => {
-      const result: Node<DomainEventNodeData | CommandNodeData | ReadModelNodeData | PolicyNodeData | UIScreenNodeData | SwimlaneBackgroundNodeData | CellQuickAddNodeData>[] = [
+      const result: Node[] = [
+        ...bcOverlayNodes,
         ...swimlaneRenderData.bgNodes,
       ];
 
@@ -183,25 +270,37 @@ function GridCanvasInner() {
 
       return result;
     },
-    [board, swimlaneRenderData]
+    [board, swimlaneRenderData, bcOverlayNodes]
   );
 
   // Create edges from links
   const reactFlowEdges = useMemo<Edge[]>(
-    () =>
-      links.map((link) => ({
-        id: `edge-${link.sourceNodeId}-${link.targetNodeId}`,
-        source: link.sourceNodeId,
-        target: link.targetNodeId,
-        sourceHandle: null,
-        targetHandle: null,
-        type: 'default',
-        animated: true,
-        label: link.connectionType,
-        style: { stroke: EDGE_COLOR, strokeWidth: 2 },
-        labelStyle: { fill: '#fff', fontWeight: 600, fontSize: 11 },
-        labelBgStyle: { fill: 'rgba(30,30,40,0.75)', rx: 4 },
-      })),
+    () => {
+      const HANDLE_MAP: Record<string, { sourceHandle: string; targetHandle: string }> = {
+        'triggers':        { sourceHandle: 'bottom',     targetHandle: 'top' },        // Command→DomainEvent ↓
+        'feeds':           { sourceHandle: 'top-out',    targetHandle: 'bottom' },     // DomainEvent→ReadModel ↑
+        'triggers policy': { sourceHandle: 'top-out',    targetHandle: 'bottom' },     // DomainEvent→Policy ↑
+        'executes':        { sourceHandle: 'right',      targetHandle: 'left' },       // Policy→Command →
+        'user action':     { sourceHandle: 'bottom-out', targetHandle: 'top' },        // UIScreen→Command ↓
+        'displays':        { sourceHandle: 'top',        targetHandle: 'bottom' },     // ReadModel→UIScreen ↑
+      };
+      return links.map((link) => {
+        const handles = HANDLE_MAP[link.connectionType] ?? { sourceHandle: null, targetHandle: null };
+        return {
+          id: `edge-${link.sourceNodeId}-${link.targetNodeId}`,
+          source: link.sourceNodeId,
+          target: link.targetNodeId,
+          sourceHandle: handles.sourceHandle,
+          targetHandle: handles.targetHandle,
+          type: 'default',
+          animated: true,
+          label: link.connectionType,
+          style: { stroke: EDGE_COLOR, strokeWidth: 2 },
+          labelStyle: { fill: '#fff', fontWeight: 600, fontSize: 11 },
+          labelBgStyle: { fill: 'rgba(30,30,40,0.75)', rx: 4 },
+        };
+      });
+    },
     [links]
   );
 

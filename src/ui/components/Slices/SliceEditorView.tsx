@@ -115,7 +115,7 @@ export function SliceEditorView({ selectedColumns }: SliceEditorViewProps) {
   const existingSliceScenarios = useMemo<{ sliceId: string; scenarios: ReadonlyArray<ScenarioProjection> }[]>(() => {
     const result: { sliceId: string; scenarios: ReadonlyArray<ScenarioProjection> }[] = [];
     const projection: VerticalSliceProjection = {
-      onSlice(id, _name, cmdId, _eventIds, _rmId, scenarios) {
+      onSlice(id, _name, cmdId, _eventIds, _rmId, scenarios, _boundedContextId) {
         if (cmdId === commandId && commandId) {
           result.push({ sliceId: id, scenarios });
         }

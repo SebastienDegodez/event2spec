@@ -4,6 +4,7 @@ import { NodePalette } from './ui/components/Toolbar/NodePalette';
 import { SwimlanePanel } from './ui/components/Toolbar/SwimlanePanel';
 import { SlicePanel } from './ui/components/Slices/SlicePanel';
 import { SliceEditorView } from './ui/components/Slices/SliceEditorView';
+import { BoundedContextPanel } from './ui/components/Slices/BoundedContextPanel';
 import { PropertiesPanel } from './ui/components/PropertiesPanel/PropertiesPanel';
 import { ValidationCounter } from './ui/components/Validation/ValidationCounter';
 import { useSelectedColumns } from './core/store/useBoardStore';
@@ -29,6 +30,7 @@ export default function App() {
         <div className="app-sidebar">
           <NodePalette />
           <SwimlanePanel />
+          <BoundedContextPanel />
           <SlicePanel />
         </div>
         <main className="app-canvas">
