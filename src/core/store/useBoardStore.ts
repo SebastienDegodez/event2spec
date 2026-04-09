@@ -12,7 +12,6 @@ import { type SwimlaneRepository } from '../domain/SwimlaneRepository';
 import { type ActorType } from '../domain/ActorType';
 import { type NodeKind } from '../domain/NodeKind';
 import { type NodeProperties, createDefaultNodeProperties } from '../domain/NodeProperties';
-import { type BoardMode } from '../domain/BoardMode';
 import { AddDomainEventNodeCommand } from '../usecases/commands/AddDomainEventNode/AddDomainEventNodeCommand';
 import { AddDomainEventNodeCommandHandler } from '../usecases/commands/AddDomainEventNode/AddDomainEventNodeCommandHandler';
 import { MoveNodeCommand } from '../usecases/commands/MoveNode/MoveNodeCommand';
@@ -67,7 +66,6 @@ import { resolveAutoLinks, type BoardNodeSummary } from '../domain/resolveAutoLi
 export type { NodeLink };
 export type { ConnectionType };
 export type { NodeProperties };
-export type { BoardMode };
 
 /** Information about the currently selected node. */
 export interface SelectedNode {
@@ -116,15 +114,14 @@ interface PersistedState {
   swimlanes?: PersistedSwimlane[];
   slices?: PersistedSlice[];
   nodeProperties?: Record<string, NodeProperties>;
-  boardMode?: BoardMode;
 }
 
 const STORAGE_KEY = 'event2spec-board';
 
-function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; swimlanes: SwimlaneCollection; slices: VerticalSliceCollection; nodeProperties: Record<string, NodeProperties>; boardMode: BoardMode } {
+function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; swimlanes: SwimlaneCollection; slices: VerticalSliceCollection; nodeProperties: Record<string, NodeProperties> } {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { board: GridBoard.empty(), links: [], swimlanes: SwimlaneCollection.empty(), slices: VerticalSliceCollection.empty(), nodeProperties: {}, boardMode: 'classic' };
+    if (!raw) return { board: GridBoard.empty(), links: [], swimlanes: SwimlaneCollection.empty(), slices: VerticalSliceCollection.empty(), nodeProperties: {} };
     const parsed = JSON.parse(raw) as PersistedState;
     const { nodes } = parsed;
     let board = GridBoard.empty();
@@ -160,13 +157,13 @@ function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; 
       }
       slices = slices.add(slice);
     }
-    return { board, links, swimlanes, slices, nodeProperties: parsed.nodeProperties ?? {}, boardMode: parsed.boardMode ?? 'classic' };
+    return { board, links, swimlanes, slices, nodeProperties: parsed.nodeProperties ?? {} };
   } catch {
-    return { board: GridBoard.empty(), links: [], swimlanes: SwimlaneCollection.empty(), slices: VerticalSliceCollection.empty(), nodeProperties: {}, boardMode: 'classic' };
+    return { board: GridBoard.empty(), links: [], swimlanes: SwimlaneCollection.empty(), slices: VerticalSliceCollection.empty(), nodeProperties: {} };
   }
 }
 
-function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlanes: SwimlaneCollection, slices: VerticalSliceCollection, nodeProperties: Record<string, NodeProperties>, boardMode: BoardMode): void {
+function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlanes: SwimlaneCollection, slices: VerticalSliceCollection, nodeProperties: Record<string, NodeProperties>): void {
   const nodes: PersistedNode[] = [];
   const projection: BoardProjection = {
     onDomainEventNode(id, label, column, row) {
@@ -205,7 +202,7 @@ function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, swimlan
       });
     },
   });
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ nodes, links, swimlanes: persistedSwimlanes, slices: persistedSlices, nodeProperties, boardMode }));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ nodes, links, swimlanes: persistedSwimlanes, slices: persistedSlices, nodeProperties }));
 }
 
 /** Collects all board nodes as summaries for auto-link resolution. */
@@ -230,7 +227,6 @@ interface BoardStoreState {
   selectedNode: SelectedNode | null;
   nodeProperties: Record<string, NodeProperties>;
   selectedColumns: number[];
-  boardMode: BoardMode;
   /** When set, the node component with this id should enter editing mode immediately. */
   autoEditNodeId: string | null;
 }
@@ -288,8 +284,6 @@ interface BoardActions {
   selectColumns: (columns: number[]) => void;
   /** Clear the column selection. */
   clearColumnSelection: () => void;
-  /** Switch the board display mode (classic or swimlane). */
-  setBoardMode: (mode: BoardMode) => void;
   /** Add a node at a grid position and automatically create links with adjacent nodes. */
   addNodeWithAutoLinks: (id: string, kind: NodeKind, label: string, column: number, row: number) => void;
   /** Clear the auto-edit node id (after a node has entered editing mode). */
@@ -317,8 +311,8 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
   const swimlaneRepository: SwimlaneRepository = {
     load: () => get().swimlanes,
     save: (swimlanes) => {
-      const { board, links, slices, nodeProperties, boardMode } = get();
-      saveToStorage(board, links, swimlanes, slices, nodeProperties, boardMode);
+      const { board, links, slices, nodeProperties } = get();
+      saveToStorage(board, links, swimlanes, slices, nodeProperties);
       set({ swimlanes });
     },
   };
@@ -332,8 +326,8 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
   const sliceRepository: VerticalSliceRepository = {
     load: () => get().slices,
     save: (slices) => {
-      const { board, links, swimlanes, nodeProperties, boardMode } = get();
-      saveToStorage(board, links, swimlanes, slices, nodeProperties, boardMode);
+      const { board, links, swimlanes, nodeProperties } = get();
+      saveToStorage(board, links, swimlanes, slices, nodeProperties);
       set({ slices });
     },
   };
@@ -353,14 +347,13 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
     selectedNode: null,
     nodeProperties: initialState.nodeProperties,
     selectedColumns: [],
-    boardMode: initialState.boardMode,
     autoEditNodeId: null,
 
     addDomainEventNode: (id, label, column, row) =>
       set((state) => {
         const board = addDomainEventNodeHandler.handle(state.board, new AddDomainEventNodeCommand(id, label, column, row));
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('domainEvent') };
-        saveToStorage(board, state.links, state.swimlanes, state.slices, nodeProperties, state.boardMode);
+        saveToStorage(board, state.links, state.swimlanes, state.slices, nodeProperties);
         return { board, nodeProperties };
       }),
 
@@ -371,7 +364,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
           ? [...state.links, { sourceNodeId: id, targetNodeId: linkedEventId, connectionType: 'triggers' as const }]
           : state.links;
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('command') };
-        saveToStorage(board, links, state.swimlanes, state.slices, nodeProperties, state.boardMode);
+        saveToStorage(board, links, state.swimlanes, state.slices, nodeProperties);
         return { board, links, nodeProperties };
       }),
 
@@ -379,7 +372,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       set((state) => {
         const board = addReadModelNodeHandler.handle(state.board, new AddReadModelNodeCommand(id, label, column, row));
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('readModel') };
-        saveToStorage(board, state.links, state.swimlanes, state.slices, nodeProperties, state.boardMode);
+        saveToStorage(board, state.links, state.swimlanes, state.slices, nodeProperties);
         return { board, nodeProperties };
       }),
 
@@ -387,7 +380,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       set((state) => {
         const board = addPolicyNodeHandler.handle(state.board, new AddPolicyNodeCommand(id, label, column, row));
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('policy') };
-        saveToStorage(board, state.links, state.swimlanes, state.slices, nodeProperties, state.boardMode);
+        saveToStorage(board, state.links, state.swimlanes, state.slices, nodeProperties);
         return { board, nodeProperties };
       }),
 
@@ -395,21 +388,21 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       set((state) => {
         const board = addUIScreenNodeHandler.handle(state.board, new AddUIScreenNodeCommand(id, label, column, row));
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('uiScreen') };
-        saveToStorage(board, state.links, state.swimlanes, state.slices, nodeProperties, state.boardMode);
+        saveToStorage(board, state.links, state.swimlanes, state.slices, nodeProperties);
         return { board, nodeProperties };
       }),
 
     moveNode: (id, column, row) =>
       set((state) => {
         const board = moveNodeHandler.handle(state.board, new MoveNodeCommand(id, column, row));
-        saveToStorage(board, state.links, state.swimlanes, state.slices, state.nodeProperties, state.boardMode);
+        saveToStorage(board, state.links, state.swimlanes, state.slices, state.nodeProperties);
         return { board };
       }),
 
     updateLabel: (id, label) =>
       set((state) => {
         const board = updateLabelHandler.handle(state.board, new UpdateNodeLabelCommand(id, label));
-        saveToStorage(board, state.links, state.swimlanes, state.slices, state.nodeProperties, state.boardMode);
+        saveToStorage(board, state.links, state.swimlanes, state.slices, state.nodeProperties);
         const selectedNode = state.selectedNode?.id === id ? { ...state.selectedNode, label } : state.selectedNode;
         return { board, selectedNode };
       }),
@@ -420,7 +413,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         const links = state.links.filter((link) => link.sourceNodeId !== id && link.targetNodeId !== id);
         const { [id]: _, ...nodeProperties } = state.nodeProperties;
         void _;
-        saveToStorage(board, links, state.swimlanes, state.slices, nodeProperties, state.boardMode);
+        saveToStorage(board, links, state.swimlanes, state.slices, nodeProperties);
         const selectedNode = state.selectedNode?.id === id ? null : state.selectedNode;
         return { board, links, nodeProperties, selectedNode };
       }),
@@ -432,7 +425,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         );
         if (alreadyExists) return state;
         const links = [...state.links, { sourceNodeId, targetNodeId, connectionType }];
-        saveToStorage(state.board, links, state.swimlanes, state.slices, state.nodeProperties, state.boardMode);
+        saveToStorage(state.board, links, state.swimlanes, state.slices, state.nodeProperties);
         return { links };
       }),
 
@@ -441,7 +434,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         const links = state.links.filter(
           (link) => !(link.sourceNodeId === sourceNodeId && link.targetNodeId === targetNodeId)
         );
-        saveToStorage(state.board, links, state.swimlanes, state.slices, state.nodeProperties, state.boardMode);
+        saveToStorage(state.board, links, state.swimlanes, state.slices, state.nodeProperties);
         return { links };
       }),
 
@@ -454,7 +447,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
     updateNodeProperties: (id, properties) =>
       set((state) => {
         const nodeProperties = { ...state.nodeProperties, [id]: properties };
-        saveToStorage(state.board, state.links, state.swimlanes, state.slices, nodeProperties, state.boardMode);
+        saveToStorage(state.board, state.links, state.swimlanes, state.slices, nodeProperties);
         return { nodeProperties };
       }),
 
@@ -506,12 +499,6 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
     clearColumnSelection: () => set({ selectedColumns: [] }),
 
-    setBoardMode: (mode) =>
-      set((state) => {
-        saveToStorage(state.board, state.links, state.swimlanes, state.slices, state.nodeProperties, mode);
-        return { boardMode: mode };
-      }),
-
     addNodeWithAutoLinks: (id, kind, label, column, row) =>
       set((state) => {
         let board = state.board;
@@ -536,7 +523,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         }));
         const links = [...state.links, ...newLinks];
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties(kind) };
-        saveToStorage(board, links, state.swimlanes, state.slices, nodeProperties, state.boardMode);
+        saveToStorage(board, links, state.swimlanes, state.slices, nodeProperties);
         return { board, links, nodeProperties, autoEditNodeId: id };
       }),
 
@@ -566,8 +553,6 @@ export const useSelectedNode = () => useBoardStore((state) => state.selectedNode
 
 export const useNodeProperties = () => useBoardStore((state) => state.nodeProperties);
 
-export const useBoardMode = () => useBoardStore((state) => state.boardMode);
-
 export const useAutoEditNodeId = () => useBoardStore((state) => state.autoEditNodeId);
 
 export const useBoardActions = () =>
@@ -588,7 +573,6 @@ export const useBoardActions = () =>
       updateNodeProperties: state.updateNodeProperties,
       exportJSON: state.exportJSON,
       exportMarkdown: state.exportMarkdown,
-      setBoardMode: state.setBoardMode,
       addNodeWithAutoLinks: state.addNodeWithAutoLinks,
       clearAutoEditNodeId: state.clearAutoEditNodeId,
     }))
