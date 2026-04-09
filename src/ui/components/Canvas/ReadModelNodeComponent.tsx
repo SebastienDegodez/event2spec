@@ -45,7 +45,7 @@ export const ReadModelNodeComponent = memo(({ id, data, selected }: NodeProps) =
       data-column={nodeData.column}
       data-row={nodeData.row}
     >
-      <Handle type="target" position={Position.Left} className="read-model-handle" />
+      <Handle type="target" id="bottom" position={Position.Bottom} className="read-model-handle" />
 
       <div className="note-fold read-model-fold" />
 
@@ -86,7 +86,7 @@ export const ReadModelNodeComponent = memo(({ id, data, selected }: NodeProps) =
 
       {warningType && <ValidationBadge warningType={warningType} />}
 
-      <Handle type="source" position={Position.Right} className="read-model-handle" />
+      <Handle type="source" id="top" position={Position.Top} className="read-model-handle" />
     </div>
   );
 });

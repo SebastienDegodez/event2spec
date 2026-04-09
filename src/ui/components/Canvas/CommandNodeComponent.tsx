@@ -45,7 +45,8 @@ export const CommandNodeComponent = memo(({ id, data, selected }: NodeProps) => 
       data-column={nodeData.column}
       data-row={nodeData.row}
     >
-      <Handle type="target" position={Position.Left} className="command-handle" />
+      <Handle type="target" id="top"  position={Position.Top}  className="command-handle" />
+      <Handle type="target" id="left" position={Position.Left} className="command-handle" />
 
       <div className="note-fold command-fold" />
 
@@ -86,7 +87,7 @@ export const CommandNodeComponent = memo(({ id, data, selected }: NodeProps) => 
 
       {warningType && <ValidationBadge warningType={warningType} />}
 
-      <Handle type="source" position={Position.Bottom} className="command-handle" />
+      <Handle type="source" id="bottom" position={Position.Bottom} className="command-handle" />
     </div>
   );
 });

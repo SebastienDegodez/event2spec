@@ -45,7 +45,7 @@ export const PolicyNodeComponent = memo(({ id, data, selected }: NodeProps) => {
       data-column={nodeData.column}
       data-row={nodeData.row}
     >
-      <Handle type="target" position={Position.Left} className="policy-handle" />
+      <Handle type="target" id="bottom" position={Position.Bottom} className="policy-handle" />
 
       <div className="note-fold policy-fold" />
 
@@ -86,7 +86,7 @@ export const PolicyNodeComponent = memo(({ id, data, selected }: NodeProps) => {
 
       {warningType && <ValidationBadge warningType={warningType} />}
 
-      <Handle type="source" position={Position.Right} className="policy-handle" />
+      <Handle type="source" id="right" position={Position.Right} className="policy-handle" />
     </div>
   );
 });
