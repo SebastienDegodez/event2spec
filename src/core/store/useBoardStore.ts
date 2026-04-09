@@ -227,6 +227,8 @@ interface BoardStoreState {
   selectedNode: SelectedNode | null;
   nodeProperties: Record<string, NodeProperties>;
   selectedColumns: number[];
+  /** When set, the node component with this id should enter editing mode immediately. */
+  autoEditNodeId: string | null;
 }
 
 interface BoardActions {
@@ -284,6 +286,8 @@ interface BoardActions {
   clearColumnSelection: () => void;
   /** Add a node at a grid position and automatically create links with adjacent nodes. */
   addNodeWithAutoLinks: (id: string, kind: NodeKind, label: string, column: number, row: number) => void;
+  /** Clear the auto-edit node id (after a node has entered editing mode). */
+  clearAutoEditNodeId: () => void;
   /** Export the current board as a JSON string conforming to the EventModel schema. */
   exportJSON: () => string;
   /** Export the current board as a Markdown string conforming to the event-modeling skill format. */
@@ -343,6 +347,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
     selectedNode: null,
     nodeProperties: initialState.nodeProperties,
     selectedColumns: [],
+    autoEditNodeId: null,
 
     addDomainEventNode: (id, label, column, row) =>
       set((state) => {
@@ -519,8 +524,10 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         const links = [...state.links, ...newLinks];
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties(kind) };
         saveToStorage(board, links, state.swimlanes, state.slices, nodeProperties);
-        return { board, links, nodeProperties };
+        return { board, links, nodeProperties, autoEditNodeId: id };
       }),
+
+    clearAutoEditNodeId: () => set({ autoEditNodeId: null }),
 
     exportJSON: () => {
       const { board, links, swimlanes, slices, nodeProperties } = get();
@@ -546,6 +553,8 @@ export const useSelectedNode = () => useBoardStore((state) => state.selectedNode
 
 export const useNodeProperties = () => useBoardStore((state) => state.nodeProperties);
 
+export const useAutoEditNodeId = () => useBoardStore((state) => state.autoEditNodeId);
+
 export const useBoardActions = () =>
   useBoardStore(
     useShallow((state) => ({
@@ -565,6 +574,7 @@ export const useBoardActions = () =>
       exportJSON: state.exportJSON,
       exportMarkdown: state.exportMarkdown,
       addNodeWithAutoLinks: state.addNodeWithAutoLinks,
+      clearAutoEditNodeId: state.clearAutoEditNodeId,
     }))
   );
 
