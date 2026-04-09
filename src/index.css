@@ -31,6 +31,10 @@
   --note-yellow-dark: #ca8a04;
   --note-shadow-ui-screen-selected: 0 0 0 2px #eab308, 0 8px 32px rgba(234, 179, 8, 0.35);
 
+  --category-actor-ui-rgb: 234, 179, 8;
+  --category-cmd-read-rgb: 59, 130, 246;
+  --category-event-rgb: 245, 158, 11;
+
   --accent: #f59e0b;
   --accent-dim: rgba(245, 158, 11, 0.18);
   --text-muted: rgba(255, 255, 255, 0.38);
