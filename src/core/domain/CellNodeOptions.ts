@@ -1,5 +1,4 @@
 import { type NodeKind } from './NodeKind';
-import { type SwimlaneCategory } from './SwimlaneCategory';
 
 /** Visual descriptor for a quick-add button inside a cell. */
 export interface CellNodeOption {
@@ -23,12 +22,9 @@ const EVENT_OPTIONS: readonly CellNodeOption[] = [
   { kind: 'domainEvent', letter: 'E', label: 'Domain Event', color: '#f59e0b' },
 ];
 
-/** Returns the node types that can be added to a given swimlane category. */
-export function cellNodeOptions(category: SwimlaneCategory): readonly CellNodeOption[] {
-  const mapping: Record<SwimlaneCategory, readonly CellNodeOption[]> = {
-    actor_ui: ACTOR_UI_OPTIONS,
-    command_readmodel: COMMAND_READMODEL_OPTIONS,
-    event: EVENT_OPTIONS,
-  };
-  return mapping[category];
+/** Returns the node types that can be added to a given absolute row. */
+export function cellNodeOptions(row: number): readonly CellNodeOption[] {
+  if (row === 0) return ACTOR_UI_OPTIONS;
+  if (row === 1) return COMMAND_READMODEL_OPTIONS;
+  return EVENT_OPTIONS;
 }

@@ -50,7 +50,7 @@ export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
       data-column={nodeData.column}
       data-row={nodeData.row}
     >
-      <Handle type="target" position={Position.Top} className="event-handle" />
+      <Handle type="target" id="top"     position={Position.Top} className="event-handle" />
 
       <div className="note-fold" />
 
@@ -100,7 +100,7 @@ export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
 
       {warningType && <ValidationBadge warningType={warningType} />}
 
-      <Handle type="source" position={Position.Right} className="event-handle" />
+      <Handle type="source" id="top-out" position={Position.Top} style={{ left: '30%' }} className="event-handle" />
     </div>
   );
 });

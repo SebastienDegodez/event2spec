@@ -46,6 +46,18 @@ export class VerticalSliceCollection {
     );
   }
 
+  assignBoundedContext(sliceId: string, boundedContextId: string | undefined): VerticalSliceCollection {
+    return new VerticalSliceCollection(
+      this.slices.map((s) => (s.id === sliceId ? s.withBoundedContext(boundedContextId) : s)),
+    );
+  }
+
+  unassignBoundedContext(boundedContextId: string): VerticalSliceCollection {
+    return new VerticalSliceCollection(
+      this.slices.map((s) => (s.boundedContextId === boundedContextId ? s.withBoundedContext(undefined) : s)),
+    );
+  }
+
   isEmpty(): boolean {
     return this.slices.length === 0;
   }
@@ -59,6 +71,7 @@ export class VerticalSliceCollection {
         s.eventIds,
         s.readModelId,
         s.scenarios.map((sc) => ({ given: sc.given, when: sc.when, then: sc.then })),
+        s.boundedContextId,
       );
     });
   }
