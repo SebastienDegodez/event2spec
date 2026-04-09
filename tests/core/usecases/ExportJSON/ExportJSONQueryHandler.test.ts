@@ -114,7 +114,7 @@ describe('ExportJSONQueryHandler', () => {
     expect(() => JSON.parse(result)).not.toThrow();
   });
 
-  it('exports swimlanes with id, actorName, order, and color', () => {
+  it('exports swimlanes with id, actorName, actorType, order, and color', () => {
     const swimlanes = SwimlaneCollection.empty()
       .add(Swimlane.create('s1', 'Customer', 'human'))
       .add(Swimlane.create('s2', 'Order Service', 'internal_system'));
@@ -123,8 +123,8 @@ describe('ExportJSONQueryHandler', () => {
     const model = JSON.parse(result);
 
     expect(model.swimlanes).toHaveLength(2);
-    expect(model.swimlanes[0]).toMatchObject({ id: 's1', actorName: 'Customer', order: 0, color: 'yellow' });
-    expect(model.swimlanes[1]).toMatchObject({ id: 's2', actorName: 'Order Service', order: 1, color: 'blue' });
+    expect(model.swimlanes[0]).toMatchObject({ id: 's1', actorName: 'Customer', actorType: 'human', order: 0, color: 'yellow' });
+    expect(model.swimlanes[1]).toMatchObject({ id: 's2', actorName: 'Order Service', actorType: 'internal_system', order: 1, color: 'blue' });
   });
 
   it('exports empty swimlanes array when no swimlanes exist', () => {
@@ -171,5 +171,98 @@ describe('ExportJSONQueryHandler', () => {
     const result = handler.handle(GridBoard.empty(), [], emptySwimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
     const model = JSON.parse(result);
     expect(model.verticalSlices).toHaveLength(0);
+  });
+
+  it('exports swimlaneId for domain events based on grid row', () => {
+    const swimlanes = SwimlaneCollection.empty()
+      .add(Swimlane.create('s1', 'Customer', 'human'));
+    const board = GridBoard.empty().insertNode(
+      DomainEventNode.create('e1', 'OrderPlaced', 2, 2)
+    );
+
+    const result = handler.handle(board, [], swimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
+    const model = JSON.parse(result);
+
+    expect(model.domainEvents[0].swimlaneId).toBe('s1');
+  });
+
+  it('exports swimlaneId and timelinePosition for commands', () => {
+    const swimlanes = SwimlaneCollection.empty()
+      .add(Swimlane.create('s1', 'Customer', 'human'));
+    const board = GridBoard.empty().insertNode(
+      CommandNode.create('c1', 'PlaceOrder', 3, 1)
+    );
+
+    const result = handler.handle(board, [], swimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
+    const model = JSON.parse(result);
+
+    expect(model.commands[0].swimlaneId).toBe('s1');
+    expect(model.commands[0].timelinePosition).toBe(3);
+  });
+
+  it('exports swimlaneId and timelinePosition for read models', () => {
+    const swimlanes = SwimlaneCollection.empty()
+      .add(Swimlane.create('s1', 'Customer', 'human'));
+    const board = GridBoard.empty().insertNode(
+      ReadModelNode.create('rm1', 'Order Summary', 4, 1)
+    );
+
+    const result = handler.handle(board, [], swimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
+    const model = JSON.parse(result);
+
+    expect(model.readModels[0].swimlaneId).toBe('s1');
+    expect(model.readModels[0].timelinePosition).toBe(4);
+  });
+
+  it('exports swimlaneId and timelinePosition for policies', () => {
+    const swimlanes = SwimlaneCollection.empty()
+      .add(Swimlane.create('s1', 'Customer', 'human'));
+    const board = GridBoard.empty().insertNode(
+      PolicyNode.create('p1', 'AutoConfirm', 3, 1)
+    );
+
+    const result = handler.handle(board, [], swimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
+    const model = JSON.parse(result);
+
+    expect(model.policies[0].swimlaneId).toBe('s1');
+    expect(model.policies[0].timelinePosition).toBe(3);
+  });
+
+  it('exports swimlaneId for UI screens', () => {
+    const swimlanes = SwimlaneCollection.empty()
+      .add(Swimlane.create('s1', 'Customer', 'human'));
+    const board = GridBoard.empty().insertNode(
+      UIScreenNode.create('ui1', 'Order Form', 1, 0)
+    );
+
+    const result = handler.handle(board, [], swimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
+    const model = JSON.parse(result);
+
+    expect(model.uiScreens[0].swimlaneId).toBe('s1');
+  });
+
+  it('resolves swimlaneId to second swimlane when node is in its grid rows', () => {
+    const swimlanes = SwimlaneCollection.empty()
+      .add(Swimlane.create('s1', 'Customer', 'human'))
+      .add(Swimlane.create('s2', 'Order Service', 'internal_system'));
+    const board = GridBoard.empty().insertNode(
+      DomainEventNode.create('e1', 'OrderShipped', 2, 5)
+    );
+
+    const result = handler.handle(board, [], swimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
+    const model = JSON.parse(result);
+
+    expect(model.domainEvents[0].swimlaneId).toBe('s2');
+  });
+
+  it('exports empty swimlaneId when no swimlanes are defined', () => {
+    const board = GridBoard.empty().insertNode(
+      DomainEventNode.create('e1', 'OrderPlaced', 2, 0)
+    );
+
+    const result = handler.handle(board, [], emptySwimlanes, emptySlices, emptyProperties, new ExportJSONQuery());
+    const model = JSON.parse(result);
+
+    expect(model.domainEvents[0].swimlaneId).toBe('');
   });
 });

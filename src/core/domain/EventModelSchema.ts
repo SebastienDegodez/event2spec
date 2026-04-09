@@ -14,6 +14,7 @@ export interface Actor {
 export interface Swimlane {
   id: string;
   actorName: string;
+  actorType: ActorType;
   order: number;
   color: SwimlaneColor;
 }
@@ -32,34 +33,41 @@ export interface DomainEventEntry {
 export interface CommandEntry {
   id: string;
   name: string;
+  swimlaneId: string;
   actor: string;
   payload: Record<string, unknown>;
   resultingEvents: string[];
   guardConditions: string[];
+  timelinePosition: number;
 }
 
 /** A read model / projection fed by domain events. */
 export interface ReadModelEntry {
   id: string;
   name: string;
+  swimlaneId: string;
   fedBy: string[];
   consumedBy: string;
   data: Record<string, unknown>;
+  timelinePosition: number;
 }
 
 /** A policy that reacts to an event and triggers a command. */
 export interface PolicyEntry {
   id: string;
   name: string;
+  swimlaneId: string;
   whenEvent: string;
   thenCommand: string;
   condition: string;
+  timelinePosition: number;
 }
 
 /** A UI screen that triggers commands and displays read models. */
 export interface UIScreenEntry {
   id: string;
   name: string;
+  swimlaneId: string;
   description: string;
   triggersCommand: string;
   displaysReadModel: string;
