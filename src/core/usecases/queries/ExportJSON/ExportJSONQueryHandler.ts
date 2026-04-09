@@ -5,6 +5,7 @@ import { type NodeLink } from '../../../domain/NodeLink';
 import { type NodeProperties } from '../../../domain/NodeProperties';
 import { SwimlaneCollection } from '../../../domain/SwimlaneCollection';
 import { VerticalSliceCollection } from '../../../domain/VerticalSliceCollection';
+import { gridRowToSwimlane } from '../../../domain/SwimlaneLayout';
 import { ExportJSONQuery } from './ExportJSONQuery';
 
 export class ExportJSONQueryHandler {
@@ -40,54 +41,75 @@ export class ExportJSONQueryHandler {
       }
     }
 
+    const swimlaneIndexToId = new Map<number, string>();
+    const exportedSwimlanes: EventModel['swimlanes'] = [];
+    swimlanes.describeTo({
+      onSwimlane(id, actorName, actorType, color, index) {
+        swimlaneIndexToId.set(index, id);
+        exportedSwimlanes.push({ id, actorName, actorType, order: index, color });
+      },
+    });
+
+    function resolveSwimlaneId(row: number): string {
+      const { swimlaneIndex } = gridRowToSwimlane(row);
+      return swimlaneIndexToId.get(swimlaneIndex) ?? '';
+    }
+
     const projection: BoardProjection = {
-      onDomainEventNode(id, label, column) {
+      onDomainEventNode(id, label, column, row) {
         const props = nodeProperties[id];
         domainEvents.push({
           id,
           name: label,
-          swimlaneId: '',
+          swimlaneId: resolveSwimlaneId(row),
           triggeredBy: '',
           data: props?.type === 'domainEvent' ? props.data : {},
           timelinePosition: column,
         });
       },
-      onCommandNode(id, label) {
+      onCommandNode(id, label, column, row) {
         const props = nodeProperties[id];
         commands.push({
           id,
           name: label,
+          swimlaneId: resolveSwimlaneId(row),
           actor: props?.type === 'command' ? props.actor : '',
           payload: props?.type === 'command' ? props.payload : {},
           resultingEvents: triggersLinks.has(id) ? [triggersLinks.get(id)!] : [],
           guardConditions: props?.type === 'command' ? props.guardConditions : [],
+          timelinePosition: column,
         });
       },
-      onReadModelNode(id, label) {
+      onReadModelNode(id, label, column, row) {
         const props = nodeProperties[id];
         readModels.push({
           id,
           name: label,
+          swimlaneId: resolveSwimlaneId(row),
           fedBy: feedsLinks.get(id) ?? [],
           consumedBy: props?.type === 'readModel' ? props.consumedBy : readModelScreenLinks.get(id) ?? '',
           data: props?.type === 'readModel' ? props.data : {},
+          timelinePosition: column,
         });
       },
-      onPolicyNode(id, label) {
+      onPolicyNode(id, label, column, row) {
         const props = nodeProperties[id];
         policies.push({
           id,
           name: label,
+          swimlaneId: resolveSwimlaneId(row),
           whenEvent: '',
           thenCommand: policyCommandLinks.get(id) ?? '',
           condition: props?.type === 'policy' ? props.condition : '',
+          timelinePosition: column,
         });
       },
-      onUIScreenNode(id, label, column) {
+      onUIScreenNode(id, label, column, row) {
         const props = nodeProperties[id];
         uiScreens.push({
           id,
           name: label,
+          swimlaneId: resolveSwimlaneId(row),
           description: props?.type === 'uiScreen' ? props.description : '',
           triggersCommand: uiScreenCommandLinks.get(id) ?? '',
           displaysReadModel: '',
@@ -97,13 +119,6 @@ export class ExportJSONQueryHandler {
     };
 
     board.describeTo(projection);
-
-    const exportedSwimlanes: EventModel['swimlanes'] = [];
-    swimlanes.describeTo({
-      onSwimlane(id, actorName, _actorType, color, index) {
-        exportedSwimlanes.push({ id, actorName, order: index, color });
-      },
-    });
 
     const exportedSlices: VerticalSliceSchema[] = [];
     slices.describeTo({
