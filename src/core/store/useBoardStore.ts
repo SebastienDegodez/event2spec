@@ -78,6 +78,7 @@ interface PersistedNode {
   column: number;
   row: number;
   type: 'domainEvent' | 'command' | 'readModel' | 'policy' | 'uiScreen';
+  boundedContextId?: string;
 }
 
 /** Serialisable representation of a scenario for localStorage persistence. */
@@ -130,7 +131,7 @@ function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; 
     let board = GridBoard.empty();
     for (const node of nodes) {
       if (node.type === 'domainEvent') {
-        board = board.insertNode(DomainEventNode.create(node.id, node.label, node.column, node.row));
+        board = board.insertNode(DomainEventNode.create(node.id, node.label, node.column, node.row, node.boundedContextId));
       } else if (node.type === 'command') {
         board = board.insertNode(CommandNode.create(node.id, node.label, node.column, node.row));
       } else if (node.type === 'readModel') {
@@ -172,8 +173,8 @@ function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; 
 function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, slices: VerticalSliceCollection, boundedContexts: BoundedContextCollection, nodeProperties: Record<string, NodeProperties>): void {
   const nodes: PersistedNode[] = [];
   const projection: BoardProjection = {
-    onDomainEventNode(id, label, column, row) {
-      nodes.push({ id, label, column, row, type: 'domainEvent' });
+    onDomainEventNode(id, label, column, row, boundedContextId) {
+      nodes.push({ id, label, column, row, type: 'domainEvent', boundedContextId });
     },
     onCommandNode(id, label, column, row) {
       nodes.push({ id, label, column, row, type: 'command' });
@@ -485,6 +486,35 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
     deleteBoundedContext: (id) => {
       deleteBoundedContextHandler.handle(new DeleteBoundedContextCommand(id));
+      // Cascade: remove domain events belonging to the deleted BC, their links, and their nodeProperties
+      set((state) => {
+        const eventIdsToDelete: string[] = [];
+        const cascadeProjection: BoardProjection = {
+          onDomainEventNode(nodeId, _label, _column, _row, boundedContextId) {
+            if (boundedContextId === id) eventIdsToDelete.push(nodeId);
+          },
+          onCommandNode() {},
+          onReadModelNode() {},
+          onPolicyNode() {},
+          onUIScreenNode() {},
+        };
+        state.board.describeTo(cascadeProjection);
+        if (eventIdsToDelete.length === 0) return state;
+        let board = state.board;
+        for (const eventId of eventIdsToDelete) {
+          board = board.removeNode(eventId);
+        }
+        const eventIdSet = new Set(eventIdsToDelete);
+        const links = state.links.filter(
+          (link) => !eventIdSet.has(link.sourceNodeId) && !eventIdSet.has(link.targetNodeId)
+        );
+        const nodeProperties = { ...state.nodeProperties };
+        for (const eventId of eventIdsToDelete) {
+          delete nodeProperties[eventId];
+        }
+        saveToStorage(board, links, state.slices, state.boundedContexts, nodeProperties);
+        return { board, links, nodeProperties };
+      });
     },
 
     renameBoundedContext: (id, name) => {

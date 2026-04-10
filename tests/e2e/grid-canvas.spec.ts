@@ -4,6 +4,12 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('.react-flow__pane');
+    await page.evaluate(() => {
+      const minimap = document.querySelector('.react-flow__minimap');
+      if (minimap) (minimap as HTMLElement).style.display = 'none';
+    });
+    await page.getByLabel('New bounded context name').fill('Sales');
+    await page.getByLabel('Create bounded context').click();
   });
 
   test('displays a dot-grid background on an empty board', async ({ page }) => {
@@ -11,13 +17,10 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
     await expect(background).toBeVisible();
   });
 
-  test('right-clicking the canvas and selecting "Add domain event" creates a note', async ({ page }) => {
-    const pane = page.locator('.react-flow__pane');
-    await pane.click({ position: { x: 350, y: 250 }, button: 'right' });
-
-    const menuItem = page.locator('.context-menu-item', { hasText: 'Add domain event' });
-    await expect(menuItem).toBeVisible();
-    await menuItem.click();
+  test('adding a domain event from row-2 quick-add creates a note', async ({ page }) => {
+    const eventCell = page.locator('.cell-quick-add[data-row="2"]').first();
+    await eventCell.hover();
+    await eventCell.locator('.cell-quick-add-btn[aria-label="Add Domain Event"]').click();
 
     const note = page.locator('.domain-event-node').first();
     await expect(note).toBeVisible();
@@ -27,11 +30,10 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
   test('dropping a note onto an occupied cell shifts the existing note right', async ({
     page,
   }) => {
-    const pane = page.locator('.react-flow__pane');
-
-    // Create note A via right-click context menu
-    await pane.click({ position: { x: 350, y: 250 }, button: 'right' });
-    await page.locator('.context-menu-item', { hasText: 'Add domain event' }).click();
+    // Create note A from row-2 quick-add
+    const eventCells = page.locator('.cell-quick-add[data-row="2"]');
+    await eventCells.first().hover();
+    await eventCells.first().locator('.cell-quick-add-btn[aria-label="Add Domain Event"]').click();
     await expect(page.locator('.domain-event-node')).toHaveCount(1);
 
     // Read the column of note A
@@ -40,9 +42,10 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
     const idA = await noteA.getAttribute('data-id');
     expect(columnA).not.toBeNull();
 
-    // Create note B at a different position (one grid cell to the right)
-    await pane.click({ position: { x: 350 + 250, y: 250 }, button: 'right' });
-    await page.locator('.context-menu-item', { hasText: 'Add domain event' }).click();
+    // Create note B at a different column
+    const nextEventCell = page.locator('.cell-quick-add[data-row="2"]').first();
+    await nextEventCell.hover();
+    await nextEventCell.locator('.cell-quick-add-btn[aria-label="Add Domain Event"]').click();
     await expect(page.locator('.domain-event-node')).toHaveCount(2);
 
     // Find both notes by their data-id — wait for note B to have a data-column attribute
@@ -90,11 +93,10 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
   });
 
   test('right-clicking a node shows insert before and after options', async ({ page }) => {
-    const pane = page.locator('.react-flow__pane');
-
-    // Create a note via right-click context menu
-    await pane.click({ position: { x: 350, y: 250 }, button: 'right' });
-    await page.locator('.context-menu-item', { hasText: 'Add domain event' }).click();
+    // Create a note from row-2 quick-add
+    const eventCell = page.locator('.cell-quick-add[data-row="2"]').first();
+    await eventCell.hover();
+    await eventCell.locator('.cell-quick-add-btn[aria-label="Add Domain Event"]').click();
     await expect(page.locator('.domain-event-node')).toHaveCount(1);
 
     // Right-click the note to get the node context menu
@@ -106,11 +108,10 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
   });
 
   test('inserting an event before shifts the existing node right', async ({ page }) => {
-    const pane = page.locator('.react-flow__pane');
-
-    // Create a note via right-click context menu
-    await pane.click({ position: { x: 350, y: 250 }, button: 'right' });
-    await page.locator('.context-menu-item', { hasText: 'Add domain event' }).click();
+    // Create a note from row-2 quick-add
+    const eventCell = page.locator('.cell-quick-add[data-row="2"]').first();
+    await eventCell.hover();
+    await eventCell.locator('.cell-quick-add-btn[aria-label="Add Domain Event"]').click();
     await expect(page.locator('.domain-event-node')).toHaveCount(1);
 
     const originalNote = page.locator('.domain-event-node').first();
@@ -129,11 +130,10 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
   });
 
   test('inserting an event after places it in the next column', async ({ page }) => {
-    const pane = page.locator('.react-flow__pane');
-
-    // Create a note via right-click context menu
-    await pane.click({ position: { x: 350, y: 250 }, button: 'right' });
-    await page.locator('.context-menu-item', { hasText: 'Add domain event' }).click();
+    // Create a note from row-2 quick-add
+    const eventCell = page.locator('.cell-quick-add[data-row="2"]').first();
+    await eventCell.hover();
+    await eventCell.locator('.cell-quick-add-btn[aria-label="Add Domain Event"]').click();
     await expect(page.locator('.domain-event-node')).toHaveCount(1);
 
     const originalNote = page.locator('.domain-event-node').first();
@@ -157,7 +157,7 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
   });
 });
 
-test.describe('GridCanvas — Quick-Add Buttons (Swimlane Mode)', () => {
+test.describe('GridCanvas — Quick-Add Buttons (Fixed Rows + Bounded Context Rows)', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('.react-flow__pane');
@@ -168,12 +168,34 @@ test.describe('GridCanvas — Quick-Add Buttons (Swimlane Mode)', () => {
       if (minimap) (minimap as HTMLElement).style.display = 'none';
     });
 
-    // Switch to swimlane mode
-    await page.getByRole('button', { name: /Click to switch/ }).click();
-    await expect(page.getByRole('button', { name: /swimlane.*Click to switch/i })).toBeVisible();
+    // Add one bounded context so row 2 quick-add placeholders are rendered.
+    await page.getByLabel('New bounded context name').fill('Sales');
+    await page.getByLabel('Create bounded context').click();
+  });
 
-    // Add a swimlane
-    await page.getByRole('button', { name: 'Add swimlane' }).click();
+  test('fixed row labels are visible for row 0 and row 1', async ({ page }) => {
+    await expect(page.locator('.fixed-row-labels-overlay')).toBeVisible();
+    await expect(page.locator('.fixed-row-label', { hasText: 'UI' })).toBeVisible();
+    await expect(page.locator('.fixed-row-label', { hasText: 'Cmd · RM' })).toBeVisible();
+  });
+
+  test('quick-add options are row-specific', async ({ page }) => {
+    const uiCell = page.locator('.cell-quick-add[data-row="0"]').first();
+    await uiCell.hover();
+    await expect(uiCell.locator('.cell-quick-add-btn')).toHaveCount(1);
+    await expect(uiCell.locator('.cell-quick-add-btn[aria-label="Add UI Screen"]')).toBeVisible();
+
+    const cmdCell = page.locator('.cell-quick-add[data-row="1"]').first();
+    await cmdCell.hover();
+    await expect(cmdCell.locator('.cell-quick-add-btn')).toHaveCount(3);
+    await expect(cmdCell.locator('.cell-quick-add-btn[aria-label="Add Command"]')).toBeVisible();
+    await expect(cmdCell.locator('.cell-quick-add-btn[aria-label="Add Read Model"]')).toBeVisible();
+    await expect(cmdCell.locator('.cell-quick-add-btn[aria-label="Add Policy"]')).toBeVisible();
+
+    const eventCell = page.locator('.cell-quick-add[data-row="2"]').first();
+    await eventCell.hover();
+    await expect(eventCell.locator('.cell-quick-add-btn')).toHaveCount(1);
+    await expect(eventCell.locator('.cell-quick-add-btn[aria-label="Add Domain Event"]')).toBeVisible();
   });
 
   test('quick-add buttons appear on hover in empty swimlane cells', async ({ page }) => {

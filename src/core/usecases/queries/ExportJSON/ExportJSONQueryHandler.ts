@@ -40,7 +40,7 @@ export class ExportJSONQueryHandler {
     }
 
     const projection: BoardProjection = {
-      onDomainEventNode(id, label, column, row) {
+      onDomainEventNode(id, label, column) {
         const props = nodeProperties[id];
         domainEvents.push({
           id,
@@ -51,7 +51,7 @@ export class ExportJSONQueryHandler {
           timelinePosition: column,
         });
       },
-      onCommandNode(id, label, column, row) {
+      onCommandNode(id, label, column) {
         const props = nodeProperties[id];
         commands.push({
           id,
@@ -64,7 +64,7 @@ export class ExportJSONQueryHandler {
           timelinePosition: column,
         });
       },
-      onReadModelNode(id, label, column, row) {
+      onReadModelNode(id, label, column) {
         const props = nodeProperties[id];
         readModels.push({
           id,
@@ -76,7 +76,7 @@ export class ExportJSONQueryHandler {
           timelinePosition: column,
         });
       },
-      onPolicyNode(id, label, column, row) {
+      onPolicyNode(id, label, column) {
         const props = nodeProperties[id];
         policies.push({
           id,
@@ -88,7 +88,7 @@ export class ExportJSONQueryHandler {
           timelinePosition: column,
         });
       },
-      onUIScreenNode(id, label, column, row) {
+      onUIScreenNode(id, label, column) {
         const props = nodeProperties[id];
         uiScreens.push({
           id,
@@ -106,7 +106,7 @@ export class ExportJSONQueryHandler {
 
     const exportedSlices: VerticalSliceSchema[] = [];
     slices.describeTo({
-      onSlice(_id, name, commandId, eventIds, readModelId, scenarios, _boundedContextId) {
+      onSlice(_id, name, commandId, eventIds, readModelId, scenarios) {
         const exportedScenarios: ScenarioSchema[] = scenarios.map((s) => ({
           given: [...s.given],
           when: s.when,
