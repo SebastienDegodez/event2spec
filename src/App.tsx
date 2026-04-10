@@ -1,7 +1,6 @@
 import { GridCanvas } from './ui/components/Canvas/GridCanvas';
 import { ExportToolbar } from './ui/components/Toolbar/ExportToolbar';
 import { NodePalette } from './ui/components/Toolbar/NodePalette';
-import { SwimlanePanel } from './ui/components/Toolbar/SwimlanePanel';
 import { SlicePanel } from './ui/components/Slices/SlicePanel';
 import { SliceEditorView } from './ui/components/Slices/SliceEditorView';
 import { BoundedContextPanel } from './ui/components/Slices/BoundedContextPanel';
@@ -29,7 +28,6 @@ export default function App() {
       <div className="app-workspace">
         <div className="app-sidebar">
           <NodePalette />
-          <SwimlanePanel />
           <BoundedContextPanel />
           <SlicePanel />
         </div>
