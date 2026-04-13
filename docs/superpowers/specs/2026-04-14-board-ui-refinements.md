@@ -1,7 +1,7 @@
 # Board UI Refinements — Spec
 
 **Date:** 2026-04-14  
-**Status:** Draft  
+**Status:** Approved  
 **Builds on:** [2026-04-09-event-modeling-board-redesign](2026-04-09-event-modeling-board-redesign.md)
 
 ---
