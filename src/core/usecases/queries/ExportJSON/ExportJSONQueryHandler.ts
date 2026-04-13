@@ -40,12 +40,12 @@ export class ExportJSONQueryHandler {
     }
 
     const projection: BoardProjection = {
-      onDomainEventNode(id, label, column) {
+      onDomainEventNode(id, label, column, _row, boundedContextId) {
         const props = nodeProperties[id];
         domainEvents.push({
           id,
           name: label,
-          swimlaneId: '',
+          boundedContextId: boundedContextId ?? '',
           triggeredBy: '',
           data: props?.type === 'domainEvent' ? props.data : {},
           timelinePosition: column,
@@ -56,7 +56,6 @@ export class ExportJSONQueryHandler {
         commands.push({
           id,
           name: label,
-          swimlaneId: '',
           actor: props?.type === 'command' ? props.actor : '',
           payload: props?.type === 'command' ? props.payload : {},
           resultingEvents: triggersLinks.has(id) ? [triggersLinks.get(id)!] : [],
@@ -69,7 +68,6 @@ export class ExportJSONQueryHandler {
         readModels.push({
           id,
           name: label,
-          swimlaneId: '',
           fedBy: feedsLinks.get(id) ?? [],
           consumedBy: props?.type === 'readModel' ? props.consumedBy : readModelScreenLinks.get(id) ?? '',
           data: props?.type === 'readModel' ? props.data : {},
@@ -81,7 +79,6 @@ export class ExportJSONQueryHandler {
         policies.push({
           id,
           name: label,
-          swimlaneId: '',
           whenEvent: '',
           thenCommand: policyCommandLinks.get(id) ?? '',
           condition: props?.type === 'policy' ? props.condition : '',
@@ -93,7 +90,6 @@ export class ExportJSONQueryHandler {
         uiScreens.push({
           id,
           name: label,
-          swimlaneId: '',
           description: props?.type === 'uiScreen' ? props.description : '',
           triggersCommand: uiScreenCommandLinks.get(id) ?? '',
           displaysReadModel: '',
@@ -127,7 +123,6 @@ export class ExportJSONQueryHandler {
       version: '1.0.0',
       description: '',
       actors: [],
-      swimlanes: [],
       domainEvents,
       commands,
       readModels,

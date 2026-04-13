@@ -111,10 +111,15 @@ describe('ExportJSONQueryHandler', () => {
     expect(() => JSON.parse(result)).not.toThrow();
   });
 
-  it('exports empty swimlanes array when no swimlanes exist', () => {
-    const result = handler.handle(GridBoard.empty(), [], emptySlices, emptyProperties, new ExportJSONQuery());
+  it('exports domain events with boundedContextId from the node', () => {
+    const board = GridBoard.empty().insertNode(
+      DomainEventNode.create('e1', 'OrderPlaced', 2, 2, 'bc-1')
+    );
+
+    const result = handler.handle(board, [], emptySlices, emptyProperties, new ExportJSONQuery());
     const model = JSON.parse(result);
-    expect(model.swimlanes).toHaveLength(0);
+
+    expect(model.domainEvents[0].boundedContextId).toBe('bc-1');
   });
 
   it('exports node properties in the JSON output', () => {
