@@ -380,95 +380,125 @@ function GridCanvasInner() {
 
   return (
     <div
-      style={{ width: '100%', height: '100%', position: 'relative' }}
+      style={{ width: '100%', height: '100%', position: 'relative', display: 'flex' }}
       data-testid="grid-canvas"
     >
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        isValidConnection={isValidConnection}
-        onNodeDragStop={onNodeDragStop}
-        onNodeClick={onNodeClick}
-        onNodeContextMenu={onNodeContextMenu}
-        onPaneContextMenu={onPaneContextMenu}
-        onPaneClick={onPaneClick}
-        onMoveStart={closeContextMenu}
-        nodeTypes={nodeTypes}
-        snapToGrid
-        snapGrid={[GRID_SIZE, GRID_SIZE]}
-        translateExtent={[[0, 0], [Infinity, Infinity]]}
-        zoomOnDoubleClick={false}
-        fitView={false}
-        minZoom={0.3}
-        maxZoom={2}
-        deleteKeyCode="Delete"
-        proOptions={{ hideAttribution: false }}
-      >
-        <Background
-          variant={BackgroundVariant.Cross}
-          gap={GRID_SIZE}
-          size={6}
-          color="rgba(255,255,255,0.18)"
-        />
-        <Controls position="bottom-right" />
-        <MiniMap
-          nodeColor={(node) => {
-            if (node.type === 'command') return COMMAND_NODE_COLOR;
-            if (node.type === 'readModel') return READ_MODEL_NODE_COLOR;
-            if (node.type === 'policy') return POLICY_NODE_COLOR;
-            if (node.type === 'uiScreen') return UI_SCREEN_NODE_COLOR;
-            return DOMAIN_EVENT_NODE_COLOR;
-          }}
-          maskColor="rgba(15,15,25,0.7)"
-          position="bottom-left"
-        />
-      </ReactFlow>
-      {selectedColumns.length > 0 && (
-        <div className="column-selection-overlay" aria-hidden="true">
-          {selectedColumns.map((col) => {
-            const x = col * GRID_SIZE * viewport.zoom + viewport.x;
-            const width = GRID_SIZE * viewport.zoom;
-            return (
-              <div
-                key={col}
-                className="column-selection-highlight"
-                style={{ left: x, width }}
-              />
-            );
-          })}
-        </div>
-      )}
-      <FixedRowLabelOverlay viewport={viewport} />
-      {contextMenu && (
-        <ContextMenu
-          x={contextMenu.x}
-          y={contextMenu.y}
-          items={contextMenuItems}
-          onClose={closeContextMenu}
-        />
-      )}
+      <FixedRowLabelColumn viewport={viewport} boundedContextRows={boundedContextRowRenderData.rows} />
+      <div style={{ flex: 1, position: 'relative' }}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          isValidConnection={isValidConnection}
+          onNodeDragStop={onNodeDragStop}
+          onNodeClick={onNodeClick}
+          onNodeContextMenu={onNodeContextMenu}
+          onPaneContextMenu={onPaneContextMenu}
+          onPaneClick={onPaneClick}
+          onMoveStart={closeContextMenu}
+          nodeTypes={nodeTypes}
+          snapToGrid
+          snapGrid={[GRID_SIZE, GRID_SIZE]}
+          translateExtent={[[0, 0], [Infinity, Infinity]]}
+          zoomOnDoubleClick={false}
+          fitView={false}
+          minZoom={0.3}
+          maxZoom={2}
+          deleteKeyCode="Delete"
+          proOptions={{ hideAttribution: false }}
+        >
+          <Background
+            variant={BackgroundVariant.Cross}
+            gap={GRID_SIZE}
+            size={6}
+            color="rgba(255,255,255,0.18)"
+          />
+          <Controls position="bottom-right" />
+          <MiniMap
+            nodeColor={(node) => {
+              if (node.type === 'command') return COMMAND_NODE_COLOR;
+              if (node.type === 'readModel') return READ_MODEL_NODE_COLOR;
+              if (node.type === 'policy') return POLICY_NODE_COLOR;
+              if (node.type === 'uiScreen') return UI_SCREEN_NODE_COLOR;
+              return DOMAIN_EVENT_NODE_COLOR;
+            }}
+            maskColor="rgba(15,15,25,0.7)"
+            position="bottom-left"
+          />
+        </ReactFlow>
+        {selectedColumns.length > 0 && (
+          <div className="column-selection-overlay" aria-hidden="true">
+            {selectedColumns.map((col) => {
+              const x = col * GRID_SIZE * viewport.zoom + viewport.x;
+              const width = GRID_SIZE * viewport.zoom;
+              return (
+                <div
+                  key={col}
+                  className="column-selection-highlight"
+                  style={{ left: x, width }}
+                />
+              );
+            })}
+          </div>
+        )}
+        {contextMenu && (
+          <ContextMenu
+            x={contextMenu.x}
+            y={contextMenu.y}
+            items={contextMenuItems}
+            onClose={closeContextMenu}
+          />
+        )}
+      </div>
     </div>
   );
 }
 
-function FixedRowLabelOverlay({ viewport }: {
+const FIXED_ROW_LABEL_COLOR: Record<string, string> = {
+  yellow: 'rgba(253, 224, 71, 0.35)',
+  blue: 'rgba(96, 165, 250, 0.35)',
+  red: 'rgba(248, 113, 113, 0.35)',
+  grey: 'rgba(156, 163, 175, 0.35)',
+};
+
+function FixedRowLabelColumn({ viewport, boundedContextRows }: {
   viewport: { x: number; y: number; zoom: number };
+  boundedContextRows: readonly BoundedContextRowEntry[];
 }) {
-  const uiTop = 0 * GRID_SIZE * viewport.zoom + viewport.y;
-  const commandTop = 1 * GRID_SIZE * viewport.zoom + viewport.y;
   const rowHeight = GRID_SIZE * viewport.zoom;
 
   return (
-    <div className="fixed-row-labels-overlay" aria-label="Fixed row labels">
-      <div className="fixed-row-label" style={{ top: uiTop, height: rowHeight }}>
+    <div className="fixed-row-labels-column" aria-label="Row labels">
+      <div
+        className="fixed-row-label fixed-row-label--ui"
+        style={{ top: 0 * GRID_SIZE * viewport.zoom + viewport.y, height: rowHeight }}
+      >
         UI
       </div>
-      <div className="fixed-row-label" style={{ top: commandTop, height: rowHeight }}>
+      <div
+        className="fixed-row-label fixed-row-label--cmd"
+        style={{ top: 1 * GRID_SIZE * viewport.zoom + viewport.y, height: rowHeight }}
+      >
         Cmd · RM
       </div>
+      {boundedContextRows.map((entry) => {
+        const row = 2 + entry.index;
+        return (
+          <div
+            key={entry.id}
+            className="fixed-row-label fixed-row-label--bc"
+            style={{
+              top: row * GRID_SIZE * viewport.zoom + viewport.y,
+              height: rowHeight,
+              borderLeftColor: FIXED_ROW_LABEL_COLOR[entry.color] || FIXED_ROW_LABEL_COLOR.grey,
+            }}
+          >
+            {entry.name}
+          </div>
+        );
+      })}
     </div>
   );
 }

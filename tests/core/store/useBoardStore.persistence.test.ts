@@ -52,7 +52,10 @@ describe('useBoardStore persistence v2', () => {
 
     expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
     expect(collectNodes(state.board)).toEqual([]);
-    expect(collectBoundedContexts(state.boundedContexts)).toEqual([]);
+    // After reset, defaultBoundedContexts() provides one default BC
+    expect(collectBoundedContexts(state.boundedContexts)).toEqual([
+      { id: 'default-bc', name: 'Bounded Context 1' },
+    ]);
   });
 
   it('loads state when version is 2', async () => {

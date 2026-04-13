@@ -174,7 +174,7 @@ test.describe('GridCanvas — Quick-Add Buttons (Fixed Rows + Bounded Context Ro
   });
 
   test('fixed row labels are visible for row 0 and row 1', async ({ page }) => {
-    await expect(page.locator('.fixed-row-labels-overlay')).toBeVisible();
+    await expect(page.locator('.fixed-row-labels-column')).toBeVisible();
     await expect(page.locator('.fixed-row-label', { hasText: 'UI' })).toBeVisible();
     await expect(page.locator('.fixed-row-label', { hasText: 'Cmd · RM' })).toBeVisible();
   });
