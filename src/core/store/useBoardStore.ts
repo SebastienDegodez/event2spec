@@ -117,14 +117,21 @@ interface PersistedState {
 
 const STORAGE_KEY = 'event2spec-board';
 
+const DEFAULT_BC_ID = 'default-bc';
+const DEFAULT_BC_NAME = 'Bounded Context 1';
+
+function defaultBoundedContexts(): BoundedContextCollection {
+  return BoundedContextCollection.empty().add(BoundedContext.create(DEFAULT_BC_ID, DEFAULT_BC_NAME));
+}
+
 function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; slices: VerticalSliceCollection; boundedContexts: BoundedContextCollection; nodeProperties: Record<string, NodeProperties> } {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { board: GridBoard.empty(), links: [], slices: VerticalSliceCollection.empty(), boundedContexts: BoundedContextCollection.empty(), nodeProperties: {} };
+    if (!raw) return { board: GridBoard.empty(), links: [], slices: VerticalSliceCollection.empty(), boundedContexts: defaultBoundedContexts(), nodeProperties: {} };
     const parsed = JSON.parse(raw) as Partial<PersistedState>;
     if (parsed.version !== 2) {
       localStorage.removeItem(STORAGE_KEY);
-      return { board: GridBoard.empty(), links: [], slices: VerticalSliceCollection.empty(), boundedContexts: BoundedContextCollection.empty(), nodeProperties: {} };
+      return { board: GridBoard.empty(), links: [], slices: VerticalSliceCollection.empty(), boundedContexts: defaultBoundedContexts(), nodeProperties: {} };
     }
     const persisted = parsed as PersistedState;
     const { nodes } = persisted;
@@ -164,9 +171,12 @@ function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; 
     for (const bc of persisted.boundedContexts) {
       boundedContexts = boundedContexts.add(BoundedContext.create(bc.id, bc.name));
     }
+    if (boundedContexts.isEmpty()) {
+      boundedContexts = defaultBoundedContexts();
+    }
     return { board, links, slices, boundedContexts, nodeProperties: persisted.nodeProperties };
   } catch {
-    return { board: GridBoard.empty(), links: [], slices: VerticalSliceCollection.empty(), boundedContexts: BoundedContextCollection.empty(), nodeProperties: {} };
+    return { board: GridBoard.empty(), links: [], slices: VerticalSliceCollection.empty(), boundedContexts: defaultBoundedContexts(), nodeProperties: {} };
   }
 }
 
@@ -356,7 +366,12 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
     addDomainEventNode: (id, label, column, row) =>
       set((state) => {
-        const board = addDomainEventNodeHandler.handle(state.board, new AddDomainEventNodeCommand(id, label, column, row));
+        // Resolve bounded context from the row
+        const bcIds: string[] = [];
+        state.boundedContexts.describeTo({ onBoundedContext(bcId) { bcIds.push(bcId); } });
+        const bcIndex = row - 2;
+        const boundedContextId = bcIndex >= 0 && bcIndex < bcIds.length ? bcIds[bcIndex] : undefined;
+        const board = addDomainEventNodeHandler.handle(state.board, new AddDomainEventNodeCommand(id, label, column, row, boundedContextId));
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('domainEvent') };
         saveToStorage(board, state.links, state.slices, state.boundedContexts, nodeProperties);
         return { board, nodeProperties };
@@ -533,7 +548,12 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       set((state) => {
         let board = state.board;
         if (kind === 'domainEvent') {
-          board = addDomainEventNodeHandler.handle(board, new AddDomainEventNodeCommand(id, label, column, row));
+          // Resolve bounded context from the row (row 2 → BC index 0, row 3 → BC index 1, etc.)
+          const bcIds: string[] = [];
+          state.boundedContexts.describeTo({ onBoundedContext(bcId) { bcIds.push(bcId); } });
+          const bcIndex = row - 2;
+          const boundedContextId = bcIndex >= 0 && bcIndex < bcIds.length ? bcIds[bcIndex] : undefined;
+          board = addDomainEventNodeHandler.handle(board, new AddDomainEventNodeCommand(id, label, column, row, boundedContextId));
         } else if (kind === 'command') {
           board = addCommandNodeHandler.handle(board, new AddCommandNodeCommand(id, label, column, row, ''));
         } else if (kind === 'readModel') {
