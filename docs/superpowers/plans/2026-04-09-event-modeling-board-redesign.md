@@ -684,7 +684,7 @@ Expected: PASS.
 Run: `npm run lint`
 Expected: PASS.
 
-- [ ] **Step 3: Run e2e tests**
+- [x] **Step 3: Run e2e tests**
 
 Run: `npm run test:e2e`
 Expected: PASS.
@@ -694,7 +694,7 @@ Expected: PASS.
 Run: `npm run build`
 Expected: PASS.
 
-- [ ] **Step 5: Final commit for any residual fixes**
+- [x] **Step 5: Final commit for any residual fixes**
 
 ```bash
 git add -A
