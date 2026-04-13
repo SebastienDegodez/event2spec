@@ -125,7 +125,7 @@
   transition: box-shadow 0.15s ease, transform 0.1s ease;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   user-select: none;
 }
 
@@ -246,6 +246,7 @@
   height: 10px !important;
   background: var(--note-amber-dark) !important;
   border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  pointer-events: all !important;
   opacity: 0;
   transition: opacity 0.15s;
 }
@@ -267,7 +268,7 @@
   transition: box-shadow 0.15s ease, transform 0.1s ease;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   user-select: none;
 }
 
@@ -300,6 +301,7 @@
   height: 10px !important;
   background: var(--note-blue-dark) !important;
   border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  pointer-events: all !important;
   opacity: 0;
   transition: opacity 0.15s;
 }
@@ -400,7 +402,7 @@
   transition: box-shadow 0.15s ease, transform 0.1s ease;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   user-select: none;
 }
 
@@ -432,6 +434,7 @@
   height: 10px !important;
   background: var(--note-green-dark) !important;
   border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  pointer-events: all !important;
   opacity: 0;
   transition: opacity 0.15s;
 }
@@ -453,7 +456,7 @@
   transition: box-shadow 0.15s ease, transform 0.1s ease;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   user-select: none;
 }
 
@@ -485,6 +488,7 @@
   height: 10px !important;
   background: var(--note-purple-dark) !important;
   border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  pointer-events: all !important;
   opacity: 0;
   transition: opacity 0.15s;
 }
@@ -506,7 +510,7 @@
   transition: box-shadow 0.15s ease, transform 0.1s ease;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   user-select: none;
 }
 
@@ -538,6 +542,7 @@
   height: 10px !important;
   background: var(--note-yellow-dark) !important;
   border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  pointer-events: all !important;
   opacity: 0;
   transition: opacity 0.15s;
 }
@@ -682,32 +687,55 @@
 }
 
 /* ─── Fixed Row Labels Overlay ─────────────────────── */
-.fixed-row-labels-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 120px;
-  height: 100%;
-  pointer-events: none;
-  z-index: 11;
+/* ─── Fixed Row Labels Column (outside ReactFlow) ───── */
+.fixed-row-labels-column {
+  position: relative;
+  flex-shrink: 0;
+  width: 100px;
+  background: var(--board-bg);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
+  z-index: 2;
 }
 
 .fixed-row-label {
   position: absolute;
   left: 0;
-  width: 120px;
+  width: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
   background: rgba(13, 14, 22, 0.88);
-  border-right: 2px solid rgba(148, 163, 184, 0.35);
   color: var(--text-primary);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.7px;
   text-transform: uppercase;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  box-sizing: border-box;
+  padding: 4px;
+  line-height: 1.3;
+}
+
+.fixed-row-label--ui {
+  background: rgba(234, 179, 8, 0.06);
+  border-left: 3px solid rgba(234, 179, 8, 0.4);
+}
+
+.fixed-row-label--cmd {
+  background: rgba(59, 130, 246, 0.06);
+  border-left: 3px solid rgba(59, 130, 246, 0.4);
+}
+
+.fixed-row-label--bc {
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 3px solid;
+  text-transform: none;
+  font-weight: 600;
+  letter-spacing: 0;
+  word-break: break-word;
 }
 
 /* ─── Properties Panel ───────────────────────────────── */
