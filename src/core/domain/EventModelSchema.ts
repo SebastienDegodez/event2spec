@@ -1,29 +1,14 @@
-import type { ActorType } from './ActorType';
-import type { SwimlaneColor } from './SwimlaneColor';
-export type { ActorType } from './ActorType';
-export type { SwimlaneColor } from './SwimlaneColor';
-
 /** An actor or system participant in the event model. */
 export interface Actor {
   name: string;
   role: string;
-  type: ActorType;
-}
-
-/** A horizontal lane representing one actor or system. */
-export interface Swimlane {
-  id: string;
-  actorName: string;
-  actorType: ActorType;
-  order: number;
-  color: SwimlaneColor;
 }
 
 /** A domain event that has occurred in the system. */
 export interface DomainEventEntry {
   id: string;
   name: string;
-  swimlaneId: string;
+  boundedContextId: string;
   triggeredBy: string;
   data: Record<string, unknown>;
   timelinePosition: number;
@@ -33,7 +18,6 @@ export interface DomainEventEntry {
 export interface CommandEntry {
   id: string;
   name: string;
-  swimlaneId: string;
   actor: string;
   payload: Record<string, unknown>;
   resultingEvents: string[];
@@ -45,7 +29,6 @@ export interface CommandEntry {
 export interface ReadModelEntry {
   id: string;
   name: string;
-  swimlaneId: string;
   fedBy: string[];
   consumedBy: string;
   data: Record<string, unknown>;
@@ -56,7 +39,6 @@ export interface ReadModelEntry {
 export interface PolicyEntry {
   id: string;
   name: string;
-  swimlaneId: string;
   whenEvent: string;
   thenCommand: string;
   condition: string;
@@ -67,7 +49,6 @@ export interface PolicyEntry {
 export interface UIScreenEntry {
   id: string;
   name: string;
-  swimlaneId: string;
   description: string;
   triggersCommand: string;
   displaysReadModel: string;
@@ -118,7 +99,6 @@ export interface EventModel {
   version: string;
   description: string;
   actors: Actor[];
-  swimlanes: Swimlane[];
   domainEvents: DomainEventEntry[];
   commands: CommandEntry[];
   readModels: ReadModelEntry[];
