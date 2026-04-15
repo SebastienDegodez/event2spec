@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ReactFlow,
   Background,
@@ -36,6 +36,7 @@ import { CellQuickAddNode } from './CellQuickAddNode';
 import { ContextMenu } from './ContextMenu';
 import { type ContextMenuState } from './ContextMenuState';
 import { GRID_SIZE, NOTE_SIZE, COMMAND_NODE_COLOR, DOMAIN_EVENT_NODE_COLOR, READ_MODEL_NODE_COLOR, POLICY_NODE_COLOR, UI_SCREEN_NODE_COLOR, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
+import { useViewportCells } from '../../hooks/useViewportCells';
 
 const ROW_BACKGROUND_OFFSET_X = -10000;
 const FIXED_ROWS: readonly number[] = [0, 1] as const;
@@ -68,6 +69,21 @@ function GridCanvasInner() {
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const selectedColumns = useSelectedColumns();
   const { selectColumns, clearColumnSelection } = useColumnSelectionActions();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerSize, setContainerSize] = useState({ width: 800, height: 600 });
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      setContainerSize({ width, height });
+    });
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   // Compute the minimum column per absolute row from board nodes.
   const minColumnPerRow = useMemo(() => {
@@ -118,61 +134,63 @@ function GridCanvasInner() {
     return { bgNodes, rows };
   }, [boundedContexts, minColumnPerRow]);
 
+  const boardRenderData = useMemo(() => {
+    const actualNodes: Node[] = [
+      ...boundedContextRowRenderData.bgNodes,
+    ];
+    const occupiedCells = new Set<string>();
+
+    const createFlowNode = (id: string, label: string, column: number, row: number, type: 'domainEvent' | 'command' | 'readModel' | 'policy' | 'uiScreen') => {
+      const position = domainNodeToPixelPosition({ column, row });
+      actualNodes.push({ id, type, position, data: { label, column, row }, style: { width: NOTE_SIZE, height: NOTE_SIZE } });
+      occupiedCells.add(`${column},${row}`);
+    };
+
+    const projection: BoardProjection = {
+      onDomainEventNode(id, label, column, row) { createFlowNode(id, label, column, row, 'domainEvent'); },
+      onCommandNode(id, label, column, row) { createFlowNode(id, label, column, row, 'command'); },
+      onReadModelNode(id, label, column, row) { createFlowNode(id, label, column, row, 'readModel'); },
+      onPolicyNode(id, label, column, row) { createFlowNode(id, label, column, row, 'policy'); },
+      onUIScreenNode(id, label, column, row) { createFlowNode(id, label, column, row, 'uiScreen'); },
+    };
+    board.describeTo(projection);
+
+    const boundedContextRows = boundedContextRowRenderData.rows.map((entry) => 2 + entry.index);
+    const rowsToRender = [...FIXED_ROWS, ...boundedContextRows];
+
+    return { actualNodes, occupiedCells, rowsToRender };
+  }, [board, boundedContextRowRenderData]);
+
+  const viewportCells = useViewportCells({
+    viewport,
+    containerWidth: containerSize.width,
+    containerHeight: containerSize.height,
+    occupiedCells: boardRenderData.occupiedCells,
+    rows: boardRenderData.rowsToRender,
+  });
+
   const reactFlowNodes = useMemo<Node[]>(
     () => {
-      const result: Node[] = [
-        ...boundedContextRowRenderData.bgNodes,
-      ];
+      const result: Node[] = [...boardRenderData.actualNodes];
 
-      const occupiedCells = new Set<string>();
-      let maxColumn = 0;
-      let maxOccupiedRow = 1;
-
-      const createFlowNode = (id: string, label: string, column: number, row: number, type: 'domainEvent' | 'command' | 'readModel' | 'policy' | 'uiScreen') => {
-        const position = domainNodeToPixelPosition({ column, row });
-        result.push({ id, type, position, data: { label, column, row }, style: { width: NOTE_SIZE, height: NOTE_SIZE } });
-        occupiedCells.add(`${column},${row}`);
-        if (column > maxColumn) maxColumn = column;
-        if (row > maxOccupiedRow) maxOccupiedRow = row;
-      };
-
-      const projection: BoardProjection = {
-        onDomainEventNode(id, label, column, row) { createFlowNode(id, label, column, row, 'domainEvent'); },
-        onCommandNode(id, label, column, row) { createFlowNode(id, label, column, row, 'command'); },
-        onReadModelNode(id, label, column, row) { createFlowNode(id, label, column, row, 'readModel'); },
-        onPolicyNode(id, label, column, row) { createFlowNode(id, label, column, row, 'policy'); },
-        onUIScreenNode(id, label, column, row) { createFlowNode(id, label, column, row, 'uiScreen'); },
-      };
-
-      board.describeTo(projection);
-
-      // Add quick-add placeholder nodes for empty cells
-      const columnCount = Math.max(maxColumn + 2, 1);
-      const boundedContextRows = boundedContextRowRenderData.rows.map((entry) => 2 + entry.index);
-      const rowsToRender = [...FIXED_ROWS, ...boundedContextRows];
-      const rowCount = Math.max(rowsToRender.length > 0 ? Math.max(...rowsToRender) + 1 : 2, maxOccupiedRow + 1, 2);
-
-      for (let row = 0; row < rowCount; row++) {
+      for (const { column, row } of viewportCells) {
         const options = cellNodeOptions(row);
-        for (let col = 0; col < columnCount; col++) {
-          if (occupiedCells.has(`${col},${row}`)) continue;
-          const position = domainNodeToPixelPosition({ column: col, row });
-          result.push({
-            id: `quick-add-${col}-${row}`,
-            type: 'cellQuickAdd',
-            position,
-            data: { column: col, row, options },
-            style: { width: NOTE_SIZE, height: NOTE_SIZE },
-            draggable: false,
-            selectable: false,
-            focusable: false,
-          });
-        }
+        const position = domainNodeToPixelPosition({ column, row });
+        result.push({
+          id: `quick-add-${column}-${row}`,
+          type: 'cellQuickAdd',
+          position,
+          data: { column, row, options },
+          style: { width: NOTE_SIZE, height: NOTE_SIZE },
+          draggable: false,
+          selectable: false,
+          focusable: false,
+        });
       }
 
       return result;
     },
-    [board, boundedContextRowRenderData]
+    [boardRenderData, viewportCells]
   );
 
   // Create edges from links
@@ -384,7 +402,7 @@ function GridCanvasInner() {
       data-testid="grid-canvas"
     >
       <FixedRowLabelColumn viewport={viewport} boundedContextRows={boundedContextRowRenderData.rows} />
-      <div style={{ flex: 1, position: 'relative' }}>
+      <div ref={containerRef} style={{ flex: 1, position: 'relative' }}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
