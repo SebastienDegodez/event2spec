@@ -19,7 +19,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { useBoard, useBoardActions, useLinks, useSelectedColumns, useColumnSelectionActions, useBoundedContexts } from '../../../core/store/useBoardStore';
+import { useBoard, useBoardActions, useLinks, useSelectedColumns, useColumnSelectionActions, useBoundedContexts, useBoundedContextActions } from '../../../core/store/useBoardStore';
 import { type BoardProjection } from '../../../core/domain/BoardProjection';
 import { type BoundedContextProjection } from '../../../core/domain/BoundedContextProjection';
 import { type SwimlaneColor } from '../../../core/domain/SwimlaneColor';
@@ -32,13 +32,17 @@ import { ReadModelNodeComponent } from './ReadModelNodeComponent';
 import { PolicyNodeComponent } from './PolicyNodeComponent';
 import { UIScreenNodeComponent } from './UIScreenNodeComponent';
 import { BoundedContextRowBackgroundNode, type BoundedContextRowBackgroundNodeData } from './BoundedContextRowBackgroundNode';
+import { BoundedContextRowControlNode, type BoundedContextRowControlNodeData } from './BoundedContextRowControlNode';
+import { BoundedContextInsertNode, type BoundedContextInsertNodeData } from './BoundedContextInsertNode';
 import { CellQuickAddNode } from './CellQuickAddNode';
 import { ContextMenu } from './ContextMenu';
 import { type ContextMenuState } from './ContextMenuState';
 import { GRID_SIZE, NOTE_SIZE, COMMAND_NODE_COLOR, DOMAIN_EVENT_NODE_COLOR, READ_MODEL_NODE_COLOR, POLICY_NODE_COLOR, UI_SCREEN_NODE_COLOR, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 import { useViewportCells } from '../../hooks/useViewportCells';
 
-const ROW_BACKGROUND_OFFSET_X = -10000;
+const ROW_BACKGROUND_OFFSET_X = 0;
+const INSERT_NODE_X = 8;
+const ROW_CONTROL_X = 90;
 const FIXED_ROWS: readonly number[] = [0, 1] as const;
 const BOUNDED_CONTEXT_ROW_COLORS: readonly SwimlaneColor[] = ['yellow', 'blue', 'red', 'grey'] as const;
 
@@ -56,6 +60,8 @@ const nodeTypes = {
   policy: PolicyNodeComponent,
   uiScreen: UIScreenNodeComponent,
   boundedContextRowBackground: BoundedContextRowBackgroundNode,
+  boundedContextRowControl: BoundedContextRowControlNode,
+  boundedContextInsert: BoundedContextInsertNode,
   cellQuickAdd: CellQuickAddNode,
 };
 
@@ -63,6 +69,7 @@ function GridCanvasInner() {
   const board = useBoard();
   const links = useLinks();
   const boundedContexts = useBoundedContexts();
+  const { createBoundedContext, renameBoundedContext, deleteBoundedContext } = useBoundedContextActions();
   const { addDomainEventNode, addNodeWithAutoLinks, moveNode, addLink, removeLink, selectNode, deselectNode } = useBoardActions();
   const { screenToFlowPosition } = useReactFlow();
   const viewport = useViewport();
@@ -71,6 +78,44 @@ function GridCanvasInner() {
   const { selectColumns, clearColumnSelection } = useColumnSelectionActions();
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 800, height: 600 });
+  const [editingBoundedContextId, setEditingBoundedContextId] = useState<string | null>(null);
+  const [editingBoundedContextName, setEditingBoundedContextName] = useState('');
+
+  const handleDeleteBoundedContext = useCallback((id: string) => {
+    deleteBoundedContext(id);
+    if (editingBoundedContextId === id) {
+      setEditingBoundedContextId(null);
+      setEditingBoundedContextName('');
+    }
+  }, [deleteBoundedContext, editingBoundedContextId]);
+
+  const handleStartRenameBoundedContext = useCallback((id: string, currentName: string) => {
+    setEditingBoundedContextId(id);
+    setEditingBoundedContextName(currentName);
+  }, []);
+
+  const handleChangeEditingBoundedContextName = useCallback((value: string) => {
+    setEditingBoundedContextName(value);
+  }, []);
+
+  const handleCommitRenameBoundedContext = useCallback((id: string) => {
+    const nextName = editingBoundedContextName.trim();
+    if (nextName) {
+      renameBoundedContext(id, nextName);
+    }
+    setEditingBoundedContextId(null);
+    setEditingBoundedContextName('');
+  }, [editingBoundedContextName, renameBoundedContext]);
+
+  const handleCancelRenameBoundedContext = useCallback(() => {
+    setEditingBoundedContextId(null);
+    setEditingBoundedContextName('');
+  }, []);
+
+  const handleCreateBoundedContext = useCallback((insertIndex?: number) => {
+    const baseName = 'New Bounded Context';
+    createBoundedContext(`bc-${crypto.randomUUID()}`, baseName, insertIndex);
+  }, [createBoundedContext]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -85,37 +130,36 @@ function GridCanvasInner() {
     return () => observer.disconnect();
   }, []);
 
-  // Compute the minimum column per absolute row from board nodes.
-  const minColumnPerRow = useMemo(() => {
-    const map = new Map<number, number>();
-    const recordMinimumColumn = (_id: string, _label: string, column: number, row: number) => {
-      const current = map.get(row);
-      if (current === undefined || column < current) {
-        map.set(row, column);
-      }
-    };
-    const projection: BoardProjection = {
-      onDomainEventNode: recordMinimumColumn,
-      onCommandNode: recordMinimumColumn,
-      onReadModelNode: recordMinimumColumn,
-      onPolicyNode: recordMinimumColumn,
-      onUIScreenNode: recordMinimumColumn,
-    };
-    board.describeTo(projection);
-    return map;
-  }, [board]);
-
   // Collect bounded-context row backgrounds (rows 2+).
   const boundedContextRowRenderData = useMemo(() => {
     const bgNodes: Node<BoundedContextRowBackgroundNodeData>[] = [];
+    const controlNodes: Node<BoundedContextRowControlNodeData>[] = [];
+    const insertNodes: Node<BoundedContextInsertNodeData>[] = [];
     const rows: BoundedContextRowEntry[] = [];
+    const domainEventCountByBoundedContextId = new Map<string, number>();
+
+    const boardProjection: BoardProjection = {
+      onDomainEventNode(_id, _label, _column, _row, boundedContextId) {
+        if (!boundedContextId) return;
+        domainEventCountByBoundedContextId.set(
+          boundedContextId,
+          (domainEventCountByBoundedContextId.get(boundedContextId) ?? 0) + 1,
+        );
+      },
+      onCommandNode() {},
+      onReadModelNode() {},
+      onPolicyNode() {},
+      onUIScreenNode() {},
+    };
+    board.describeTo(boardProjection);
+
     const projection: BoundedContextProjection = {
       onBoundedContext(id, name) {
         const index = rows.length;
         const row = 2 + index;
         const color = BOUNDED_CONTEXT_ROW_COLORS[index % BOUNDED_CONTEXT_ROW_COLORS.length];
-        const startColumn = minColumnPerRow.get(row);
-        const startX = startColumn !== undefined ? startColumn * GRID_SIZE : ROW_BACKGROUND_OFFSET_X;
+        const startX = ROW_BACKGROUND_OFFSET_X;
+        const domainEventCount = domainEventCountByBoundedContextId.get(id) ?? 0;
         bgNodes.push({
           id: `bounded-context-row-bg-${id}`,
           type: 'boundedContextRowBackground',
@@ -127,16 +171,64 @@ function GridCanvasInner() {
           focusable: false,
           zIndex: -1,
         });
+
+        controlNodes.push({
+          id: `bounded-context-row-control-${id}`,
+          type: 'boundedContextRowControl',
+          position: { x: ROW_CONTROL_X, y: row * GRID_SIZE + 6 },
+          data: {
+            id,
+            name,
+            color,
+            hasDomainEvents: domainEventCount > 0,
+            domainEventCount,
+            isEditing: editingBoundedContextId === id,
+            editingName: editingBoundedContextName,
+            onStartRename: handleStartRenameBoundedContext,
+            onChangeEditingName: handleChangeEditingBoundedContextName,
+            onCommitRename: handleCommitRenameBoundedContext,
+            onCancelRename: handleCancelRenameBoundedContext,
+            onDelete: handleDeleteBoundedContext,
+          },
+          draggable: false,
+          selectable: false,
+          focusable: false,
+          zIndex: 4,
+        });
+
+        insertNodes.push({
+          id: `bounded-context-insert-after-${index}`,
+          type: 'boundedContextInsert',
+          position: { x: INSERT_NODE_X, y: row * GRID_SIZE + GRID_SIZE - 20 },
+          data: { onCreate: () => handleCreateBoundedContext(index + 1) },
+          draggable: false,
+          selectable: false,
+          focusable: false,
+          zIndex: 2,
+        });
         rows.push({ id, name, index, color });
       },
     };
     boundedContexts.describeTo(projection);
-    return { bgNodes, rows };
-  }, [boundedContexts, minColumnPerRow]);
+    return { bgNodes, controlNodes, insertNodes, rows };
+  }, [
+    board,
+    boundedContexts,
+    editingBoundedContextId,
+    editingBoundedContextName,
+    handleCancelRenameBoundedContext,
+    handleChangeEditingBoundedContextName,
+    handleCommitRenameBoundedContext,
+    handleCreateBoundedContext,
+    handleDeleteBoundedContext,
+    handleStartRenameBoundedContext,
+  ]);
 
   const boardRenderData = useMemo(() => {
     const actualNodes: Node[] = [
       ...boundedContextRowRenderData.bgNodes,
+      ...boundedContextRowRenderData.controlNodes,
+      ...boundedContextRowRenderData.insertNodes,
     ];
     const occupiedCells = new Set<string>();
 

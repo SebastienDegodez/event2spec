@@ -29,4 +29,19 @@ describe('CreateBoundedContextCommandHandler', () => {
     expect(contexts[0].id).toBe('bc1');
     expect(contexts[1].id).toBe('bc2');
   });
+
+  it('inserts a bounded context at a specific index', () => {
+    const repository = new InMemoryBoundedContextRepository();
+    const handler = new CreateBoundedContextCommandHandler(repository);
+
+    handler.handle(new CreateBoundedContextCommand('bc1', 'Réservation'));
+    handler.handle(new CreateBoundedContextCommand('bc2', 'Paiement'));
+    handler.handle(new CreateBoundedContextCommand('bc-middle', 'Facturation', 1));
+
+    const contexts = collectBoundedContexts(repository.load());
+    expect(contexts).toHaveLength(3);
+    expect(contexts[0].id).toBe('bc1');
+    expect(contexts[1].id).toBe('bc-middle');
+    expect(contexts[2].id).toBe('bc2');
+  });
 });

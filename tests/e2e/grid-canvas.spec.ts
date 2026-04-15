@@ -8,8 +8,6 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
       const minimap = document.querySelector('.react-flow__minimap');
       if (minimap) (minimap as HTMLElement).style.display = 'none';
     });
-    await page.getByLabel('New bounded context name').fill('Sales');
-    await page.getByLabel('Create bounded context').click();
   });
 
   test('displays a dot-grid background on an empty board', async ({ page }) => {
@@ -168,9 +166,7 @@ test.describe('GridCanvas — Quick-Add Buttons (Fixed Rows + Bounded Context Ro
       if (minimap) (minimap as HTMLElement).style.display = 'none';
     });
 
-    // Add one bounded context so row 2 quick-add placeholders are rendered.
-    await page.getByLabel('New bounded context name').fill('Sales');
-    await page.getByLabel('Create bounded context').click();
+    // A default bounded context is always present.
   });
 
   test('fixed row labels are visible for row 0 and row 1', async ({ page }) => {
@@ -292,5 +288,64 @@ test.describe('GridCanvas — Quick-Add Buttons (Fixed Rows + Bounded Context Ro
     // After placing, the quick-add placeholder at that cell should be gone
     const quickAddsAfter = await page.locator('.cell-quick-add').count();
     expect(quickAddsAfter).toBeLessThan(quickAddsBefore);
+  });
+});
+
+test.describe('GridCanvas — Bounded Context Canvas Editing', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('.react-flow__pane');
+    await page.evaluate(() => {
+      const minimap = document.querySelector('.react-flow__minimap');
+      if (minimap) (minimap as HTMLElement).style.display = 'none';
+    });
+  });
+
+  test('renames a bounded context from its row label', async ({ page }) => {
+    const viewport = page.locator('.react-flow__viewport');
+    const labelButton = viewport.getByRole('button', { name: 'Bounded Context 1' }).first();
+    await labelButton.click({ force: true });
+
+    const nameInput = viewport.getByLabel('Bounded context name');
+    await expect(nameInput).toBeVisible();
+    await nameInput.fill('Payments');
+    await nameInput.press('Enter');
+
+    await expect(viewport.getByRole('button', { name: 'Payments' }).first()).toBeVisible();
+  });
+
+  test('shows a confirmation modal when deleting a bounded context containing domain events', async ({ page }) => {
+    const viewport = page.locator('.react-flow__viewport');
+    const eventCell = page.locator('.cell-quick-add[data-row="2"]').first();
+    await eventCell.hover();
+    await eventCell.locator('.cell-quick-add-btn[aria-label="Add Domain Event"]').click();
+    await expect(page.locator('.domain-event-node')).toHaveCount(1);
+
+    const deleteButton = viewport.getByTestId('bounded-context-delete-button').first();
+    await deleteButton.click();
+
+    const modal = page.getByRole('dialog', { name: 'Delete bounded context' });
+    await expect(modal).toBeVisible();
+    await expect(modal).toContainText('contains 1 domain event');
+
+    await modal.getByRole('button', { name: 'Cancel' }).click();
+    await expect(modal).toBeHidden();
+
+    await deleteButton.click();
+    await modal.getByRole('button', { name: 'Delete' }).click();
+    await expect(viewport.getByTestId('bounded-context-row-label')).toHaveCount(0);
+  });
+
+  test('adds bounded contexts with insert buttons between rows and below the last row', async ({ page }) => {
+    const viewport = page.locator('.react-flow__viewport');
+    const insertButtons = viewport.getByTestId('bounded-context-insert-button');
+    await expect(insertButtons).toHaveCount(1);
+
+    await insertButtons.first().click();
+    await expect(viewport.getByTestId('bounded-context-row-label')).toHaveCount(2);
+
+    await expect(viewport.getByTestId('bounded-context-insert-button')).toHaveCount(2);
+    await viewport.getByTestId('bounded-context-insert-button').first().click();
+    await expect(viewport.getByTestId('bounded-context-row-label')).toHaveCount(3);
   });
 });
