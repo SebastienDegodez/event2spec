@@ -86,7 +86,7 @@ export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
 
       {warningType && <ValidationBadge warningType={warningType} />}
 
-      <Handle type="source" id="top-out" position={Position.Top} style={{ left: '30%' }} className="event-handle" />
+      <Handle type="source" id="top-out" position={Position.Top} style={{ left: '50%' }} className="event-handle" />
     </div>
   );
 });
