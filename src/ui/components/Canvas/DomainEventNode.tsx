@@ -13,7 +13,7 @@ export type DomainEventNodeData = {
 
 export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
   const nodeData = data as DomainEventNodeData;
-  const { updateLabel, removeNode, addCommandNode } = useBoardActions();
+  const { updateLabel, removeNode } = useBoardActions();
   const warningType = useNodeValidationWarning(id);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(nodeData.label);
@@ -37,11 +37,6 @@ export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
     removeNode(id);
     deleteElements({ nodes: [{ id }] });
   }, [id, removeNode, deleteElements]);
-
-  const handleAddCommand = useCallback(() => {
-    const commandId = `command-${crypto.randomUUID()}`;
-    addCommandNode(commandId, 'Command', nodeData.column, nodeData.row - 1, id);
-  }, [addCommandNode, id, nodeData.column, nodeData.row]);
 
   return (
     <div
@@ -87,15 +82,6 @@ export const DomainEventNode = memo(({ id, data, selected }: NodeProps) => {
         aria-label="Remove event"
       >
         ×
-      </button>
-
-      <button
-        className="note-add-command"
-        onClick={handleAddCommand}
-        title="Add command"
-        aria-label="Add command"
-      >
-        +
       </button>
 
       {warningType && <ValidationBadge warningType={warningType} />}
