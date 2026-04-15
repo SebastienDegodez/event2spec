@@ -116,8 +116,8 @@
 /* ─── Domain Event Node ──────────────────────────────── */
 .domain-event-node {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 160px;
+  height: 160px;
   background: var(--note-amber);
   border-radius: 3px 12px 3px 3px;
   box-shadow: var(--note-shadow);
@@ -242,8 +242,8 @@
 
 /* ─── React Flow handles ──────────────────────────────── */
 .event-handle {
-  width: 10px !important;
-  height: 10px !important;
+  width: 16px !important;
+  height: 16px !important;
   background: var(--note-amber-dark) !important;
   border: 2px solid rgba(255, 255, 255, 0.3) !important;
   pointer-events: all !important;
@@ -259,8 +259,8 @@
 /* ─── Command Node ────────────────────────────────────── */
 .command-node {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 160px;
+  height: 160px;
   background: var(--note-blue);
   border-radius: 3px 12px 3px 3px;
   box-shadow: var(--note-shadow);
@@ -297,8 +297,8 @@
 
 /* ─── React Flow handles — command ────────────────────── */
 .command-handle {
-  width: 10px !important;
-  height: 10px !important;
+  width: 16px !important;
+  height: 16px !important;
   background: var(--note-blue-dark) !important;
   border: 2px solid rgba(255, 255, 255, 0.3) !important;
   pointer-events: all !important;
@@ -309,42 +309,6 @@
 .command-node:hover .command-handle,
 .command-node.selected .command-handle {
   opacity: 1;
-}
-
-/* ─── Add command button on domain event ──────────────── */
-.note-add-command {
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 24px;
-  height: 24px;
-  border: 2px solid var(--note-blue);
-  background: var(--board-bg);
-  color: var(--note-blue);
-  border-radius: 50%;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.15s, background 0.15s, color 0.15s;
-  padding: 0;
-  z-index: 10;
-}
-
-.domain-event-node:hover .note-add-command,
-.domain-event-node.selected .note-add-command {
-  opacity: 1;
-}
-
-.note-add-command:hover {
-  background: var(--note-blue) !important;
-  color: #fff !important;
-  opacity: 1 !important;
 }
 
 /* ─── Drag overlay hint ───────────────────────────────── */
@@ -393,8 +357,8 @@
 /* ─── Read Model Node ────────────────────────────────── */
 .read-model-node {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 160px;
+  height: 160px;
   background: var(--note-green);
   border-radius: 3px 12px 3px 3px;
   box-shadow: var(--note-shadow);
@@ -430,8 +394,8 @@
 }
 
 .read-model-handle {
-  width: 10px !important;
-  height: 10px !important;
+  width: 16px !important;
+  height: 16px !important;
   background: var(--note-green-dark) !important;
   border: 2px solid rgba(255, 255, 255, 0.3) !important;
   pointer-events: all !important;
@@ -447,8 +411,8 @@
 /* ─── Policy Node ────────────────────────────────────── */
 .policy-node {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 160px;
+  height: 160px;
   background: var(--note-purple);
   border-radius: 3px 12px 3px 3px;
   box-shadow: var(--note-shadow);
@@ -484,8 +448,8 @@
 }
 
 .policy-handle {
-  width: 10px !important;
-  height: 10px !important;
+  width: 16px !important;
+  height: 16px !important;
   background: var(--note-purple-dark) !important;
   border: 2px solid rgba(255, 255, 255, 0.3) !important;
   pointer-events: all !important;
@@ -501,8 +465,8 @@
 /* ─── UI Screen Node ─────────────────────────────────── */
 .ui-screen-node {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 160px;
+  height: 160px;
   background: var(--note-yellow);
   border-radius: 3px 12px 3px 3px;
   box-shadow: var(--note-shadow);
@@ -538,8 +502,8 @@
 }
 
 .ui-screen-handle {
-  width: 10px !important;
-  height: 10px !important;
+  width: 16px !important;
+  height: 16px !important;
   background: var(--note-yellow-dark) !important;
   border: 2px solid rgba(255, 255, 255, 0.3) !important;
   pointer-events: all !important;
@@ -567,8 +531,8 @@
 
 /* ─── Cell Quick-Add Buttons ─────────────────────────── */
 .cell-quick-add {
-  width: 200px;
-  height: 200px;
+  width: 160px;
+  height: 160px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -691,7 +655,7 @@
 .fixed-row-labels-column {
   position: relative;
   flex-shrink: 0;
-  width: 100px;
+  width: 72px;
   background: var(--board-bg);
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
@@ -701,7 +665,7 @@
 .fixed-row-label {
   position: absolute;
   left: 0;
-  width: 100px;
+  width: 72px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -709,7 +673,7 @@
   background: rgba(13, 14, 22, 0.88);
   color: var(--text-primary);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.7px;
   text-transform: uppercase;
