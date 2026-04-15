@@ -57,28 +57,23 @@ if [ -z "$REWRITE" ]; then
   exit 0
 fi
 
-# Build output in the appropriate format
+# Build output in the common PreToolUse hook format expected by VS Code/Copilot.
+# For Copilot input, toolArgs may arrive as a JSON string or object.
 if [ "$FORMAT" = "copilot" ]; then
-  # Copilot format: permissionDecision at top level
-  jq -n \
-    --arg cmd "$REWRITE" \
-    '{
-      "permissionDecision": "allow",
-      "permissionDecisionReason": "snip auto-rewrite"
-    }'
+  ORIGINAL_INPUT=$(echo "$INPUT" | jq -c 'if (.toolArgs | type) == "string" then (.toolArgs | fromjson? // {}) elif (.toolArgs | type) == "object" then .toolArgs else {} end')
 else
-  # Claude Code format: hookSpecificOutput with updatedInput
   ORIGINAL_INPUT=$(echo "$INPUT" | jq -c '.tool_input')
-  UPDATED_INPUT=$(echo "$ORIGINAL_INPUT" | jq --arg cmd "$REWRITE" '.command = $cmd')
-
-  jq -n \
-    --argjson updated "$UPDATED_INPUT" \
-    '{
-      "hookSpecificOutput": {
-        "hookEventName": "PreToolUse",
-        "permissionDecision": "allow",
-        "permissionDecisionReason": "snip auto-rewrite",
-        "updatedInput": $updated
-      }
-    }'
 fi
+
+UPDATED_INPUT=$(echo "$ORIGINAL_INPUT" | jq --arg cmd "$REWRITE" '.command = $cmd')
+
+jq -n \
+  --argjson updated "$UPDATED_INPUT" \
+  '{
+    "hookSpecificOutput": {
+      "hookEventName": "PreToolUse",
+      "permissionDecision": "allow",
+      "permissionDecisionReason": "snip auto-rewrite",
+      "updatedInput": $updated
+    }
+  }'

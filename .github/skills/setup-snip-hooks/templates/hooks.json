@@ -1,7 +1,6 @@
 {
-  "version": 1,
   "hooks": {
-    "preToolUse": [
+    "PreToolUse": [
       {
         "type": "command",
         "command": ".github/hooks/snip-rewrite.sh",
