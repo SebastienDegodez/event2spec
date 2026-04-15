@@ -1,11 +1,5 @@
-/** Fixed grid cell size in pixels */
-export const GRID_SIZE = 250;
-
-/** Visual size of a sticky note (centered inside the cell) */
-export const NOTE_SIZE = 200;
-
-/** Margin around the note inside its grid cell */
-export const NOTE_MARGIN = (GRID_SIZE - NOTE_SIZE) / 2;
+import { GRID_SIZE, NOTE_SIZE, NOTE_MARGIN } from './gridTheme';
+export { GRID_SIZE, NOTE_SIZE, NOTE_MARGIN };
 
 /** Color used for command nodes on the minimap */
 export const COMMAND_NODE_COLOR = '#3b82f6';
