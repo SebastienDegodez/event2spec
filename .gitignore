@@ -27,3 +27,4 @@ apm_modules/
 *.sln
 *.sw?
 test-results/
+.worktrees/
