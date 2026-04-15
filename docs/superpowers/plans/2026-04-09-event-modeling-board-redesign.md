@@ -387,7 +387,7 @@ interface BoardStoreState {
 Run: `npm run test -- tests/core/store/useBoardStore.noSwimlanes.test.ts tests/core/usecases/ExportJSON/ExportJSONQueryHandler.test.ts tests/core/usecases/ExportMarkdown/ExportMarkdownQueryHandler.test.ts`
 Expected: PASS.
 
-- [x] **Step 5: Commit** _(old swimlane command dirs deleted, ExportJSON cleaned)_
+- [x] **Step 5: Commit** 
 
 ```bash
 git add src/core/store/useBoardStore.ts src/core/usecases/queries/ExportJSON/ExportJSONQueryHandler.ts src/core/usecases/queries/ExportMarkdown/ExportMarkdownQueryHandler.ts src/core/usecases/commands/AddSwimlane src/core/usecases/commands/RemoveSwimlane src/core/usecases/commands/RenameSwimlane src/core/usecases/commands/ReorderSwimlanes src/core/usecases/commands/ChangeSwimlaneActorType tests/core/store/useBoardStore.noSwimlanes.test.ts tests/core/usecases/ExportJSON/ExportJSONQueryHandler.test.ts tests/core/usecases/ExportMarkdown/ExportMarkdownQueryHandler.test.ts
@@ -403,7 +403,7 @@ git commit -s -m "refactor(store): remove actor swimlane aggregate and commands"
 - Modify: `tests/core/usecases/DeleteBoundedContext/DeleteBoundedContextCommandHandler.test.ts`
 - Create: `tests/core/usecases/DeleteDomainEventsInBoundedContext/DeleteDomainEventsInBoundedContextCommandHandler.test.ts`
 
-- [x] **Step 1: Write failing test for cascade deletion of events on BC deletion** _(implemented as inline store logic instead of dedicated use-case)_
+- [x] **Step 1: Write failing test for cascade deletion of events on BC deletion**
 
 ```ts
 // tests/core/usecases/DeleteDomainEventsInBoundedContext/DeleteDomainEventsInBoundedContextCommandHandler.test.ts
@@ -428,7 +428,7 @@ it('removes links attached to deleted bounded-context events', () => {
 Run: `npm run test -- tests/core/usecases/DeleteDomainEventsInBoundedContext/DeleteDomainEventsInBoundedContextCommandHandler.test.ts tests/core/store/useBoardStore.deleteBoundedContextCascade.test.ts`
 Expected: FAIL because cascade behavior is missing.
 
-- [x] **Step 3: Implement cascade deletion in store orchestration** _(done inline in store `deleteBoundedContext` action, not as separate command handler)_
+- [x] **Step 3: Implement cascade deletion in store orchestration**
 
 ```ts
 // store behavior sketch
@@ -511,8 +511,6 @@ git commit -s -m "feat(canvas): implement fixed rows and bounded-context swimlan
 ```
 
 ### Task 8: Enforce Drag-and-Drop Placement Rules And BC Reassignment
-
-> **Status:** Done — row guards implemented in `MoveNodeCommandHandler` via `isRowValidForKind`. Tests at `tests/core/usecases/MoveNode/MoveNodeCommandHandler.rowRules.test.ts` (4/4 pass). Store-level test was not created separately but coverage is equivalent.
 
 **Files:**
 - Modify: `src/ui/components/Canvas/GridCanvas.tsx`
@@ -612,8 +610,6 @@ git commit -s -m "refactor(ui): make bounded context panel the primary swimlane 
 ```
 
 ### Task 10: Update Export JSON/Markdown To Reflect New Board Structure
-
-> **Status:** Done — `swimlaneId` removed from all entry types, `Swimlane` interface removed from schema, `boundedContextId` added to `DomainEventEntry`, `swimlanes` removed from `EventModel` output.
 
 **Files:**
 - Modify: `src/core/domain/EventModelSchema.ts`
