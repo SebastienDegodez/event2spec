@@ -1,6 +1,5 @@
 import { GridCanvas } from './ui/components/Canvas/GridCanvas';
 import { ExportToolbar } from './ui/components/Toolbar/ExportToolbar';
-import { NodePalette } from './ui/components/Toolbar/NodePalette';
 import { SlicePanel } from './ui/components/Slices/SlicePanel';
 import { SliceEditorView } from './ui/components/Slices/SliceEditorView';
 import { BoundedContextPanel } from './ui/components/Slices/BoundedContextPanel';
@@ -20,14 +19,13 @@ export default function App() {
           <span className="logo-text">event<strong>2spec</strong></span>
         </div>
         <div className="app-hint">
-          Right-click to add · Click + to add Command · Drag to move · Alt+click to select column
+          Hover to add · Drag handles to connect · Drag to move · Alt+click to select column
         </div>
         <ValidationCounter />
         <ExportToolbar />
       </header>
       <div className="app-workspace">
         <div className="app-sidebar">
-          <NodePalette />
           <BoundedContextPanel />
           <SlicePanel />
         </div>
