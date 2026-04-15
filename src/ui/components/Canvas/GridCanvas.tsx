@@ -33,7 +33,6 @@ import { PolicyNodeComponent } from './PolicyNodeComponent';
 import { UIScreenNodeComponent } from './UIScreenNodeComponent';
 import { BoundedContextRowBackgroundNode, type BoundedContextRowBackgroundNodeData } from './BoundedContextRowBackgroundNode';
 import { BoundedContextRowControlNode, type BoundedContextRowControlNodeData } from './BoundedContextRowControlNode';
-import { BoundedContextInsertNode, type BoundedContextInsertNodeData } from './BoundedContextInsertNode';
 import { CellQuickAddNode } from './CellQuickAddNode';
 import { ContextMenu } from './ContextMenu';
 import { type ContextMenuState } from './ContextMenuState';
@@ -41,7 +40,6 @@ import { GRID_SIZE, NOTE_SIZE, COMMAND_NODE_COLOR, DOMAIN_EVENT_NODE_COLOR, READ
 import { useViewportCells } from '../../hooks/useViewportCells';
 
 const ROW_BACKGROUND_OFFSET_X = 0;
-const INSERT_NODE_X = 8;
 const ROW_CONTROL_X = 90;
 const FIXED_ROWS: readonly number[] = [0, 1] as const;
 const BOUNDED_CONTEXT_ROW_COLORS: readonly SwimlaneColor[] = ['yellow', 'blue', 'red', 'grey'] as const;
@@ -61,7 +59,6 @@ const nodeTypes = {
   uiScreen: UIScreenNodeComponent,
   boundedContextRowBackground: BoundedContextRowBackgroundNode,
   boundedContextRowControl: BoundedContextRowControlNode,
-  boundedContextInsert: BoundedContextInsertNode,
   cellQuickAdd: CellQuickAddNode,
 };
 
@@ -134,7 +131,6 @@ function GridCanvasInner() {
   const boundedContextRowRenderData = useMemo(() => {
     const bgNodes: Node<BoundedContextRowBackgroundNodeData>[] = [];
     const controlNodes: Node<BoundedContextRowControlNodeData>[] = [];
-    const insertNodes: Node<BoundedContextInsertNodeData>[] = [];
     const rows: BoundedContextRowEntry[] = [];
     const domainEventCountByBoundedContextId = new Map<string, number>();
 
@@ -196,21 +192,11 @@ function GridCanvasInner() {
           zIndex: 4,
         });
 
-        insertNodes.push({
-          id: `bounded-context-insert-after-${index}`,
-          type: 'boundedContextInsert',
-          position: { x: INSERT_NODE_X, y: row * GRID_SIZE + GRID_SIZE - 20 },
-          data: { onCreate: () => handleCreateBoundedContext(index + 1) },
-          draggable: false,
-          selectable: false,
-          focusable: false,
-          zIndex: 2,
-        });
         rows.push({ id, name, index, color });
       },
     };
     boundedContexts.describeTo(projection);
-    return { bgNodes, controlNodes, insertNodes, rows };
+    return { bgNodes, controlNodes, rows };
   }, [
     board,
     boundedContexts,
@@ -228,7 +214,6 @@ function GridCanvasInner() {
     const actualNodes: Node[] = [
       ...boundedContextRowRenderData.bgNodes,
       ...boundedContextRowRenderData.controlNodes,
-      ...boundedContextRowRenderData.insertNodes,
     ];
     const occupiedCells = new Set<string>();
 
@@ -493,7 +478,7 @@ function GridCanvasInner() {
       style={{ width: '100%', height: '100%', position: 'relative', display: 'flex' }}
       data-testid="grid-canvas"
     >
-      <FixedRowLabelColumn viewport={viewport} boundedContextRows={boundedContextRowRenderData.rows} />
+      <FixedRowLabelColumn viewport={viewport} boundedContextRows={boundedContextRowRenderData.rows} onCreateBoundedContext={handleCreateBoundedContext} />
       <div ref={containerRef} style={{ flex: 1, position: 'relative' }}>
         <ReactFlow
           nodes={nodes}
@@ -573,9 +558,10 @@ const FIXED_ROW_LABEL_COLOR: Record<string, string> = {
   grey: 'rgba(156, 163, 175, 0.35)',
 };
 
-function FixedRowLabelColumn({ viewport, boundedContextRows }: {
+function FixedRowLabelColumn({ viewport, boundedContextRows, onCreateBoundedContext }: {
   viewport: { x: number; y: number; zoom: number };
   boundedContextRows: readonly BoundedContextRowEntry[];
+  onCreateBoundedContext: (insertAfterIndex?: number) => void;
 }) {
   const rowHeight = GRID_SIZE * viewport.zoom;
 
@@ -593,22 +579,45 @@ function FixedRowLabelColumn({ viewport, boundedContextRows }: {
       >
         Cmd · RM
       </div>
-      {boundedContextRows.map((entry) => {
+      {boundedContextRows.map((entry, idx) => {
         const row = 2 + entry.index;
         return (
-          <div
-            key={entry.id}
-            className="fixed-row-label fixed-row-label--bc"
-            style={{
-              top: row * GRID_SIZE * viewport.zoom + viewport.y,
-              height: rowHeight,
-              borderLeftColor: FIXED_ROW_LABEL_COLOR[entry.color] || FIXED_ROW_LABEL_COLOR.grey,
-            }}
-          >
-            {entry.name}
+          <div key={entry.id} style={{ position: 'relative' }}>
+            <button
+              className="bounded-context-insert-button"
+              onClick={() => onCreateBoundedContext(idx)}
+              title="Insert bounded context before"
+              aria-label="Insert bounded context"
+              style={{
+                top: row * GRID_SIZE * viewport.zoom + viewport.y - 12,
+              }}
+            >
+              ＋
+            </button>
+            <div
+              className="fixed-row-label fixed-row-label--bc"
+              style={{
+                top: row * GRID_SIZE * viewport.zoom + viewport.y,
+                height: rowHeight,
+                borderLeftColor: FIXED_ROW_LABEL_COLOR[entry.color] || FIXED_ROW_LABEL_COLOR.grey,
+              }}
+            >
+              {entry.name}
+            </div>
           </div>
         );
       })}
+      <button
+        className="bounded-context-insert-button"
+        onClick={() => onCreateBoundedContext(boundedContextRows.length)}
+        title="Insert bounded context at end"
+        aria-label="Insert bounded context at end"
+        style={{
+          top: (2 + boundedContextRows.length) * GRID_SIZE * viewport.zoom + viewport.y - 12,
+        }}
+      >
+        ＋
+      </button>
     </div>
   );
 }

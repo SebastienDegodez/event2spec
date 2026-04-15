@@ -702,6 +702,31 @@
   word-break: break-word;
 }
 
+.bounded-context-insert-button {
+  position: absolute !important;
+  left: 24px;
+  pointer-events: auto;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(19, 20, 31, 0.92);
+  color: var(--text-primary);
+  font-size: 16px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  z-index: 10;
+}
+
+.bounded-context-insert-button:hover {
+  transform: scale(1.06);
+  border-color: rgba(245, 158, 11, 0.65);
+}
+
 /* ─── Properties Panel ───────────────────────────────── */
 .properties-panel {
   flex-shrink: 0;
