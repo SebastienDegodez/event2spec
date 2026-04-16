@@ -1,7 +1,24 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
+
+const EMPTY_BOARD_STATE = {
+  version: 2,
+  nodes: [],
+  links: [],
+  slices: [],
+  boundedContexts: [{ id: 'default-bc', name: 'Bounded Context 1' }],
+  nodeProperties: {},
+};
+
+async function seedEmptyBoard(page: Page) {
+  await page.addInitScript((state) => {
+    window.localStorage.clear();
+    window.localStorage.setItem('event2spec-board', JSON.stringify(state));
+  }, EMPTY_BOARD_STATE);
+}
 
 test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
   test.beforeEach(async ({ page }) => {
+    await seedEmptyBoard(page);
     await page.goto('/');
     await page.waitForSelector('.react-flow__pane');
     await page.evaluate(() => {
@@ -157,6 +174,7 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
 
 test.describe('GridCanvas — Quick-Add Buttons (Fixed Rows + Bounded Context Rows)', () => {
   test.beforeEach(async ({ page }) => {
+    await seedEmptyBoard(page);
     await page.goto('/');
     await page.waitForSelector('.react-flow__pane');
 
@@ -293,6 +311,7 @@ test.describe('GridCanvas — Quick-Add Buttons (Fixed Rows + Bounded Context Ro
 
 test.describe('GridCanvas — Bounded Context Canvas Editing', () => {
   test.beforeEach(async ({ page }) => {
+    await seedEmptyBoard(page);
     await page.goto('/');
     await page.waitForSelector('.react-flow__pane');
     await page.evaluate(() => {
@@ -302,50 +321,54 @@ test.describe('GridCanvas — Bounded Context Canvas Editing', () => {
   });
 
   test('renames a bounded context from its row label', async ({ page }) => {
-    const viewport = page.locator('.react-flow__viewport');
-    const labelButton = viewport.getByRole('button', { name: 'Bounded Context 1' }).first();
-    await labelButton.click({ force: true });
+    const fixedLabel = page.getByTestId('fixed-bounded-context-row-label').first();
+    await expect(fixedLabel).toBeVisible();
+    await fixedLabel.hover();
+    await fixedLabel.getByRole('button', { name: 'Edit' }).click();
 
-    const nameInput = viewport.getByLabel('Bounded context name');
+    const nameInput = page.getByLabel('New name');
     await expect(nameInput).toBeVisible();
     await nameInput.fill('Payments');
     await nameInput.press('Enter');
+    await page.locator('.app-header').hover();
 
-    await expect(viewport.getByRole('button', { name: 'Payments' }).first()).toBeVisible();
+    await expect(page.getByTestId('fixed-bounded-context-row-label').first()).toContainText('Payments');
   });
 
   test('shows a confirmation modal when deleting a bounded context containing domain events', async ({ page }) => {
-    const viewport = page.locator('.react-flow__viewport');
     const eventCell = page.locator('.cell-quick-add[data-row="2"]').first();
     await eventCell.hover();
     await eventCell.locator('.cell-quick-add-btn[aria-label="Add Domain Event"]').click();
     await expect(page.locator('.domain-event-node')).toHaveCount(1);
 
-    const deleteButton = viewport.getByTestId('bounded-context-delete-button').first();
+    const fixedLabel = page.getByTestId('fixed-bounded-context-row-label').first();
+    await expect(fixedLabel).toBeVisible();
+    await fixedLabel.hover();
+    const deleteButton = fixedLabel.getByRole('button', { name: 'Delete' });
     await deleteButton.click();
 
-    const modal = page.getByRole('dialog', { name: 'Delete bounded context' });
+    const modal = page.getByRole('dialog', { name: 'Delete Bounded Context?' });
     await expect(modal).toBeVisible();
-    await expect(modal).toContainText('contains 1 domain event');
+    await expect(modal).toContainText('Bounded Context 1');
 
     await modal.getByRole('button', { name: 'Cancel' }).click();
     await expect(modal).toBeHidden();
 
+    await fixedLabel.hover();
     await deleteButton.click();
     await modal.getByRole('button', { name: 'Delete' }).click();
-    await expect(viewport.getByTestId('bounded-context-row-label')).toHaveCount(0);
+    await expect(page.getByTestId('fixed-bounded-context-row-label')).toHaveCount(0);
   });
 
   test('adds bounded contexts with insert buttons between rows and below the last row', async ({ page }) => {
-    const viewport = page.locator('.react-flow__viewport');
-    const insertButtons = viewport.getByTestId('bounded-context-insert-button');
-    await expect(insertButtons).toHaveCount(1);
+    const insertButtons = page.getByTestId('bounded-context-insert-button');
+    await expect(insertButtons).toHaveCount(2);
 
     await insertButtons.first().click();
-    await expect(viewport.getByTestId('bounded-context-row-label')).toHaveCount(2);
+    await expect(page.getByTestId('fixed-bounded-context-row-label')).toHaveCount(2);
 
-    await expect(viewport.getByTestId('bounded-context-insert-button')).toHaveCount(2);
-    await viewport.getByTestId('bounded-context-insert-button').first().click();
-    await expect(viewport.getByTestId('bounded-context-row-label')).toHaveCount(3);
+    await expect(page.getByTestId('bounded-context-insert-button')).toHaveCount(3);
+    await page.getByTestId('bounded-context-insert-button').first().click();
+    await expect(page.getByTestId('fixed-bounded-context-row-label')).toHaveCount(3);
   });
 });

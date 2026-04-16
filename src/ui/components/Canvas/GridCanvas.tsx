@@ -32,15 +32,15 @@ import { ReadModelNodeComponent } from './ReadModelNodeComponent';
 import { PolicyNodeComponent } from './PolicyNodeComponent';
 import { UIScreenNodeComponent } from './UIScreenNodeComponent';
 import { BoundedContextRowBackgroundNode, type BoundedContextRowBackgroundNodeData } from './BoundedContextRowBackgroundNode';
-import { BoundedContextRowControlNode, type BoundedContextRowControlNodeData } from './BoundedContextRowControlNode';
 import { CellQuickAddNode } from './CellQuickAddNode';
 import { ContextMenu } from './ContextMenu';
 import { type ContextMenuState } from './ContextMenuState';
+import { RenameModal } from '../RenameModal';
+import { ConfirmDeleteModal } from '../ConfirmDeleteModal';
 import { GRID_SIZE, NOTE_SIZE, COMMAND_NODE_COLOR, DOMAIN_EVENT_NODE_COLOR, READ_MODEL_NODE_COLOR, POLICY_NODE_COLOR, UI_SCREEN_NODE_COLOR, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 import { useViewportCells } from '../../hooks/useViewportCells';
 
 const ROW_BACKGROUND_OFFSET_X = 0;
-const ROW_CONTROL_X = 90;
 const FIXED_ROWS: readonly number[] = [0, 1] as const;
 const BOUNDED_CONTEXT_ROW_COLORS: readonly SwimlaneColor[] = ['yellow', 'blue', 'red', 'grey'] as const;
 
@@ -49,6 +49,7 @@ interface BoundedContextRowEntry {
   name: string;
   index: number;
   color: SwimlaneColor;
+  domainEventCount: number;
 }
 
 const nodeTypes = {
@@ -58,7 +59,6 @@ const nodeTypes = {
   policy: PolicyNodeComponent,
   uiScreen: UIScreenNodeComponent,
   boundedContextRowBackground: BoundedContextRowBackgroundNode,
-  boundedContextRowControl: BoundedContextRowControlNode,
   cellQuickAdd: CellQuickAddNode,
 };
 
@@ -77,6 +77,8 @@ function GridCanvasInner() {
   const [containerSize, setContainerSize] = useState({ width: 800, height: 600 });
   const [editingBoundedContextId, setEditingBoundedContextId] = useState<string | null>(null);
   const [editingBoundedContextName, setEditingBoundedContextName] = useState('');
+  const [deleteConfirmingBcId, setDeleteConfirmingBcId] = useState<string | null>(null);
+  const [deleteConfirmingBcName, setDeleteConfirmingBcName] = useState('');
 
   const handleDeleteBoundedContext = useCallback((id: string) => {
     deleteBoundedContext(id);
@@ -91,18 +93,35 @@ function GridCanvasInner() {
     setEditingBoundedContextName(currentName);
   }, []);
 
-  const handleChangeEditingBoundedContextName = useCallback((value: string) => {
-    setEditingBoundedContextName(value);
+  const handleStartDeleteBoundedContext = useCallback((id: string, name: string, domainEventCount: number) => {
+    if (domainEventCount === 0) {
+      handleDeleteBoundedContext(id);
+      return;
+    }
+    setDeleteConfirmingBcId(id);
+    setDeleteConfirmingBcName(name);
+  }, [handleDeleteBoundedContext]);
+
+  const handleConfirmDeleteBoundedContext = useCallback(() => {
+    if (deleteConfirmingBcId) {
+      handleDeleteBoundedContext(deleteConfirmingBcId);
+    }
+    setDeleteConfirmingBcId(null);
+    setDeleteConfirmingBcName('');
+  }, [deleteConfirmingBcId, handleDeleteBoundedContext]);
+
+  const handleCancelDeleteBoundedContext = useCallback(() => {
+    setDeleteConfirmingBcId(null);
+    setDeleteConfirmingBcName('');
   }, []);
 
-  const handleCommitRenameBoundedContext = useCallback((id: string) => {
-    const nextName = editingBoundedContextName.trim();
-    if (nextName) {
-      renameBoundedContext(id, nextName);
+  const handleConfirmRenameBoundedContext = useCallback((newName: string) => {
+    if (editingBoundedContextId) {
+      renameBoundedContext(editingBoundedContextId, newName);
     }
     setEditingBoundedContextId(null);
     setEditingBoundedContextName('');
-  }, [editingBoundedContextName, renameBoundedContext]);
+  }, [editingBoundedContextId, renameBoundedContext]);
 
   const handleCancelRenameBoundedContext = useCallback(() => {
     setEditingBoundedContextId(null);
@@ -130,7 +149,6 @@ function GridCanvasInner() {
   // Collect bounded-context row backgrounds (rows 2+).
   const boundedContextRowRenderData = useMemo(() => {
     const bgNodes: Node<BoundedContextRowBackgroundNodeData>[] = [];
-    const controlNodes: Node<BoundedContextRowControlNodeData>[] = [];
     const rows: BoundedContextRowEntry[] = [];
     const domainEventCountByBoundedContextId = new Map<string, number>();
 
@@ -168,52 +186,20 @@ function GridCanvasInner() {
           zIndex: -1,
         });
 
-        controlNodes.push({
-          id: `bounded-context-row-control-${id}`,
-          type: 'boundedContextRowControl',
-          position: { x: ROW_CONTROL_X, y: row * GRID_SIZE + 6 },
-          data: {
-            id,
-            name,
-            color,
-            hasDomainEvents: domainEventCount > 0,
-            domainEventCount,
-            isEditing: editingBoundedContextId === id,
-            editingName: editingBoundedContextName,
-            onStartRename: handleStartRenameBoundedContext,
-            onChangeEditingName: handleChangeEditingBoundedContextName,
-            onCommitRename: handleCommitRenameBoundedContext,
-            onCancelRename: handleCancelRenameBoundedContext,
-            onDelete: handleDeleteBoundedContext,
-          },
-          draggable: false,
-          selectable: false,
-          focusable: false,
-          zIndex: 4,
-        });
-
-        rows.push({ id, name, index, color });
+        rows.push({ id, name, index, color, domainEventCount });
       },
     };
     boundedContexts.describeTo(projection);
-    return { bgNodes, controlNodes, rows };
+    return { bgNodes, rows };
   }, [
     board,
     boundedContexts,
-    editingBoundedContextId,
-    editingBoundedContextName,
-    handleCancelRenameBoundedContext,
-    handleChangeEditingBoundedContextName,
-    handleCommitRenameBoundedContext,
     handleCreateBoundedContext,
-    handleDeleteBoundedContext,
-    handleStartRenameBoundedContext,
   ]);
 
   const boardRenderData = useMemo(() => {
     const actualNodes: Node[] = [
       ...boundedContextRowRenderData.bgNodes,
-      ...boundedContextRowRenderData.controlNodes,
     ];
     const occupiedCells = new Set<string>();
 
@@ -478,7 +464,13 @@ function GridCanvasInner() {
       style={{ width: '100%', height: '100%', position: 'relative', display: 'flex' }}
       data-testid="grid-canvas"
     >
-      <FixedRowLabelColumn viewport={viewport} boundedContextRows={boundedContextRowRenderData.rows} onCreateBoundedContext={handleCreateBoundedContext} />
+      <FixedRowLabelColumn
+        viewport={viewport}
+        boundedContextRows={boundedContextRowRenderData.rows}
+        onCreateBoundedContext={handleCreateBoundedContext}
+        onDeleteBoundedContext={handleStartDeleteBoundedContext}
+        onStartEditBoundedContext={handleStartRenameBoundedContext}
+      />
       <div ref={containerRef} style={{ flex: 1, position: 'relative' }}>
         <ReactFlow
           nodes={nodes}
@@ -547,6 +539,24 @@ function GridCanvasInner() {
           />
         )}
       </div>
+      {editingBoundedContextId && (
+        <RenameModal
+          title="Rename Bounded Context"
+          currentValue={editingBoundedContextName}
+          onConfirm={handleConfirmRenameBoundedContext}
+          onCancel={handleCancelRenameBoundedContext}
+        />
+      )}
+      {deleteConfirmingBcId && (
+        <ConfirmDeleteModal
+          title="Delete Bounded Context?"
+          message={`Are you sure you want to delete "${deleteConfirmingBcName}"?`}
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          onConfirm={handleConfirmDeleteBoundedContext}
+          onCancel={handleCancelDeleteBoundedContext}
+        />
+      )}
     </div>
   );
 }
@@ -558,12 +568,15 @@ const FIXED_ROW_LABEL_COLOR: Record<string, string> = {
   grey: 'rgba(156, 163, 175, 0.35)',
 };
 
-function FixedRowLabelColumn({ viewport, boundedContextRows, onCreateBoundedContext }: {
+function FixedRowLabelColumn({ viewport, boundedContextRows, onCreateBoundedContext, onDeleteBoundedContext, onStartEditBoundedContext }: {
   viewport: { x: number; y: number; zoom: number };
   boundedContextRows: readonly BoundedContextRowEntry[];
   onCreateBoundedContext: (insertAfterIndex?: number) => void;
+  onDeleteBoundedContext: (id: string, name: string, domainEventCount: number) => void;
+  onStartEditBoundedContext: (id: string, name: string) => void;
 }) {
   const rowHeight = GRID_SIZE * viewport.zoom;
+  const [hoveredBcId, setHoveredBcId] = useState<string | null>(null);
 
   return (
     <div className="fixed-row-labels-column" aria-label="Row labels">
@@ -581,9 +594,11 @@ function FixedRowLabelColumn({ viewport, boundedContextRows, onCreateBoundedCont
       </div>
       {boundedContextRows.map((entry, idx) => {
         const row = 2 + entry.index;
+        const isHovered = hoveredBcId === entry.id;
         return (
           <div key={entry.id} style={{ position: 'relative' }}>
             <button
+              data-testid="bounded-context-insert-button"
               className="bounded-context-insert-button"
               onClick={() => onCreateBoundedContext(idx)}
               title="Insert bounded context before"
@@ -595,19 +610,45 @@ function FixedRowLabelColumn({ viewport, boundedContextRows, onCreateBoundedCont
               ＋
             </button>
             <div
-              className="fixed-row-label fixed-row-label--bc"
+              data-testid="fixed-bounded-context-row-label"
+              className={`fixed-row-label fixed-row-label--bc ${isHovered ? 'fixed-row-label--bc-hovered' : ''}`}
               style={{
                 top: row * GRID_SIZE * viewport.zoom + viewport.y,
                 height: rowHeight,
                 borderLeftColor: FIXED_ROW_LABEL_COLOR[entry.color] || FIXED_ROW_LABEL_COLOR.grey,
               }}
+              onMouseEnter={() => setHoveredBcId(entry.id)}
+              onMouseLeave={() => setHoveredBcId(null)}
             >
-              {entry.name}
+              {!isHovered && entry.name}
+              {isHovered && (
+                <div className="fixed-row-label-actions">
+                  <button
+                    data-testid="fixed-bounded-context-edit-button"
+                    className="fixed-row-label-btn fixed-row-label-btn--edit"
+                    onClick={() => onStartEditBoundedContext(entry.id, entry.name)}
+                    title="Edit bounded context name"
+                    aria-label="Edit"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    data-testid="fixed-bounded-context-delete-button"
+                    className="fixed-row-label-btn fixed-row-label-btn--delete"
+                    onClick={() => onDeleteBoundedContext(entry.id, entry.name, entry.domainEventCount)}
+                    title="Delete bounded context"
+                    aria-label="Delete"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         );
       })}
       <button
+        data-testid="bounded-context-insert-button"
         className="bounded-context-insert-button"
         onClick={() => onCreateBoundedContext(boundedContextRows.length)}
         title="Insert bounded context at end"

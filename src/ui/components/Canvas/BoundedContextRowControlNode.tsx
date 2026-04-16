@@ -31,7 +31,7 @@ export const BoundedContextRowControlNode = memo(({ data }: NodeProps) => {
   const textColor = COLOR_TEXT[nodeData.color] ?? COLOR_TEXT.grey;
 
   const triggerDelete = useCallback(() => {
-    if (!nodeData.hasDomainEvents) {
+    if (nodeData.domainEventCount === 0) {
       nodeData.onDelete(nodeData.id);
       return;
     }
@@ -39,6 +39,9 @@ export const BoundedContextRowControlNode = memo(({ data }: NodeProps) => {
   }, [nodeData]);
 
   const confirmMessage = useMemo(() => {
+    if (nodeData.domainEventCount === 0) {
+      return 'Are you sure you want to delete this bounded context?';
+    }
     const label = nodeData.domainEventCount > 1 ? 'domain events' : 'domain event';
     return `This bounded context contains ${nodeData.domainEventCount} ${label}. Deleting it will remove them.`;
   }, [nodeData.domainEventCount]);
