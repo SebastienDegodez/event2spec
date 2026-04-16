@@ -12,6 +12,10 @@ export class CreateBoundedContextCommandHandler {
   handle(command: CreateBoundedContextCommand): void {
     const collection = this.repository.load();
     const context = BoundedContext.create(command.id, command.name);
-    this.repository.save(collection.add(context));
+    if (command.insertIndex === undefined) {
+      this.repository.save(collection.add(context));
+      return;
+    }
+    this.repository.save(collection.addAt(context, command.insertIndex));
   }
 }
