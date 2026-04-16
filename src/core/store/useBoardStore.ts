@@ -288,8 +288,8 @@ interface BoardActions {
   removeScenarioFromSlice: (sliceId: string, scenarioIndex: number) => void;
   /** Update an existing scenario in a slice by index. */
   updateScenarioInSlice: (sliceId: string, scenarioIndex: number, given: string[], when: string, then: string[]) => void;
-  /** Create a new bounded context. */
-  createBoundedContext: (id: string, name: string) => void;
+  /** Create a new bounded context, optionally at a specific index. */
+  createBoundedContext: (id: string, name: string, insertIndex?: number) => void;
   /** Delete a bounded context (and unassign its slices). */
   deleteBoundedContext: (id: string) => void;
   /** Rename a bounded context. */
@@ -495,8 +495,8 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       updateScenarioInSliceHandler.handle(new UpdateScenarioInSliceCommand(sliceId, scenarioIndex, given, when, then));
     },
 
-    createBoundedContext: (id, name) => {
-      createBoundedContextHandler.handle(new CreateBoundedContextCommand(id, name));
+    createBoundedContext: (id, name, insertIndex) => {
+      createBoundedContextHandler.handle(new CreateBoundedContextCommand(id, name, insertIndex));
     },
 
     deleteBoundedContext: (id) => {

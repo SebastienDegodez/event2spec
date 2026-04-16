@@ -17,6 +17,15 @@ export class BoundedContextCollection {
     return new BoundedContextCollection([...this.contexts, context]);
   }
 
+  addAt(context: BoundedContext, index: number): BoundedContextCollection {
+    const safeIndex = Math.max(0, Math.min(index, this.contexts.length));
+    return new BoundedContextCollection([
+      ...this.contexts.slice(0, safeIndex),
+      context,
+      ...this.contexts.slice(safeIndex),
+    ]);
+  }
+
   remove(id: string): BoundedContextCollection {
     return new BoundedContextCollection(this.contexts.filter((c) => c.id !== id));
   }
