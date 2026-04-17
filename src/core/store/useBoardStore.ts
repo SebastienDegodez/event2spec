@@ -4,6 +4,7 @@ import { GridBoard } from '../domain/GridBoard';
 import { type BoardProjection } from '../domain/BoardProjection';
 import { DomainEventNode } from '../domain/DomainEventNode';
 import { CommandNode } from '../domain/CommandNode';
+import { type GridBoardRepository } from '../domain/GridBoardRepository';
 import { ReadModelNode } from '../domain/ReadModelNode';
 import { PolicyNode } from '../domain/PolicyNode';
 import { UIScreenNode } from '../domain/UIScreenNode';
@@ -328,8 +329,6 @@ interface BoardActions {
   exportMarkdown: () => string;
 }
 
-const addDomainEventNodeHandler = new AddDomainEventNodeCommandHandler();
-const addCommandNodeHandler = new AddCommandNodeCommandHandler();
 const addReadModelNodeHandler = new AddReadModelNodeCommandHandler();
 const addPolicyNodeHandler = new AddPolicyNodeCommandHandler();
 const addUIScreenNodeHandler = new AddUIScreenNodeCommandHandler();
@@ -392,7 +391,15 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         state.boundedContexts.describeTo({ onBoundedContext(bcId) { bcIds.push(bcId); } });
         const bcIndex = row - 2;
         const boundedContextId = bcIndex >= 0 && bcIndex < bcIds.length ? bcIds[bcIndex] : undefined;
-        const board = addDomainEventNodeHandler.handle(state.board, new AddDomainEventNodeCommand(id, label, column, row, boundedContextId));
+        let board = state.board;
+        const boardRepository: GridBoardRepository = {
+          load: () => board,
+          save: (nextBoard) => {
+            board = nextBoard;
+          },
+        };
+        const addDomainEventNodeHandler = new AddDomainEventNodeCommandHandler(boardRepository);
+        addDomainEventNodeHandler.handle(new AddDomainEventNodeCommand(id, label, column, row, boundedContextId));
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('domainEvent') };
         saveToStorage(board, state.links, state.slices, state.boundedContexts, nodeProperties);
         return { board, nodeProperties };
@@ -400,7 +407,15 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
     addCommandNode: (id, label, column, row, linkedEventId) =>
       set((state) => {
-        const board = addCommandNodeHandler.handle(state.board, new AddCommandNodeCommand(id, label, column, row, linkedEventId ?? ''));
+        let board = state.board;
+        const boardRepository: GridBoardRepository = {
+          load: () => board,
+          save: (nextBoard) => {
+            board = nextBoard;
+          },
+        };
+        const addCommandNodeHandler = new AddCommandNodeCommandHandler(boardRepository);
+        addCommandNodeHandler.handle(new AddCommandNodeCommand(id, label, column, row, linkedEventId ?? ''));
         const links = linkedEventId
           ? [...state.links, { sourceNodeId: id, targetNodeId: linkedEventId, connectionType: 'triggers' as const }]
           : state.links;
@@ -598,15 +613,23 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
     addNodeWithAutoLinks: (id, kind, label, column, row) =>
       set((state) => {
         let board = state.board;
+        const boardRepository: GridBoardRepository = {
+          load: () => board,
+          save: (nextBoard) => {
+            board = nextBoard;
+          },
+        };
         if (kind === 'domainEvent') {
           // Resolve bounded context from the row (row 2 → BC index 0, row 3 → BC index 1, etc.)
           const bcIds: string[] = [];
           state.boundedContexts.describeTo({ onBoundedContext(bcId) { bcIds.push(bcId); } });
           const bcIndex = row - 2;
           const boundedContextId = bcIndex >= 0 && bcIndex < bcIds.length ? bcIds[bcIndex] : undefined;
-          board = addDomainEventNodeHandler.handle(board, new AddDomainEventNodeCommand(id, label, column, row, boundedContextId));
+          const addDomainEventNodeHandler = new AddDomainEventNodeCommandHandler(boardRepository);
+          addDomainEventNodeHandler.handle(new AddDomainEventNodeCommand(id, label, column, row, boundedContextId));
         } else if (kind === 'command') {
-          board = addCommandNodeHandler.handle(board, new AddCommandNodeCommand(id, label, column, row, ''));
+          const addCommandNodeHandler = new AddCommandNodeCommandHandler(boardRepository);
+          addCommandNodeHandler.handle(new AddCommandNodeCommand(id, label, column, row, ''));
         } else if (kind === 'readModel') {
           board = addReadModelNodeHandler.handle(board, new AddReadModelNodeCommand(id, label, column, row));
         } else if (kind === 'policy') {

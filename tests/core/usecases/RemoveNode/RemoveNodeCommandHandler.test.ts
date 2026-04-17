@@ -5,16 +5,21 @@ import { AddDomainEventNodeCommandHandler } from '../../../../src/core/usecases/
 import { RemoveNodeCommand } from '../../../../src/core/usecases/commands/RemoveNode/RemoveNodeCommand';
 import { RemoveNodeCommandHandler } from '../../../../src/core/usecases/commands/RemoveNode/RemoveNodeCommandHandler';
 import { collectNodes } from '../../../helpers/collectNodes';
+import { InMemoryGridBoardRepository } from '../../../helpers/InMemoryGridBoardRepository';
 
-const addHandler = new AddDomainEventNodeCommandHandler();
 const handler = new RemoveNodeCommandHandler();
 
 describe('RemoveNodeCommandHandler', () => {
   it('removes a node by id', () => {
-    const board = [
+    const repository = new InMemoryGridBoardRepository(GridBoard.empty());
+    const addHandler = new AddDomainEventNodeCommandHandler(repository);
+
+    [
       new AddDomainEventNodeCommand('keep', 'Keep', 0, 0),
       new AddDomainEventNodeCommand('remove', 'Remove', 1, 0),
-    ].reduce((b, cmd) => addHandler.handle(b, cmd), GridBoard.empty());
+    ].forEach((command) => addHandler.handle(command));
+
+    const board = repository.load();
 
     const result = handler.handle(board, new RemoveNodeCommand('remove'));
     const nodes = collectNodes(result);
@@ -24,7 +29,10 @@ describe('RemoveNodeCommandHandler', () => {
   });
 
   it('leaves the board unchanged when removing an unknown id', () => {
-    const board = addHandler.handle(GridBoard.empty(), new AddDomainEventNodeCommand('a', 'A', 0, 0));
+    const repository = new InMemoryGridBoardRepository(GridBoard.empty());
+    const addHandler = new AddDomainEventNodeCommandHandler(repository);
+    addHandler.handle(new AddDomainEventNodeCommand('a', 'A', 0, 0));
+    const board = repository.load();
 
     const result = handler.handle(board, new RemoveNodeCommand('unknown'));
 

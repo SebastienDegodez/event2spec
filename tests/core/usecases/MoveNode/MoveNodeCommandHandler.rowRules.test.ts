@@ -9,10 +9,9 @@ import { AddUIScreenNodeCommandHandler } from '../../../../src/core/usecases/com
 import { MoveNodeCommand } from '../../../../src/core/usecases/commands/MoveNode/MoveNodeCommand';
 import { MoveNodeCommandHandler } from '../../../../src/core/usecases/commands/MoveNode/MoveNodeCommandHandler';
 import { collectNodes } from '../../../helpers/collectNodes';
+import { InMemoryGridBoardRepository } from '../../../helpers/InMemoryGridBoardRepository';
 
 const addScreenHandler = new AddUIScreenNodeCommandHandler();
-const addCommandHandler = new AddCommandNodeCommandHandler();
-const addDomainEventHandler = new AddDomainEventNodeCommandHandler();
 const moveHandler = new MoveNodeCommandHandler();
 
 describe('MoveNodeCommandHandler row rules', () => {
@@ -30,10 +29,10 @@ describe('MoveNodeCommandHandler row rules', () => {
   });
 
   it('ignores invalid command move to row 0', () => {
-    const board = addCommandHandler.handle(
-      GridBoard.empty(),
-      new AddCommandNodeCommand('cmd-1', 'Place Order', 0, 1, 'evt-1')
-    );
+    const repository = new InMemoryGridBoardRepository(GridBoard.empty());
+    const addCommandHandler = new AddCommandNodeCommandHandler(repository);
+    addCommandHandler.handle(new AddCommandNodeCommand('cmd-1', 'Place Order', 0, 1, 'evt-1'));
+    const board = repository.load();
 
     const result = moveHandler.handle(board, new MoveNodeCommand('cmd-1', 2, 0));
     const node = collectNodes(result).find((n) => n.id === 'cmd-1');
@@ -43,10 +42,10 @@ describe('MoveNodeCommandHandler row rules', () => {
   });
 
   it('ignores invalid domainEvent move to row 1', () => {
-    const board = addDomainEventHandler.handle(
-      GridBoard.empty(),
-      new AddDomainEventNodeCommand('evt-1', 'OrderPlaced', 0, 2)
-    );
+    const repository = new InMemoryGridBoardRepository(GridBoard.empty());
+    const addDomainEventHandler = new AddDomainEventNodeCommandHandler(repository);
+    addDomainEventHandler.handle(new AddDomainEventNodeCommand('evt-1', 'OrderPlaced', 0, 2));
+    const board = repository.load();
 
     const result = moveHandler.handle(board, new MoveNodeCommand('evt-1', 3, 1));
     const node = collectNodes(result).find((n) => n.id === 'evt-1');
@@ -56,10 +55,10 @@ describe('MoveNodeCommandHandler row rules', () => {
   });
 
   it('applies valid moves', () => {
-    const board = addDomainEventHandler.handle(
-      GridBoard.empty(),
-      new AddDomainEventNodeCommand('evt-1', 'OrderPlaced', 0, 2)
-    );
+    const repository = new InMemoryGridBoardRepository(GridBoard.empty());
+    const addDomainEventHandler = new AddDomainEventNodeCommandHandler(repository);
+    addDomainEventHandler.handle(new AddDomainEventNodeCommand('evt-1', 'OrderPlaced', 0, 2));
+    const board = repository.load();
 
     const result = moveHandler.handle(board, new MoveNodeCommand('evt-1', 2, 3));
     const node = collectNodes(result).find((n) => n.id === 'evt-1');

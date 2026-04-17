@@ -5,13 +5,16 @@ import { AddDomainEventNodeCommandHandler } from '../../../../src/core/usecases/
 import { UpdateNodeLabelCommand } from '../../../../src/core/usecases/commands/UpdateNodeLabel/UpdateNodeLabelCommand';
 import { UpdateNodeLabelCommandHandler } from '../../../../src/core/usecases/commands/UpdateNodeLabel/UpdateNodeLabelCommandHandler';
 import { collectNodes } from '../../../helpers/collectNodes';
+import { InMemoryGridBoardRepository } from '../../../helpers/InMemoryGridBoardRepository';
 
-const addHandler = new AddDomainEventNodeCommandHandler();
 const handler = new UpdateNodeLabelCommandHandler();
 
 describe('UpdateNodeLabelCommandHandler', () => {
   it('updates the label of an existing node', () => {
-    const board = addHandler.handle(GridBoard.empty(), new AddDomainEventNodeCommand('n1', 'OldLabel', 0, 0));
+    const repository = new InMemoryGridBoardRepository(GridBoard.empty());
+    const addHandler = new AddDomainEventNodeCommandHandler(repository);
+    addHandler.handle(new AddDomainEventNodeCommand('n1', 'OldLabel', 0, 0));
+    const board = repository.load();
 
     const result = handler.handle(board, new UpdateNodeLabelCommand('n1', 'NewLabel'));
     const nodes = collectNodes(result);
@@ -21,10 +24,15 @@ describe('UpdateNodeLabelCommandHandler', () => {
   });
 
   it('leaves other nodes unchanged when updating a label', () => {
-    const board = [
+    const repository = new InMemoryGridBoardRepository(GridBoard.empty());
+    const addHandler = new AddDomainEventNodeCommandHandler(repository);
+
+    [
       new AddDomainEventNodeCommand('n1', 'First', 0, 0),
       new AddDomainEventNodeCommand('n2', 'Second', 1, 0),
-    ].reduce((b, cmd) => addHandler.handle(b, cmd), GridBoard.empty());
+    ].forEach((command) => addHandler.handle(command));
+
+    const board = repository.load();
 
     const result = handler.handle(board, new UpdateNodeLabelCommand('n1', 'Updated'));
     const nodes = collectNodes(result);
