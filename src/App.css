@@ -2038,19 +2038,10 @@
 
 /* ─── Slice overlays ────────────────────────────────────────────────────── */
 
-.slice-column-hitbox-layer,
 .slice-overlay-layer {
   position: absolute;
   inset: 0;
   overflow: hidden;
-}
-
-.slice-column-hitbox-layer {
-  pointer-events: none;
-  z-index: 4;
-}
-
-.slice-overlay-layer {
   pointer-events: none;
   z-index: 5;
 }
@@ -2061,7 +2052,6 @@
   border: 0;
   background: transparent;
   cursor: pointer;
-  pointer-events: auto;
 }
 
 .slice-overlay {

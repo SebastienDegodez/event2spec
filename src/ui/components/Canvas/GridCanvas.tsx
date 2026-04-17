@@ -530,7 +530,12 @@ function GridCanvasInner() {
       {/* Slice header strip — dedicated row above the swimlanes */}
       <div style={{ display: 'flex', flexShrink: 0 }}>
         <div className="slice-header-corner" />
-        <SliceHeaderStrip entries={allHeaderEntries} viewport={viewport} />
+        <SliceHeaderStrip
+          entries={allHeaderEntries}
+          viewport={viewport}
+          hitboxColumns={visibleColumns.filter((col) => !slices.isColumnCovered(col))}
+          onHitboxClick={startSliceSelection}
+        />
       </div>
       {/* Main canvas area */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden', position: 'relative' }}>
@@ -585,25 +590,7 @@ function GridCanvasInner() {
               position="bottom-left"
             />
           </ReactFlow>
-          <div className="slice-column-hitbox-layer" aria-hidden="true">
-            {visibleColumns.map((column) => {
-              const left = column * GRID_SIZE * viewport.zoom + viewport.x;
-              const width = GRID_SIZE * viewport.zoom;
-              const top = viewport.y;
-              const height = GRID_SIZE * viewport.zoom;
 
-              return (
-                <button
-                  key={column}
-                  type="button"
-                  data-testid={`slice-column-hitbox-${column}`}
-                  className="slice-column-hitbox"
-                  style={{ left, width, top, height }}
-                  onClick={() => startSliceSelection(column)}
-                />
-              );
-            })}
-          </div>
           <div className="slice-overlay-layer" aria-hidden="true">
             {sliceOverlayEntries.map((entry) => (
               <SliceOverlay
@@ -676,12 +663,30 @@ interface SliceHeaderEntry {
 function SliceHeaderStrip({
   entries,
   viewport,
+  hitboxColumns,
+  onHitboxClick,
 }: {
   entries: SliceHeaderEntry[];
   viewport: { x: number; y: number; zoom: number };
+  hitboxColumns: number[];
+  onHitboxClick: (column: number) => void;
 }) {
   return (
     <div className="slice-header-strip">
+      {hitboxColumns.map((column) => {
+        const left = column * GRID_SIZE * viewport.zoom + viewport.x;
+        const width = GRID_SIZE * viewport.zoom;
+        return (
+          <button
+            key={column}
+            type="button"
+            data-testid={`slice-column-hitbox-${column}`}
+            className="slice-column-hitbox"
+            style={{ left, top: 0, bottom: 0, width }}
+            onClick={() => onHitboxClick(column)}
+          />
+        );
+      })}
       {entries.map((entry) => {
         const left = entry.startColumn * GRID_SIZE * viewport.zoom + viewport.x;
         const width = entry.columnCount * GRID_SIZE * viewport.zoom;

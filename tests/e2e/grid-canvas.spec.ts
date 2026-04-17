@@ -347,8 +347,8 @@ test.describe('GridCanvas — Contiguous Slice Selection', () => {
     await expect(page.getByTestId('slice-selection-header')).toContainText('Columns 6-7');
   });
 
-  test('clicking a covered column is ignored', async ({ page }) => {
-    await page.getByTestId('slice-column-hitbox-2').click();
+  test('covered columns have no hitbox element', async ({ page }) => {
+    await expect(page.getByTestId('slice-column-hitbox-2')).toHaveCount(0);
     await expect(page.getByTestId('slice-selection-header')).toHaveCount(0);
   });
 
