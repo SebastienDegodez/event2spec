@@ -27,6 +27,8 @@ import { AddUIScreenNodeCommand } from '../usecases/commands/AddUIScreenNode/Add
 import { AddUIScreenNodeCommandHandler } from '../usecases/commands/AddUIScreenNode/AddUIScreenNodeCommandHandler';
 import { CreateSliceCommand } from '../usecases/commands/CreateSlice/CreateSliceCommand';
 import { CreateSliceCommandHandler } from '../usecases/commands/CreateSlice/CreateSliceCommandHandler';
+import { ExtendSliceRightCommand } from '../usecases/commands/ExtendSliceRight/ExtendSliceRightCommand';
+import { ExtendSliceRightCommandHandler } from '../usecases/commands/ExtendSliceRight/ExtendSliceRightCommandHandler';
 import { RenameSliceCommand } from '../usecases/commands/RenameSlice/RenameSliceCommand';
 import { RenameSliceCommandHandler } from '../usecases/commands/RenameSlice/RenameSliceCommandHandler';
 import { CreateBoundedContextCommand } from '../usecases/commands/CreateBoundedContext/CreateBoundedContextCommand';
@@ -97,6 +99,8 @@ interface PersistedSlice {
   readModelId: string;
   scenarios: PersistedScenario[];
   boundedContextId?: string;
+  startColumn?: number;
+  columnCount?: number;
 }
 
 /** Serialisable representation of a bounded context for localStorage persistence. */
@@ -107,7 +111,7 @@ interface PersistedBoundedContext {
 
 /** Shape of the data persisted in localStorage. */
 interface PersistedState {
-  version: 2;
+  version: 2 | 3;
   nodes: PersistedNode[];
   links: NodeLink[];
   slices: PersistedSlice[];
@@ -129,7 +133,7 @@ function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; 
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return { board: GridBoard.empty(), links: [], slices: VerticalSliceCollection.empty(), boundedContexts: defaultBoundedContexts(), nodeProperties: {} };
     const parsed = JSON.parse(raw) as Partial<PersistedState>;
-    if (parsed.version !== 2) {
+    if (parsed.version !== 2 && parsed.version !== 3) {
       localStorage.removeItem(STORAGE_KEY);
       return { board: GridBoard.empty(), links: [], slices: VerticalSliceCollection.empty(), boundedContexts: defaultBoundedContexts(), nodeProperties: {} };
     }
@@ -158,7 +162,9 @@ function loadFromStorage(): { board: GridBoard; links: ReadonlyArray<NodeLink>; 
     });
     let slices = VerticalSliceCollection.empty();
     for (const ps of persisted.slices) {
-      let slice = VerticalSlice.create(ps.id, ps.name, ps.commandId, ps.eventIds, ps.readModelId);
+      const startColumn = typeof ps.startColumn === 'number' ? ps.startColumn : 0;
+      const columnCount = typeof ps.columnCount === 'number' ? ps.columnCount : 1;
+      let slice = VerticalSlice.create(ps.id, ps.name, ps.commandId, ps.eventIds, ps.readModelId, startColumn, columnCount);
       for (const sc of ps.scenarios) {
         slice = slice.addScenario(Scenario.create(sc.given, sc.when, sc.then));
       }
@@ -202,7 +208,7 @@ function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, slices:
   board.describeTo(projection);
   const persistedSlices: PersistedSlice[] = [];
   slices.describeTo({
-    onSlice(id, name, commandId, eventIds, readModelId, scenarios, boundedContextId) {
+    onSlice(id, name, commandId, eventIds, readModelId, scenarios, boundedContextId, startColumn, columnCount) {
       persistedSlices.push({
         id,
         name,
@@ -211,6 +217,8 @@ function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, slices:
         readModelId,
         scenarios: scenarios.map((s) => ({ given: [...s.given], when: s.when, then: [...s.then] })),
         boundedContextId,
+        startColumn,
+        columnCount,
       });
     },
   });
@@ -220,7 +228,7 @@ function saveToStorage(board: GridBoard, links: ReadonlyArray<NodeLink>, slices:
       persistedBoundedContexts.push({ id, name });
     },
   });
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 2, nodes, links, slices: persistedSlices, boundedContexts: persistedBoundedContexts, nodeProperties }));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 3, nodes, links, slices: persistedSlices, boundedContexts: persistedBoundedContexts, nodeProperties }));
 }
 
 /** Collects all board nodes as summaries for auto-link resolution. */
@@ -244,7 +252,7 @@ interface BoardStoreState {
   boundedContexts: BoundedContextCollection;
   selectedNode: SelectedNode | null;
   nodeProperties: Record<string, NodeProperties>;
-  selectedColumns: number[];
+  selectedSliceRange: { startColumn: number; columnCount: number } | null;
   /** When set, the node component with this id should enter editing mode immediately. */
   autoEditNodeId: string | null;
 }
@@ -296,10 +304,12 @@ interface BoardActions {
   renameBoundedContext: (id: string, name: string) => void;
   /** Assign a vertical slice to a bounded context (or unassign if boundedContextId is undefined). */
   assignSliceToBoundedContext: (sliceId: string, boundedContextId: string | undefined) => void;
-  /** Set the currently selected columns (for slice creation). */
-  selectColumns: (columns: number[]) => void;
-  /** Clear the column selection. */
-  clearColumnSelection: () => void;
+  /** Start a temporary slice range from a free column. Ignored if column is already covered. */
+  startSliceSelection: (column: number) => void;
+  /** Extend the current temporary slice range by one column to the right. */
+  extendSelectedSliceRangeRight: () => void;
+  /** Clear the temporary slice selection range. */
+  clearSliceSelection: () => void;
   /** Add a node at a grid position and automatically create links with adjacent nodes. */
   addNodeWithAutoLinks: (id: string, kind: NodeKind, label: string, column: number, row: number) => void;
   /** Clear the auto-edit node id (after a node has entered editing mode). */
@@ -339,6 +349,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
   const addScenarioToSliceHandler = new AddScenarioToSliceCommandHandler(sliceRepository);
   const removeScenarioFromSliceHandler = new RemoveScenarioFromSliceCommandHandler(sliceRepository);
   const updateScenarioInSliceHandler = new UpdateScenarioInSliceCommandHandler(sliceRepository);
+  const extendSliceRightHandler = new ExtendSliceRightCommandHandler(sliceRepository);
 
   const boundedContextRepository: BoundedContextRepository = {
     load: () => get().boundedContexts,
@@ -361,7 +372,7 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
     boundedContexts: initialState.boundedContexts,
     selectedNode: null,
     nodeProperties: initialState.nodeProperties,
-    selectedColumns: [],
+    selectedSliceRange: null,
     autoEditNodeId: null,
 
     addDomainEventNode: (id, label, column, row) =>
@@ -471,9 +482,34 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         return { nodeProperties };
       }),
 
-    createSlice: (id, name, commandId, eventIds, readModelId) => {
-      createSliceHandler.handle(new CreateSliceCommand(id, name, commandId, eventIds, readModelId));
+    createSlice: (id, name, commandId, eventIds, readModelId, startColumn = 0, columnCount = 1) => {
+      createSliceHandler.handle(new CreateSliceCommand(id, name, commandId, eventIds, readModelId, startColumn, columnCount));
     },
+
+    startSliceSelection: (column) =>
+      set((state) => {
+        if (state.slices.isColumnCovered(column)) {
+          return state;
+        }
+        return { selectedSliceRange: { startColumn: column, columnCount: 1 } };
+      }),
+
+    extendSelectedSliceRangeRight: () =>
+      set((state) => {
+        if (!state.selectedSliceRange) return state;
+        const nextColumn = state.selectedSliceRange.startColumn + state.selectedSliceRange.columnCount;
+        if (state.slices.isColumnCovered(nextColumn)) {
+          return state;
+        }
+        return {
+          selectedSliceRange: {
+            startColumn: state.selectedSliceRange.startColumn,
+            columnCount: state.selectedSliceRange.columnCount + 1,
+          },
+        };
+      }),
+
+    clearSliceSelection: () => set({ selectedSliceRange: null }),
 
     renameSlice: (id, name) => {
       renameSliceHandler.handle(new RenameSliceCommand(id, name));
@@ -540,9 +576,6 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       assignSliceToBoundedContextHandler.handle(new AssignSliceToBoundedContextCommand(sliceId, boundedContextId));
     },
 
-    selectColumns: (columns) => set({ selectedColumns: columns }),
-
-    clearColumnSelection: () => set({ selectedColumns: [] }),
 
     addNodeWithAutoLinks: (id, kind, label, column, row) =>
       set((state) => {
@@ -650,12 +683,13 @@ export const useBoundedContextActions = () =>
     }))
   );
 
-export const useSelectedColumns = () => useBoardStore((state) => state.selectedColumns);
+export const useSelectedSliceRange = () => useBoardStore((state) => state.selectedSliceRange);
 
 export const useColumnSelectionActions = () =>
   useBoardStore(
     useShallow((state) => ({
-      selectColumns: state.selectColumns,
-      clearColumnSelection: state.clearColumnSelection,
+      startSliceSelection: state.startSliceSelection,
+      extendSelectedSliceRangeRight: state.extendSelectedSliceRangeRight,
+      clearSliceSelection: state.clearSliceSelection,
     }))
   );
