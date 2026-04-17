@@ -21,15 +21,23 @@ function emptyScenario(): ScenarioEditorState {
 }
 
 interface SliceEditorViewProps {
-  selectedColumns: number[];
+  selectedSliceRange: {
+    startColumn: number;
+    columnCount: number;
+  };
 }
 
-export function SliceEditorView({ selectedColumns }: SliceEditorViewProps) {
+export function SliceEditorView({ selectedSliceRange }: SliceEditorViewProps) {
   const board = useBoard();
   const links = useLinks();
   const slices = useSlices();
   const { createSlice, addScenarioToSlice, removeScenarioFromSlice, updateScenarioInSlice } = useSliceActions();
-  const { clearColumnSelection } = useColumnSelectionActions();
+  const { clearSliceSelection } = useColumnSelectionActions();
+  const selectedColumns = useMemo(
+    () => Array.from({ length: selectedSliceRange.columnCount }, (_, index) => selectedSliceRange.startColumn + index),
+    [selectedSliceRange],
+  );
+
 
   const [name, setName] = useState('');
   const [commandId, setCommandId] = useState('');
@@ -132,10 +140,10 @@ export function SliceEditorView({ selectedColumns }: SliceEditorViewProps) {
   const handleCreate = useCallback(() => {
     if (!name.trim() || !commandId) return;
     const id = `slice-${crypto.randomUUID()}`;
-    createSlice(id, name.trim(), commandId, resolvedEventIds, readModelId);
+    createSlice(id, name.trim(), commandId, resolvedEventIds, readModelId, selectedSliceRange.startColumn, selectedSliceRange.columnCount);
     setName('');
-    clearColumnSelection();
-  }, [name, commandId, resolvedEventIds, readModelId, createSlice, clearColumnSelection]);
+    clearSliceSelection();
+  }, [name, commandId, resolvedEventIds, readModelId, createSlice, clearSliceSelection, selectedSliceRange]);
 
   const handleAddScenarioToSlice = useCallback((sliceId: string) => {
     if (!newScenario || !newScenario.whenId) return;
@@ -158,13 +166,11 @@ export function SliceEditorView({ selectedColumns }: SliceEditorViewProps) {
     setEditingScenarioIndex(null);
   }, [editingScenarioIndex, editingScenario, updateScenarioInSlice]);
 
-  if (selectedColumns.length === 0) return null;
-
   return (
     <aside className="slice-editor-view" aria-label="Slice editor">
       <div className="slice-editor-header">
         <span className="slice-editor-title">🗂 New Slice</span>
-        <button className="slice-editor-close" onClick={clearColumnSelection} aria-label="Close">×</button>
+        <button className="slice-editor-close" onClick={clearSliceSelection} aria-label="Close">×</button>
       </div>
 
       <div className="slice-editor-section">
@@ -240,7 +246,7 @@ export function SliceEditorView({ selectedColumns }: SliceEditorViewProps) {
         >
           Create Slice
         </button>
-        <button className="slice-editor-btn" onClick={clearColumnSelection}>Cancel</button>
+        <button className="slice-editor-btn" onClick={clearSliceSelection}>Cancel</button>
       </div>
 
       {existingSliceScenarios.length > 0 && (

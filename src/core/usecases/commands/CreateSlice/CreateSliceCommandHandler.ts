@@ -11,7 +11,7 @@ export class CreateSliceCommandHandler {
 
   handle(command: CreateSliceCommand): void {
     const collection = this.repository.load();
-    const slice = VerticalSlice.create(command.id, command.name, command.commandId, command.eventIds, command.readModelId);
+    const slice = VerticalSlice.create(command.id, command.name, command.commandId, command.eventIds, command.readModelId, command.startColumn, command.columnCount);
     this.repository.save(collection.add(slice));
   }
 }

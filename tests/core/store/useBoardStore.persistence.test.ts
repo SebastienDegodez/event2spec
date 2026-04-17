@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { collectNodes } from '../../helpers/collectNodes';
 import { collectBoundedContexts } from '../../helpers/collectBoundedContexts';
+import { collectSlices } from '../../helpers/collectSlices';
 
 const STORAGE_KEY = 'event2spec-board';
 
@@ -28,6 +29,73 @@ function createLocalStorageMock(): LocalStorageMock {
     },
   };
 }
+
+describe('useBoardStore persistence v3', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    (globalThis as { localStorage: LocalStorageMock }).localStorage = createLocalStorageMock();
+  });
+
+  it('loads persisted slice ranges from version 3', async () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        version: 3,
+        nodes: [],
+        links: [],
+        boundedContexts: [{ id: 'bc-1', name: 'Ordering' }],
+        slices: [
+          {
+            id: 'vs-1',
+            name: 'Checkout',
+            commandId: 'c1',
+            eventIds: ['e1'],
+            readModelId: 'rm1',
+            scenarios: [],
+            startColumn: 6,
+            columnCount: 3,
+          },
+        ],
+        nodeProperties: {},
+      })
+    );
+
+    const { useBoardStore } = await import('../../../src/core/store/useBoardStore');
+    const collected = collectSlices(useBoardStore.getState().slices);
+
+    expect(collected[0].startColumn).toBe(6);
+    expect(collected[0].columnCount).toBe(3);
+  });
+
+  it('normalizes legacy v2 slices to default range when fields are absent', async () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        version: 2,
+        nodes: [],
+        links: [],
+        boundedContexts: [{ id: 'bc-1', name: 'Ordering' }],
+        slices: [
+          {
+            id: 'vs-1',
+            name: 'Checkout',
+            commandId: 'c1',
+            eventIds: ['e1'],
+            readModelId: 'rm1',
+            scenarios: [],
+          },
+        ],
+        nodeProperties: {},
+      })
+    );
+
+    const { useBoardStore } = await import('../../../src/core/store/useBoardStore');
+    const collected = collectSlices(useBoardStore.getState().slices);
+
+    expect(collected[0].startColumn).toBe(0);
+    expect(collected[0].columnCount).toBe(1);
+  });
+});
 
 describe('useBoardStore persistence v2', () => {
   beforeEach(() => {
