@@ -2,13 +2,15 @@ import { GridCanvas } from './ui/components/Canvas/GridCanvas';
 import { ExportToolbar } from './ui/components/Toolbar/ExportToolbar';
 import { SlicePanel } from './ui/components/Slices/SlicePanel';
 import { SliceEditorView } from './ui/components/Slices/SliceEditorView';
+import { SliceInspectorView } from './ui/components/Slices/SliceInspectorView';
 import { PropertiesPanel } from './ui/components/PropertiesPanel/PropertiesPanel';
 import { ValidationCounter } from './ui/components/Validation/ValidationCounter';
-import { useSelectedSliceRange } from './core/store/useBoardStore';
+import { useActiveSliceInspectorId, useSelectedSliceRange } from './core/store/useBoardStore';
 import './App.css';
 
 export default function App() {
   const selectedSliceRange = useSelectedSliceRange();
+  const activeSliceInspectorId = useActiveSliceInspectorId();
 
   return (
     <div className="app-shell">
@@ -32,6 +34,8 @@ export default function App() {
         </main>
         {selectedSliceRange ? (
           <SliceEditorView selectedSliceRange={selectedSliceRange} />
+        ) : activeSliceInspectorId ? (
+          <SliceInspectorView />
         ) : (
           <PropertiesPanel />
         )}

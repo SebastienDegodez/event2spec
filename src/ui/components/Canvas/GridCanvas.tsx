@@ -19,7 +19,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { useBoard, useBoardActions, useLinks, useSlices, useSelectedSliceRange, useColumnSelectionActions, useBoundedContexts, useBoundedContextActions } from '../../../core/store/useBoardStore';
+import { useBoard, useBoardActions, useLinks, useSlices, useSliceActions, useSelectedSliceRange, useColumnSelectionActions, useBoundedContexts, useBoundedContextActions } from '../../../core/store/useBoardStore';
 import { type BoardProjection } from '../../../core/domain/BoardProjection';
 import { type BoundedContextProjection } from '../../../core/domain/BoundedContextProjection';
 import { type SwimlaneColor } from '../../../core/domain/SwimlaneColor';
@@ -69,6 +69,7 @@ function GridCanvasInner() {
   const slices = useSlices();
   const boundedContexts = useBoundedContexts();
   const { createBoundedContext, renameBoundedContext, deleteBoundedContext } = useBoundedContextActions();
+  const { openSliceInspector, extendSliceRight } = useSliceActions();
   const { addDomainEventNode, addNodeWithAutoLinks, moveNode, addLink, removeLink, selectNode, deselectNode } = useBoardActions();
   const { screenToFlowPosition } = useReactFlow();
   const viewport = useViewport();
@@ -458,6 +459,9 @@ function GridCanvasInner() {
       startColumn: number;
       columnCount: number;
       canExtendRight: boolean;
+      onExtendRight: () => void;
+      onEdit: () => void;
+      onScenarios: () => void;
     }> = [];
 
     slices.describeTo({
@@ -469,12 +473,15 @@ function GridCanvasInner() {
           startColumn,
           columnCount,
           canExtendRight: !slices.isColumnCovered(nextColumn, id),
+          onExtendRight: () => extendSliceRight(id),
+          onEdit: () => openSliceInspector(id, 'details'),
+          onScenarios: () => openSliceInspector(id, 'scenarios'),
         });
       },
     });
 
     return entries;
-  }, [slices]);
+  }, [extendSliceRight, openSliceInspector, slices]);
 
   const visibleColumns = useMemo(() => {
     const columns = new Set<number>();
@@ -577,6 +584,9 @@ function GridCanvasInner() {
               topOffset={32}
               height={containerSize.height - 40}
               canExtendRight={entry.canExtendRight}
+              onExtendRight={entry.onExtendRight}
+              onEdit={entry.onEdit}
+              onScenarios={entry.onScenarios}
             />
           ))}
           {selectedSliceRange && (

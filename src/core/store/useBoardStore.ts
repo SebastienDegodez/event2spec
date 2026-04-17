@@ -253,6 +253,8 @@ interface BoardStoreState {
   selectedNode: SelectedNode | null;
   nodeProperties: Record<string, NodeProperties>;
   selectedSliceRange: { startColumn: number; columnCount: number } | null;
+  activeSliceInspectorId: string | null;
+  activeSliceInspectorMode: 'details' | 'scenarios' | null;
   /** When set, the node component with this id should enter editing mode immediately. */
   autoEditNodeId: string | null;
 }
@@ -285,11 +287,17 @@ interface BoardActions {
   /** Update the properties of a node. */
   updateNodeProperties: (id: string, properties: NodeProperties) => void;
   /** Create a new vertical slice. */
-  createSlice: (id: string, name: string, commandId: string, eventIds: string[], readModelId: string) => void;
+  createSlice: (id: string, name: string, commandId: string, eventIds: string[], readModelId: string, startColumn?: number, columnCount?: number) => void;
   /** Rename a vertical slice. */
   renameSlice: (id: string, name: string) => void;
   /** Delete a vertical slice. */
   deleteSlice: (id: string) => void;
+  /** Open the slice inspector. */
+  openSliceInspector: (sliceId: string, mode?: 'details' | 'scenarios') => void;
+  /** Close the slice inspector. */
+  closeSliceInspector: () => void;
+  /** Extend an existing slice by one column to the right. */
+  extendSliceRight: (sliceId: string) => void;
   /** Add a scenario (Given/When/Then) to a slice. */
   addScenarioToSlice: (sliceId: string, given: string[], when: string, then: string[]) => void;
   /** Remove a scenario from a slice by index. */
@@ -373,6 +381,8 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
     selectedNode: null,
     nodeProperties: initialState.nodeProperties,
     selectedSliceRange: null,
+    activeSliceInspectorId: null,
+    activeSliceInspectorMode: null,
     autoEditNodeId: null,
 
     addDomainEventNode: (id, label, column, row) =>
@@ -519,6 +529,14 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
       deleteSliceHandler.handle(new DeleteSliceCommand(id));
     },
 
+    openSliceInspector: (sliceId, mode = 'details') => set({ activeSliceInspectorId: sliceId, activeSliceInspectorMode: mode }),
+
+    closeSliceInspector: () => set({ activeSliceInspectorId: null, activeSliceInspectorMode: null }),
+
+    extendSliceRight: (sliceId) => {
+      extendSliceRightHandler.handle(new ExtendSliceRightCommand(sliceId));
+    },
+
     addScenarioToSlice: (sliceId, given, when, then) => {
       addScenarioToSliceHandler.handle(new AddScenarioToSliceCommand(sliceId, given, when, then));
     },
@@ -638,6 +656,8 @@ export const useNodeProperties = () => useBoardStore((state) => state.nodeProper
 
 export const useAutoEditNodeId = () => useBoardStore((state) => state.autoEditNodeId);
 
+export const useActiveSliceInspectorId = () => useBoardStore((state) => state.activeSliceInspectorId);
+
 export const useBoardActions = () =>
   useBoardStore(
     useShallow((state) => ({
@@ -667,6 +687,9 @@ export const useSliceActions = () =>
       createSlice: state.createSlice,
       renameSlice: state.renameSlice,
       deleteSlice: state.deleteSlice,
+      openSliceInspector: state.openSliceInspector,
+      closeSliceInspector: state.closeSliceInspector,
+      extendSliceRight: state.extendSliceRight,
       addScenarioToSlice: state.addScenarioToSlice,
       removeScenarioFromSlice: state.removeScenarioFromSlice,
       updateScenarioInSlice: state.updateScenarioInSlice,
