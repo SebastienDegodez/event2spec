@@ -1968,6 +1968,7 @@
 }
 
 .slice-column-hitbox-layer {
+  pointer-events: none;
   z-index: 4;
 }
 
@@ -1978,12 +1979,11 @@
 
 .slice-column-hitbox {
   position: absolute;
-  top: 0;
-  bottom: 0;
   padding: 0;
   border: 0;
   background: transparent;
   cursor: pointer;
+  pointer-events: auto;
 }
 
 .slice-overlay {
@@ -1993,7 +1993,7 @@
 
 .slice-overlay-frame {
   position: absolute;
-  inset: 28px 0 0;
+  inset: 32px 0 0;
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
@@ -2011,20 +2011,25 @@
   right: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 24px;
-  padding: 0 10px;
+  gap: 6px;
+  height: 28px;
+  padding: 0 8px;
   pointer-events: auto;
-  background: rgba(17, 24, 39, 0.9);
+  background: rgba(17, 24, 39, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
+  overflow: hidden;
 }
 
 .slice-overlay-title {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: #e5e7eb;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
 }
 
 .slice-overlay-action {

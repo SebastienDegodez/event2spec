@@ -52,7 +52,7 @@ export function SliceOverlay({
         </button>
         {!isTemporary && (
           <>
-            <button type="button" data-testid="slice-header-edit" className="slice-overlay-action" onClick={onEdit}>View / Edit</button>
+            <button type="button" data-testid="slice-header-edit" className="slice-overlay-action" onClick={onEdit}>Edit</button>
             <button type="button" data-testid="slice-header-scenarios" className="slice-overlay-action" onClick={onScenarios}>Scenarios</button>
           </>
         )}

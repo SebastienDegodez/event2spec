@@ -1,6 +1,5 @@
 import { GridCanvas } from './ui/components/Canvas/GridCanvas';
 import { ExportToolbar } from './ui/components/Toolbar/ExportToolbar';
-import { SlicePanel } from './ui/components/Slices/SlicePanel';
 import { SliceEditorView } from './ui/components/Slices/SliceEditorView';
 import { SliceInspectorView } from './ui/components/Slices/SliceInspectorView';
 import { PropertiesPanel } from './ui/components/PropertiesPanel/PropertiesPanel';
@@ -26,9 +25,6 @@ export default function App() {
         <ExportToolbar />
       </header>
       <div className="app-workspace">
-        <div className="app-sidebar">
-          <SlicePanel />
-        </div>
         <main className="app-canvas">
           <GridCanvas />
         </main>

@@ -558,6 +558,8 @@ function GridCanvasInner() {
           {visibleColumns.map((column) => {
             const left = column * GRID_SIZE * viewport.zoom + viewport.x;
             const width = GRID_SIZE * viewport.zoom;
+            const top = viewport.y;
+            const height = GRID_SIZE * viewport.zoom;
 
             return (
               <button
@@ -565,7 +567,7 @@ function GridCanvasInner() {
                 type="button"
                 data-testid={`slice-column-hitbox-${column}`}
                 className="slice-column-hitbox"
-                style={{ left, width }}
+                style={{ left, width, top, height }}
                 onClick={() => startSliceSelection(column)}
               />
             );
@@ -580,7 +582,7 @@ function GridCanvasInner() {
               startColumn={entry.startColumn}
               columnCount={entry.columnCount}
               viewport={viewport}
-              topOffset={32}
+              topOffset={0}
               height={containerSize.height - 40}
               canExtendRight={entry.canExtendRight}
               onExtendRight={entry.onExtendRight}
@@ -595,7 +597,7 @@ function GridCanvasInner() {
               startColumn={selectedSliceRange.startColumn}
               columnCount={selectedSliceRange.columnCount}
               viewport={viewport}
-              topOffset={32}
+              topOffset={0}
               height={containerSize.height - 40}
               isTemporary
               canExtendRight={!slices.isColumnCovered(selectedSliceRange.startColumn + selectedSliceRange.columnCount)}
