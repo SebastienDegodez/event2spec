@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useBoard, useSlices, useSliceActions, useBoardStore } from '../../../core/store/useBoardStore';
 import { type BoardProjection } from '../../../core/domain/BoardProjection';
 import { type VerticalSliceProjection, type ScenarioProjection } from '../../../core/domain/VerticalSliceProjection';
@@ -27,7 +27,6 @@ export function SliceInspectorView() {
   const activeSliceInspectorId = useBoardStore((state) => state.activeSliceInspectorId);
   const activeSliceInspectorMode = useBoardStore((state) => state.activeSliceInspectorMode);
   const { closeSliceInspector, renameSlice, addScenarioToSlice, removeScenarioFromSlice } = useSliceActions();
-  const [draftName, setDraftName] = useState('');
   const [scenarioDialogOpen, setScenarioDialogOpen] = useState(false);
 
   const availableNodes = useMemo(() => {
@@ -64,12 +63,12 @@ export function SliceInspectorView() {
     return availableNodes.find((entry) => entry.id === nodeId)?.label ?? nodeId;
   }, [availableNodes]);
 
-  const handleRename = useCallback(() => {
-    if (!slice || !draftName.trim()) {
+  const handleRename = useCallback((name: string) => {
+    if (!slice || !name.trim()) {
       return;
     }
-    renameSlice(slice.id, draftName.trim());
-  }, [draftName, renameSlice, slice]);
+    renameSlice(slice.id, name.trim());
+  }, [renameSlice, slice]);
 
   const handleScenarioConfirm = useCallback((given: string[], when: string, then: string[]) => {
     if (!slice) {
@@ -78,10 +77,6 @@ export function SliceInspectorView() {
     addScenarioToSlice(slice.id, given, when, then);
     setScenarioDialogOpen(false);
   }, [addScenarioToSlice, slice]);
-
-  useEffect(() => {
-    setDraftName(slice?.name ?? '');
-  }, [slice]);
 
   if (!slice) {
     return null;
@@ -109,9 +104,8 @@ export function SliceInspectorView() {
         <label className="slice-editor-label">Name</label>
         <input
           className="slice-editor-input"
-          value={draftName}
-          onChange={(event) => setDraftName(event.target.value)}
-          onBlur={handleRename}
+          defaultValue={slice.name}
+          onBlur={(event) => handleRename(event.target.value)}
           aria-label="Slice name"
         />
       </div>

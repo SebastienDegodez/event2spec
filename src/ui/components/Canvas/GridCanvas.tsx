@@ -197,7 +197,6 @@ function GridCanvasInner() {
   }, [
     board,
     boundedContexts,
-    handleCreateBoundedContext,
   ]);
 
   const boardRenderData = useMemo(() => {

@@ -23,7 +23,7 @@ Constraints validated with user:
 ### 2.1 Column Selection
 
 - Clicking a free column starts a temporary selection range.
-- Clicking a covered column does nothing for new selection.
+- Clicking a column already covered by a slice is ignored.
 - Temporary selection range is represented as:
   - startColumn
   - columnCount
