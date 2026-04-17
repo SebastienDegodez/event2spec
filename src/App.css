@@ -1958,24 +1958,161 @@
   color: #fee2e2;
 }
 
-/* ─── Column selection overlay ──────────────────────────────────────────── */
+/* ─── Slice header strip ────────────────────────────────────────────────── */
 
-.column-selection-overlay {
+.slice-header-corner {
+  width: 72px;
+  flex-shrink: 0;
+  height: 32px;
+  background: var(--board-bg);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.slice-header-strip {
+  position: relative;
+  flex: 1;
+  height: 32px;
+  overflow: hidden;
+  background: rgba(13, 14, 22, 0.88);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.slice-header-chip {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  background: rgba(17, 24, 39, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.slice-header-chip--temporary {
+  background: rgba(30, 50, 80, 0.92);
+  border-color: rgba(96, 165, 250, 0.4);
+}
+
+.slice-header-chip-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #e5e7eb;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.slice-header-chip-btn {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #f9fafb;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 11px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.slice-header-chip-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.slice-header-chip-btn--delete {
+  border-color: rgba(248, 113, 113, 0.3);
+  color: rgba(248, 113, 113, 0.85);
+  padding: 2px 5px;
+}
+
+.slice-header-chip-btn--delete:hover {
+  background: rgba(248, 113, 113, 0.15);
+  border-color: rgba(248, 113, 113, 0.6);
+  color: #f87171;
+}
+
+/* ─── Slice overlays ────────────────────────────────────────────────────── */
+
+.slice-overlay-layer {
   position: absolute;
   inset: 0;
-  pointer-events: none;
   overflow: hidden;
+  pointer-events: none;
   z-index: 5;
 }
 
-.column-selection-highlight {
+.slice-column-hitbox {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slice-overlay {
+  position: absolute;
+  pointer-events: none;
+}
+
+.slice-overlay-frame {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.slice-overlay--temporary .slice-overlay-frame {
+  border-color: rgba(96, 165, 250, 0.5);
+  background: rgba(96, 165, 250, 0.09);
+}
+
+.slice-overlay-header {
   position: absolute;
   top: 0;
-  bottom: 0;
-  background: rgba(99, 102, 241, 0.18);
-  border-left: 2px solid rgba(99, 102, 241, 0.6);
-  border-right: 2px solid rgba(99, 102, 241, 0.6);
-  pointer-events: none;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 8px;
+  pointer-events: auto;
+  background: rgba(17, 24, 39, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.slice-overlay-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #e5e7eb;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.slice-overlay-action {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #f9fafb;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.slice-overlay-action:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 /* ─── SliceEditorView panel ─────────────────────────────────────────────── */

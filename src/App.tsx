@@ -1,14 +1,15 @@
 import { GridCanvas } from './ui/components/Canvas/GridCanvas';
 import { ExportToolbar } from './ui/components/Toolbar/ExportToolbar';
-import { SlicePanel } from './ui/components/Slices/SlicePanel';
 import { SliceEditorView } from './ui/components/Slices/SliceEditorView';
+import { SliceInspectorView } from './ui/components/Slices/SliceInspectorView';
 import { PropertiesPanel } from './ui/components/PropertiesPanel/PropertiesPanel';
 import { ValidationCounter } from './ui/components/Validation/ValidationCounter';
-import { useSelectedColumns } from './core/store/useBoardStore';
+import { useActiveSliceInspectorId, useSelectedSliceRange } from './core/store/useBoardStore';
 import './App.css';
 
 export default function App() {
-  const selectedColumns = useSelectedColumns();
+  const selectedSliceRange = useSelectedSliceRange();
+  const activeSliceInspectorId = useActiveSliceInspectorId();
 
   return (
     <div className="app-shell">
@@ -24,14 +25,13 @@ export default function App() {
         <ExportToolbar />
       </header>
       <div className="app-workspace">
-        <div className="app-sidebar">
-          <SlicePanel />
-        </div>
         <main className="app-canvas">
           <GridCanvas />
         </main>
-        {selectedColumns.length > 0 ? (
-          <SliceEditorView selectedColumns={selectedColumns} />
+        {selectedSliceRange ? (
+          <SliceEditorView selectedSliceRange={selectedSliceRange} />
+        ) : activeSliceInspectorId ? (
+          <SliceInspectorView />
         ) : (
           <PropertiesPanel />
         )}

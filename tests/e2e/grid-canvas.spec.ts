@@ -9,6 +9,23 @@ const EMPTY_BOARD_STATE = {
   nodeProperties: {},
 };
 
+const BOARD_WITH_EXISTING_SLICE = {
+  version: 3,
+  nodes: [
+    { id: 'cmd-1', label: 'Add to cart', column: 2, row: 1, type: 'command' },
+    { id: 'evt-1', label: 'Product added', column: 2, row: 2, type: 'domainEvent', boundedContextId: 'default-bc' },
+    { id: 'cmd-2', label: 'Checkout', column: 6, row: 1, type: 'command' },
+    { id: 'evt-2', label: 'Order requested', column: 6, row: 2, type: 'domainEvent', boundedContextId: 'default-bc' },
+  ],
+  links: [],
+  slices: [
+    { id: 'vs-1', name: 'Existing Slice', commandId: 'cmd-1', eventIds: ['evt-1'], readModelId: '', scenarios: [], startColumn: 2, columnCount: 2 },
+    { id: 'vs-2', name: 'Blocking Slice', commandId: 'cmd-2', eventIds: ['evt-2'], readModelId: '', scenarios: [], startColumn: 4, columnCount: 1 },
+  ],
+  boundedContexts: [{ id: 'default-bc', name: 'Bounded Context 1' }],
+  nodeProperties: {},
+};
+
 async function seedEmptyBoard(page: Page) {
   await page.addInitScript((state) => {
     window.localStorage.clear();
@@ -306,6 +323,44 @@ test.describe('GridCanvas — Quick-Add Buttons (Fixed Rows + Bounded Context Ro
     // After placing, the quick-add placeholder at that cell should be gone
     const quickAddsAfter = await page.locator('.cell-quick-add').count();
     expect(quickAddsAfter).toBeLessThan(quickAddsBefore);
+  });
+});
+
+test.describe('GridCanvas — Contiguous Slice Selection', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript((state) => {
+      window.localStorage.clear();
+      window.localStorage.setItem('event2spec-board', JSON.stringify(state));
+    }, BOARD_WITH_EXISTING_SLICE);
+    await page.goto('/');
+    await page.waitForSelector('.react-flow__pane');
+  });
+
+  test('clicking a free column starts a temporary slice range and the arrow extends it', async ({ page }) => {
+    await page.getByTestId('slice-column-hitbox-6').click();
+    await expect(page.getByTestId('slice-selection-header')).toContainText('Columns 6-6');
+
+    const extendButton = page.getByTestId('slice-selection-extend-right');
+    await expect(extendButton).toBeEnabled();
+    await extendButton.click();
+
+    await expect(page.getByTestId('slice-selection-header')).toContainText('Columns 6-7');
+  });
+
+  test('covered columns have no hitbox element', async ({ page }) => {
+    await expect(page.getByTestId('slice-column-hitbox-2')).toHaveCount(0);
+    await expect(page.getByTestId('slice-selection-header')).toHaveCount(0);
+  });
+
+  test('slice header shows a delete button for existing slices', async ({ page }) => {
+    const sliceHeader = page.getByTestId('slice-header-vs-1');
+    await expect(sliceHeader.getByTestId('slice-header-delete')).toBeEnabled();
+  });
+
+  test('slice header edit button opens the slice inspector on the right', async ({ page }) => {
+    await page.getByTestId('slice-header-vs-1').getByTestId('slice-header-edit').click();
+    await expect(page.getByLabel('Slice inspector')).toBeVisible();
+    await expect(page.getByLabel('Slice inspector')).toContainText('Existing Slice');
   });
 });
 

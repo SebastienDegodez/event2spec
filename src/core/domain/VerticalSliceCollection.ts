@@ -62,6 +62,25 @@ export class VerticalSliceCollection {
     return this.slices.length === 0;
   }
 
+  isColumnCovered(column: number, excludedSliceId?: string): boolean {
+    return this.slices.some((slice) => {
+      if (excludedSliceId && slice.id === excludedSliceId) return false;
+      return slice.coveredColumns().includes(column);
+    });
+  }
+
+  extendSliceRight(id: string): VerticalSliceCollection {
+    const slice = this.slices.find((entry) => entry.id === id);
+    if (!slice) {
+      throw new Error(`Slice ${id} not found`);
+    }
+    const nextColumn = slice.startColumn + slice.columnCount;
+    if (this.isColumnCovered(nextColumn, id)) {
+      throw new Error(`Column ${nextColumn} is already covered`);
+    }
+    return new VerticalSliceCollection(this.slices.map((entry) => (entry.id === id ? entry.extendRight() : entry)));
+  }
+
   describeTo(projection: VerticalSliceProjection): void {
     this.slices.forEach((s) => {
       projection.onSlice(
@@ -72,6 +91,8 @@ export class VerticalSliceCollection {
         s.readModelId,
         s.scenarios.map((sc) => ({ given: sc.given, when: sc.when, then: sc.then })),
         s.boundedContextId,
+        s.startColumn,
+        s.columnCount,
       );
     });
   }
