@@ -4,11 +4,11 @@ import { SlicePanel } from './ui/components/Slices/SlicePanel';
 import { SliceEditorView } from './ui/components/Slices/SliceEditorView';
 import { PropertiesPanel } from './ui/components/PropertiesPanel/PropertiesPanel';
 import { ValidationCounter } from './ui/components/Validation/ValidationCounter';
-import { useSelectedColumns } from './core/store/useBoardStore';
+import { useSelectedSliceRange } from './core/store/useBoardStore';
 import './App.css';
 
 export default function App() {
-  const selectedColumns = useSelectedColumns();
+  const selectedSliceRange = useSelectedSliceRange();
 
   return (
     <div className="app-shell">
@@ -30,8 +30,8 @@ export default function App() {
         <main className="app-canvas">
           <GridCanvas />
         </main>
-        {selectedColumns.length > 0 ? (
-          <SliceEditorView selectedColumns={selectedColumns} />
+        {selectedSliceRange ? (
+          <SliceEditorView selectedSliceRange={selectedSliceRange} />
         ) : (
           <PropertiesPanel />
         )}

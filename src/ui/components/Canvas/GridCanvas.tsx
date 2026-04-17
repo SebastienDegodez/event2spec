@@ -19,7 +19,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { useBoard, useBoardActions, useLinks, useSelectedColumns, useColumnSelectionActions, useBoundedContexts, useBoundedContextActions } from '../../../core/store/useBoardStore';
+import { useBoard, useBoardActions, useLinks, useSlices, useSelectedSliceRange, useColumnSelectionActions, useBoundedContexts, useBoundedContextActions } from '../../../core/store/useBoardStore';
 import { type BoardProjection } from '../../../core/domain/BoardProjection';
 import { type BoundedContextProjection } from '../../../core/domain/BoundedContextProjection';
 import { type SwimlaneColor } from '../../../core/domain/SwimlaneColor';
@@ -35,6 +35,7 @@ import { BoundedContextRowBackgroundNode, type BoundedContextRowBackgroundNodeDa
 import { CellQuickAddNode } from './CellQuickAddNode';
 import { ContextMenu } from './ContextMenu';
 import { type ContextMenuState } from './ContextMenuState';
+import { SliceOverlay } from './SliceOverlay';
 import { RenameModal } from '../RenameModal';
 import { ConfirmDeleteModal } from '../ConfirmDeleteModal';
 import { GRID_SIZE, NOTE_SIZE, COMMAND_NODE_COLOR, DOMAIN_EVENT_NODE_COLOR, READ_MODEL_NODE_COLOR, POLICY_NODE_COLOR, UI_SCREEN_NODE_COLOR, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
@@ -65,14 +66,15 @@ const nodeTypes = {
 function GridCanvasInner() {
   const board = useBoard();
   const links = useLinks();
+  const slices = useSlices();
   const boundedContexts = useBoundedContexts();
   const { createBoundedContext, renameBoundedContext, deleteBoundedContext } = useBoundedContextActions();
   const { addDomainEventNode, addNodeWithAutoLinks, moveNode, addLink, removeLink, selectNode, deselectNode } = useBoardActions();
   const { screenToFlowPosition } = useReactFlow();
   const viewport = useViewport();
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
-  const selectedColumns = useSelectedColumns();
-  const { selectColumns, clearColumnSelection } = useColumnSelectionActions();
+  const selectedSliceRange = useSelectedSliceRange();
+  const { startSliceSelection, extendSelectedSliceRangeRight, clearSliceSelection } = useColumnSelectionActions();
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 800, height: 600 });
   const [editingBoundedContextId, setEditingBoundedContextId] = useState<string | null>(null);
@@ -359,25 +361,15 @@ function GridCanvasInner() {
     [selectNode]
   );
 
-  // Click on the pane: close context menu and deselect node (or toggle column selection with Alt key)
+  // Click on the pane: close context menu, deselect the node and start slice range selection.
   const onPaneClick = useCallback((event: React.MouseEvent) => {
     setContextMenu(null);
-    if (event.altKey) {
-      const flowPosition = screenToFlowPosition({ x: event.clientX, y: event.clientY });
-      const { column } = pixelToGrid(flowPosition.x, flowPosition.y);
-      const already = selectedColumns.includes(column);
-      if (already) {
-        selectColumns(selectedColumns.filter((c) => c !== column));
-      } else if (selectedColumns.length < 2) {
-        selectColumns([...selectedColumns, column]);
-      } else {
-        selectColumns([selectedColumns[1], column]);
-      }
-      return;
-    }
-    clearColumnSelection();
+    clearSliceSelection();
+    const flowPosition = screenToFlowPosition({ x: event.clientX, y: event.clientY });
+    const { column } = pixelToGrid(flowPosition.x, flowPosition.y);
+    startSliceSelection(column);
     deselectNode();
-  }, [deselectNode, screenToFlowPosition, selectedColumns, selectColumns, clearColumnSelection]);
+  }, [clearSliceSelection, deselectNode, screenToFlowPosition, startSliceSelection]);
 
   const addEventAtPosition = useCallback(
     (column: number, row: number) => {
@@ -459,6 +451,47 @@ function GridCanvasInner() {
     ];
   }, [contextMenu, addEventAtPosition, addNodeAtPosition]);
 
+  const sliceOverlayEntries = useMemo(() => {
+    const entries: Array<{
+      id: string;
+      label: string;
+      startColumn: number;
+      columnCount: number;
+      canExtendRight: boolean;
+    }> = [];
+
+    slices.describeTo({
+      onSlice(id, name, _commandId, _eventIds, _readModelId, _scenarios, _boundedContextId, startColumn, columnCount) {
+        const nextColumn = startColumn + columnCount;
+        entries.push({
+          id,
+          label: name,
+          startColumn,
+          columnCount,
+          canExtendRight: !slices.isColumnCovered(nextColumn, id),
+        });
+      },
+    });
+
+    return entries;
+  }, [slices]);
+
+  const visibleColumns = useMemo(() => {
+    const columns = new Set<number>();
+
+    viewportCells.forEach((cell) => {
+      columns.add(cell.column);
+    });
+
+    if (columns.size === 0) {
+      for (let column = 0; column <= 20; column += 1) {
+        columns.add(column);
+      }
+    }
+
+    return [...columns].sort((left, right) => left - right);
+  }, [viewportCells]);
+
   return (
     <div
       style={{ width: '100%', height: '100%', position: 'relative', display: 'flex' }}
@@ -515,21 +548,52 @@ function GridCanvasInner() {
             position="bottom-left"
           />
         </ReactFlow>
-        {selectedColumns.length > 0 && (
-          <div className="column-selection-overlay" aria-hidden="true">
-            {selectedColumns.map((col) => {
-              const x = col * GRID_SIZE * viewport.zoom + viewport.x;
-              const width = GRID_SIZE * viewport.zoom;
-              return (
-                <div
-                  key={col}
-                  className="column-selection-highlight"
-                  style={{ left: x, width }}
-                />
-              );
-            })}
-          </div>
-        )}
+        <div className="slice-column-hitbox-layer" aria-hidden="true">
+          {visibleColumns.map((column) => {
+            const left = column * GRID_SIZE * viewport.zoom + viewport.x;
+            const width = GRID_SIZE * viewport.zoom;
+
+            return (
+              <button
+                key={column}
+                type="button"
+                data-testid={`slice-column-hitbox-${column}`}
+                className="slice-column-hitbox"
+                style={{ left, width }}
+                onClick={() => startSliceSelection(column)}
+              />
+            );
+          })}
+        </div>
+        <div className="slice-overlay-layer" aria-hidden="true">
+          {sliceOverlayEntries.map((entry) => (
+            <SliceOverlay
+              key={entry.id}
+              id={entry.id}
+              label={entry.label}
+              startColumn={entry.startColumn}
+              columnCount={entry.columnCount}
+              viewport={viewport}
+              topOffset={32}
+              height={containerSize.height - 40}
+              canExtendRight={entry.canExtendRight}
+            />
+          ))}
+          {selectedSliceRange && (
+            <SliceOverlay
+              id="temporary-selection"
+              label={`Columns ${selectedSliceRange.startColumn}-${selectedSliceRange.startColumn + selectedSliceRange.columnCount - 1}`}
+              startColumn={selectedSliceRange.startColumn}
+              columnCount={selectedSliceRange.columnCount}
+              viewport={viewport}
+              topOffset={32}
+              height={containerSize.height - 40}
+              isTemporary
+              canExtendRight={!slices.isColumnCovered(selectedSliceRange.startColumn + selectedSliceRange.columnCount)}
+              onExtendRight={extendSelectedSliceRangeRight}
+            />
+          )}
+        </div>
         {contextMenu && (
           <ContextMenu
             x={contextMenu.x}

@@ -20,6 +20,7 @@ const BOARD_WITH_EXISTING_SLICE = {
   links: [],
   slices: [
     { id: 'vs-1', name: 'Existing Slice', commandId: 'cmd-1', eventIds: ['evt-1'], readModelId: '', scenarios: [], startColumn: 2, columnCount: 2 },
+    { id: 'vs-2', name: 'Blocking Slice', commandId: 'cmd-2', eventIds: ['evt-2'], readModelId: '', scenarios: [], startColumn: 4, columnCount: 1 },
   ],
   boundedContexts: [{ id: 'default-bc', name: 'Bounded Context 1' }],
   nodeProperties: {},
