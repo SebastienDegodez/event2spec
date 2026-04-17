@@ -352,9 +352,9 @@ test.describe('GridCanvas — Contiguous Slice Selection', () => {
     await expect(page.getByTestId('slice-selection-header')).toHaveCount(0);
   });
 
-  test('slice header right arrow is disabled when the next column is already covered', async ({ page }) => {
+  test('slice header shows a delete button for existing slices', async ({ page }) => {
     const sliceHeader = page.getByTestId('slice-header-vs-1');
-    await expect(sliceHeader.getByTestId('slice-header-extend-right')).toBeDisabled();
+    await expect(sliceHeader.getByTestId('slice-header-delete')).toBeEnabled();
   });
 
   test('slice header edit button opens the slice inspector on the right', async ({ page }) => {
