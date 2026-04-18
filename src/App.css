@@ -2052,6 +2052,7 @@
   border: 0;
   background: transparent;
   cursor: pointer;
+  z-index: 1;
 }
 
 .slice-overlay {
