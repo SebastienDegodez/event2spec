@@ -39,6 +39,7 @@ import { buildReactFlowNodes } from './buildReactFlowNodes';
 import { canvasNodeTypes } from './canvasNodeTypes';
 import { GRID_SIZE, NOTE_SIZE, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 import { useViewportCells } from '../../hooks/useViewportCells';
+import { useBoundedContextModals } from '../../hooks/useBoundedContextModals';
 
 const ROW_BACKGROUND_OFFSET_X = 0;
 const FIXED_ROWS: readonly number[] = [0, 1] as const;
@@ -59,63 +60,20 @@ function GridCanvasInner() {
   const { startSliceSelection, extendSelectedSliceRangeRight, clearSliceSelection } = useColumnSelectionActions();
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 800, height: 600 });
-  const [editingBoundedContextId, setEditingBoundedContextId] = useState<string | null>(null);
-  const [editingBoundedContextName, setEditingBoundedContextName] = useState('');
-  const [deleteConfirmingBcId, setDeleteConfirmingBcId] = useState<string | null>(null);
-  const [deleteConfirmingBcName, setDeleteConfirmingBcName] = useState('');
 
-  const handleDeleteBoundedContext = useCallback((id: string) => {
-    deleteBoundedContext(id);
-    if (editingBoundedContextId === id) {
-      setEditingBoundedContextId(null);
-      setEditingBoundedContextName('');
-    }
-  }, [deleteBoundedContext, editingBoundedContextId]);
-
-  const handleStartRenameBoundedContext = useCallback((id: string, currentName: string) => {
-    setEditingBoundedContextId(id);
-    setEditingBoundedContextName(currentName);
-  }, []);
-
-  const handleStartDeleteBoundedContext = useCallback((id: string, name: string, domainEventCount: number) => {
-    if (domainEventCount === 0) {
-      handleDeleteBoundedContext(id);
-      return;
-    }
-    setDeleteConfirmingBcId(id);
-    setDeleteConfirmingBcName(name);
-  }, [handleDeleteBoundedContext]);
-
-  const handleConfirmDeleteBoundedContext = useCallback(() => {
-    if (deleteConfirmingBcId) {
-      handleDeleteBoundedContext(deleteConfirmingBcId);
-    }
-    setDeleteConfirmingBcId(null);
-    setDeleteConfirmingBcName('');
-  }, [deleteConfirmingBcId, handleDeleteBoundedContext]);
-
-  const handleCancelDeleteBoundedContext = useCallback(() => {
-    setDeleteConfirmingBcId(null);
-    setDeleteConfirmingBcName('');
-  }, []);
-
-  const handleConfirmRenameBoundedContext = useCallback((newName: string) => {
-    if (editingBoundedContextId) {
-      renameBoundedContext(editingBoundedContextId, newName);
-    }
-    setEditingBoundedContextId(null);
-    setEditingBoundedContextName('');
-  }, [editingBoundedContextId, renameBoundedContext]);
-
-  const handleCancelRenameBoundedContext = useCallback(() => {
-    setEditingBoundedContextId(null);
-    setEditingBoundedContextName('');
-  }, []);
-
-  const handleCreateBoundedContext = useCallback((insertIndex?: number) => {
-    const baseName = 'New Bounded Context';
-    createBoundedContext(`bc-${crypto.randomUUID()}`, baseName, insertIndex);
-  }, [createBoundedContext]);
+  const {
+    editingBoundedContextId,
+    editingBoundedContextName,
+    deleteConfirmingBcId,
+    deleteConfirmingBcName,
+    handleStartRenameBoundedContext,
+    handleStartDeleteBoundedContext,
+    handleConfirmRenameBoundedContext,
+    handleCancelRenameBoundedContext,
+    handleConfirmDeleteBoundedContext,
+    handleCancelDeleteBoundedContext,
+    handleCreateBoundedContext,
+  } = useBoundedContextModals({ deleteBoundedContext, renameBoundedContext, createBoundedContext });
 
   useEffect(() => {
     const el = containerRef.current;

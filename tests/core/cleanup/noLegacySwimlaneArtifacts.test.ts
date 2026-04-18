@@ -156,6 +156,13 @@ describe('legacy swimlane cleanup', () => {
     expect(gridCanvas.includes('const createFlowNode = (')).toBe(false);
   });
 
+  it('extracts bounded context modals hook into a dedicated hook', () => {
+    expect(existsSync(pathInRepo('src/ui/hooks/useBoundedContextModals.ts'))).toBe(true);
+
+    const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
+    expect(gridCanvas.includes('setRenamingBoundedContext') || gridCanvas.includes('setEditingBoundedContextId')).toBe(false);
+  });
+
   it('extracts react flow nodes builder into a dedicated helper', () => {
     expect(existsSync(pathInRepo('src/ui/components/Canvas/buildReactFlowNodes.ts'))).toBe(true);
 
