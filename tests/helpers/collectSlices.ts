@@ -1,5 +1,5 @@
-import { VerticalSliceCollection } from '../../src/core/domain/VerticalSliceCollection';
-import { type VerticalSliceProjection, type ScenarioProjection } from '../../src/core/domain/VerticalSliceProjection';
+import { VerticalSliceCollection } from '../../src/core/domain/vertical-slice/VerticalSliceCollection';
+import { type VerticalSliceProjection, type ScenarioProjection } from '../../src/core/domain/vertical-slice/VerticalSliceProjection';
 
 export interface CollectedSlice {
   id: string;

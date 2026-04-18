@@ -1,5 +1,5 @@
-import { BoundedContextCollection } from '../../src/core/domain/BoundedContextCollection';
-import { type BoundedContextProjection } from '../../src/core/domain/BoundedContextProjection';
+import { BoundedContextCollection } from '../../src/core/domain/bounded-context/BoundedContextCollection';
+import { type BoundedContextProjection } from '../../src/core/domain/bounded-context/BoundedContextProjection';
 
 export interface CollectedBoundedContext {
   id: string;

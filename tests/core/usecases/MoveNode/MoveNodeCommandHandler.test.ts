@@ -1,20 +1,22 @@
 import { describe, it, expect } from 'vitest';
-import { GridBoard } from '../../../../src/core/domain/GridBoard';
+import { GridBoard } from '../../../../src/core/domain/board/GridBoard';
 import { AddDomainEventNodeCommand } from '../../../../src/core/usecases/commands/AddDomainEventNode/AddDomainEventNodeCommand';
 import { AddDomainEventNodeCommandHandler } from '../../../../src/core/usecases/commands/AddDomainEventNode/AddDomainEventNodeCommandHandler';
 import { MoveNodeCommand } from '../../../../src/core/usecases/commands/MoveNode/MoveNodeCommand';
 import { MoveNodeCommandHandler } from '../../../../src/core/usecases/commands/MoveNode/MoveNodeCommandHandler';
 import { collectNodes } from '../../../helpers/collectNodes';
-
-const addHandler = new AddDomainEventNodeCommandHandler();
-const handler = new MoveNodeCommandHandler();
+import { InMemoryGridBoardRepository } from '../../../helpers/InMemoryGridBoardRepository';
 
 describe('MoveNodeCommandHandler', () => {
   it('moves a node to a new position', () => {
     // domain events are valid only in row >= 2 (bounded context rows)
-    const board = addHandler.handle(GridBoard.empty(), new AddDomainEventNodeCommand('a', 'A', 0, 2));
+    const repository = new InMemoryGridBoardRepository(GridBoard.empty());
+    const addHandler = new AddDomainEventNodeCommandHandler(repository);
+    addHandler.handle(new AddDomainEventNodeCommand('a', 'A', 0, 2));
+    const handler = new MoveNodeCommandHandler(repository);
 
-    const result = handler.handle(board, new MoveNodeCommand('a', 2, 2));
+    handler.handle(new MoveNodeCommand('a', 2, 2));
+    const result = repository.load();
     const nodes = collectNodes(result);
     const moved = nodes.find((n) => n.id === 'a');
 
@@ -23,12 +25,17 @@ describe('MoveNodeCommandHandler', () => {
   });
 
   it('resolves collisions when moving to an occupied position', () => {
-    const board = [
+    const repository = new InMemoryGridBoardRepository(GridBoard.empty());
+    const addHandler = new AddDomainEventNodeCommandHandler(repository);
+
+    [
       new AddDomainEventNodeCommand('a', 'A', 0, 2),
       new AddDomainEventNodeCommand('b', 'B', 1, 2),
-    ].reduce((b, cmd) => addHandler.handle(b, cmd), GridBoard.empty());
+    ].forEach((command) => addHandler.handle(command));
+    const handler = new MoveNodeCommandHandler(repository);
 
-    const result = handler.handle(board, new MoveNodeCommand('a', 1, 2));
+    handler.handle(new MoveNodeCommand('a', 1, 2));
+    const result = repository.load();
     const nodes = collectNodes(result);
 
     const nodeA = nodes.find((n) => n.id === 'a');
@@ -41,12 +48,17 @@ describe('MoveNodeCommandHandler', () => {
   });
 
   it('does not shift nodes when moving to an unoccupied position on the same row', () => {
-    const board = [
+    const repository = new InMemoryGridBoardRepository(GridBoard.empty());
+    const addHandler = new AddDomainEventNodeCommandHandler(repository);
+
+    [
       new AddDomainEventNodeCommand('a', 'A', 0, 2),
       new AddDomainEventNodeCommand('b', 'B', 2, 2),
-    ].reduce((b, cmd) => addHandler.handle(b, cmd), GridBoard.empty());
+    ].forEach((command) => addHandler.handle(command));
+    const handler = new MoveNodeCommandHandler(repository);
 
-    const result = handler.handle(board, new MoveNodeCommand('a', 1, 2));
+    handler.handle(new MoveNodeCommand('a', 1, 2));
+    const result = repository.load();
     const nodes = collectNodes(result);
 
     const nodeA = nodes.find((n) => n.id === 'a');
@@ -59,9 +71,13 @@ describe('MoveNodeCommandHandler', () => {
   });
 
   it('leaves the board unchanged when moving an unknown id', () => {
-    const board = addHandler.handle(GridBoard.empty(), new AddDomainEventNodeCommand('a', 'A', 0, 2));
+    const repository = new InMemoryGridBoardRepository(GridBoard.empty());
+    const addHandler = new AddDomainEventNodeCommandHandler(repository);
+    addHandler.handle(new AddDomainEventNodeCommand('a', 'A', 0, 2));
+    const handler = new MoveNodeCommandHandler(repository);
 
-    const result = handler.handle(board, new MoveNodeCommand('unknown', 1, 2));
+    handler.handle(new MoveNodeCommand('unknown', 1, 2));
+    const result = repository.load();
 
     expect(collectNodes(result)).toHaveLength(1);
   });

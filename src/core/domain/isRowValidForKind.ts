@@ -1,4 +1,4 @@
-import { type NodeKind } from './NodeKind';
+import { type NodeKind } from './node/NodeKind';
 
 export function isRowValidForKind(kind: NodeKind, row: number): boolean {
   if (kind === 'uiScreen') return row === 0;

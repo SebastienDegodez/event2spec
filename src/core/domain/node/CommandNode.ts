@@ -1,6 +1,6 @@
-import { BoardNode } from './BoardNode';
-import type { BoardProjection } from './BoardProjection';
-import { GridPosition } from './GridPosition';
+import { BoardNode } from '../board/BoardNode';
+import type { BoardProjection } from '../board/BoardProjection';
+import { GridPosition } from '../board/GridPosition';
 
 export class CommandNode extends BoardNode {
   constructor(id: string, label: string, position: GridPosition) {

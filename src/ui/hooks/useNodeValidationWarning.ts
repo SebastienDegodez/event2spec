@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useValidationWarnings } from './useValidationWarnings';
-import { type ValidationWarningType } from '../../core/domain/ValidationWarningType';
+import { type ValidationWarningType } from '../../core/domain/validation/ValidationWarningType';
 
 export function useNodeValidationWarning(nodeId: string): ValidationWarningType | null {
   const warnings = useValidationWarnings();

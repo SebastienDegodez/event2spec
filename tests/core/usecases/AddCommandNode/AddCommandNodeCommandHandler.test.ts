@@ -1,19 +1,29 @@
 import { describe, it, expect } from 'vitest';
-import { GridBoard } from '../../../../src/core/domain/GridBoard';
+import { GridBoard } from '../../../../src/core/domain/board/GridBoard';
 import { AddDomainEventNodeCommand } from '../../../../src/core/usecases/commands/AddDomainEventNode/AddDomainEventNodeCommand';
 import { AddDomainEventNodeCommandHandler } from '../../../../src/core/usecases/commands/AddDomainEventNode/AddDomainEventNodeCommandHandler';
 import { AddCommandNodeCommand } from '../../../../src/core/usecases/commands/AddCommandNode/AddCommandNodeCommand';
 import { AddCommandNodeCommandHandler } from '../../../../src/core/usecases/commands/AddCommandNode/AddCommandNodeCommandHandler';
 import { collectNodes } from '../../../helpers/collectNodes';
 
-const addEventHandler = new AddDomainEventNodeCommandHandler();
-const handler = new AddCommandNodeCommandHandler();
+function createBoardRepository(initial: GridBoard = GridBoard.empty()) {
+  let board = initial;
+  return {
+    load: () => board,
+    save: (next: GridBoard) => {
+      board = next;
+    },
+  };
+}
 
 describe('AddCommandNodeCommandHandler', () => {
   it('places a command node on the board at the requested position', () => {
-    const board = GridBoard.empty();
-    const result = handler.handle(board, new AddCommandNodeCommand('c1', 'PlaceOrder', 2, 0, 'e1'));
+    const repository = createBoardRepository();
+    const handler = new AddCommandNodeCommandHandler(repository);
 
+    handler.handle(new AddCommandNodeCommand('c1', 'PlaceOrder', 2, 0, 'e1'));
+
+    const result = repository.load();
     const nodes = collectNodes(result);
     const placed = nodes[0];
 
@@ -25,12 +35,15 @@ describe('AddCommandNodeCommandHandler', () => {
   });
 
   it('places a command node above a domain event on the same grid', () => {
-    const board = addEventHandler.handle(
-      GridBoard.empty(),
-      new AddDomainEventNodeCommand('e1', 'OrderPlaced', 2, 1)
-    );
+    const repository = createBoardRepository();
+    const addEventHandler = new AddDomainEventNodeCommandHandler(repository);
+    const handler = new AddCommandNodeCommandHandler(repository);
 
-    const result = handler.handle(board, new AddCommandNodeCommand('c1', 'PlaceOrder', 2, 0, 'e1'));
+    addEventHandler.handle(new AddDomainEventNodeCommand('e1', 'OrderPlaced', 2, 1));
+
+    handler.handle(new AddCommandNodeCommand('c1', 'PlaceOrder', 2, 0, 'e1'));
+
+    const result = repository.load();
     const nodes = collectNodes(result);
 
     const event = nodes.find((n) => n.id === 'e1');
@@ -45,12 +58,14 @@ describe('AddCommandNodeCommandHandler', () => {
   });
 
   it('shifts existing nodes in the same row when inserting at an occupied position', () => {
-    const board = handler.handle(
-      GridBoard.empty(),
-      new AddCommandNodeCommand('c1', 'Existing', 2, 0, 'e1')
-    );
+    const repository = createBoardRepository();
+    const handler = new AddCommandNodeCommandHandler(repository);
 
-    const result = handler.handle(board, new AddCommandNodeCommand('c2', 'New', 2, 0, 'e2'));
+    handler.handle(new AddCommandNodeCommand('c1', 'Existing', 2, 0, 'e1'));
+
+    handler.handle(new AddCommandNodeCommand('c2', 'New', 2, 0, 'e2'));
+
+    const result = repository.load();
     const nodes = collectNodes(result);
 
     const existing = nodes.find((n) => n.id === 'c1');
@@ -63,12 +78,13 @@ describe('AddCommandNodeCommandHandler', () => {
   });
 
   it('does not mutate the original board', () => {
-    const board = handler.handle(
-      GridBoard.empty(),
-      new AddCommandNodeCommand('c1', 'X', 0, 0, 'e1')
-    );
-    handler.handle(board, new AddCommandNodeCommand('c2', 'Y', 0, 0, 'e2'));
+    const initialBoard = GridBoard.empty();
+    const repository = createBoardRepository(initialBoard);
+    const handler = new AddCommandNodeCommandHandler(repository);
 
-    expect(collectNodes(board)).toHaveLength(1);
+    handler.handle(new AddCommandNodeCommand('c1', 'X', 0, 0, 'e1'));
+    handler.handle(new AddCommandNodeCommand('c2', 'Y', 0, 0, 'e2'));
+
+    expect(collectNodes(initialBoard)).toHaveLength(0);
   });
 });

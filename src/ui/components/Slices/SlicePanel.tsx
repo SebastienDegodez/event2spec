@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useSlices } from '../../../core/store/useBoardStore';
-import { type VerticalSliceProjection } from '../../../core/domain/VerticalSliceProjection';
+import { type VerticalSliceProjection } from '../../../core/domain/vertical-slice/VerticalSliceProjection';
 
 interface SlicePanelEntry {
   id: string;

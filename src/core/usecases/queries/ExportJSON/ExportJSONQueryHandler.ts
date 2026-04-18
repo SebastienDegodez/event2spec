@@ -1,14 +1,58 @@
-import { GridBoard } from '../../../domain/GridBoard';
-import { type BoardProjection } from '../../../domain/BoardProjection';
+import { GridBoard } from '../../../domain/board/GridBoard';
+import { type BoardProjection } from '../../../domain/board/BoardProjection';
 import { type EventModel, type DomainEventEntry, type CommandEntry, type ReadModelEntry, type PolicyEntry, type UIScreenEntry, type VerticalSlice as VerticalSliceSchema, type Scenario as ScenarioSchema } from '../../../domain/EventModelSchema';
-import { type NodeLink } from '../../../domain/NodeLink';
-import { type NodeProperties } from '../../../domain/NodeProperties';
-import { VerticalSliceCollection } from '../../../domain/VerticalSliceCollection';
+import { type NodeLink } from '../../../domain/node/NodeLink';
+import { type NodeProperties } from '../../../domain/node/NodeProperties';
+import { VerticalSliceCollection } from '../../../domain/vertical-slice/VerticalSliceCollection';
 import { ExportJSONQuery } from './ExportJSONQuery';
 
+export interface ExportJSONQueryRepository {
+  loadBoard(): GridBoard;
+  loadLinks(): ReadonlyArray<NodeLink>;
+  loadSlices(): VerticalSliceCollection;
+  loadNodeProperties(): Record<string, NodeProperties>;
+}
+
 export class ExportJSONQueryHandler {
-  handle(board: GridBoard, links: ReadonlyArray<NodeLink>, slices: VerticalSliceCollection, nodeProperties: Record<string, NodeProperties>, query: ExportJSONQuery): string {
-    void query;
+  private readonly repository: ExportJSONQueryRepository | undefined;
+
+  constructor(repository?: ExportJSONQueryRepository) {
+    this.repository = repository;
+  }
+
+  handle(query: ExportJSONQuery): string;
+  handle(board: GridBoard, links: ReadonlyArray<NodeLink>, slices: VerticalSliceCollection, nodeProperties: Record<string, NodeProperties>, query: ExportJSONQuery): string;
+  handle(
+    boardOrQuery: GridBoard | ExportJSONQuery,
+    links?: ReadonlyArray<NodeLink>,
+    slices?: VerticalSliceCollection,
+    nodeProperties?: Record<string, NodeProperties>,
+    query?: ExportJSONQuery,
+  ): string {
+    let board: GridBoard;
+    let resolvedLinks: ReadonlyArray<NodeLink>;
+    let resolvedSlices: VerticalSliceCollection;
+    let resolvedNodeProperties: Record<string, NodeProperties>;
+    let resolvedQuery: ExportJSONQuery;
+
+    if (boardOrQuery instanceof ExportJSONQuery) {
+      if (!this.repository) {
+        throw new Error('ExportJSONQueryRepository is required when calling handle(query)');
+      }
+      board = this.repository.loadBoard();
+      resolvedLinks = this.repository.loadLinks();
+      resolvedSlices = this.repository.loadSlices();
+      resolvedNodeProperties = this.repository.loadNodeProperties();
+      resolvedQuery = boardOrQuery;
+    } else {
+      board = boardOrQuery;
+      resolvedLinks = links ?? [];
+      resolvedSlices = slices ?? VerticalSliceCollection.empty();
+      resolvedNodeProperties = nodeProperties ?? {};
+      resolvedQuery = query ?? new ExportJSONQuery();
+    }
+
+    void resolvedQuery;
 
     const domainEvents: DomainEventEntry[] = [];
     const commands: CommandEntry[] = [];
@@ -17,14 +61,14 @@ export class ExportJSONQueryHandler {
     const uiScreens: UIScreenEntry[] = [];
 
     const triggersLinks = new Map<string, string>(
-      links.filter((l) => l.connectionType === 'triggers').map((l) => [l.sourceNodeId, l.targetNodeId])
+      resolvedLinks.filter((l) => l.connectionType === 'triggers').map((l) => [l.sourceNodeId, l.targetNodeId])
     );
     const feedsLinks = new Map<string, string[]>();
     const policyCommandLinks = new Map<string, string>();
     const uiScreenCommandLinks = new Map<string, string>();
     const readModelScreenLinks = new Map<string, string>();
 
-    for (const link of links) {
+    for (const link of resolvedLinks) {
       if (link.connectionType === 'feeds') {
         const existing = feedsLinks.get(link.targetNodeId) ?? [];
         feedsLinks.set(link.targetNodeId, [...existing, link.sourceNodeId]);
@@ -41,7 +85,7 @@ export class ExportJSONQueryHandler {
 
     const projection: BoardProjection = {
       onDomainEventNode(id, label, column, _row, boundedContextId) {
-        const props = nodeProperties[id];
+        const props = resolvedNodeProperties[id];
         domainEvents.push({
           id,
           name: label,
@@ -52,7 +96,7 @@ export class ExportJSONQueryHandler {
         });
       },
       onCommandNode(id, label, column) {
-        const props = nodeProperties[id];
+        const props = resolvedNodeProperties[id];
         commands.push({
           id,
           name: label,
@@ -64,7 +108,7 @@ export class ExportJSONQueryHandler {
         });
       },
       onReadModelNode(id, label, column) {
-        const props = nodeProperties[id];
+        const props = resolvedNodeProperties[id];
         readModels.push({
           id,
           name: label,
@@ -75,7 +119,7 @@ export class ExportJSONQueryHandler {
         });
       },
       onPolicyNode(id, label, column) {
-        const props = nodeProperties[id];
+        const props = resolvedNodeProperties[id];
         policies.push({
           id,
           name: label,
@@ -86,7 +130,7 @@ export class ExportJSONQueryHandler {
         });
       },
       onUIScreenNode(id, label, column) {
-        const props = nodeProperties[id];
+        const props = resolvedNodeProperties[id];
         uiScreens.push({
           id,
           name: label,
@@ -101,7 +145,7 @@ export class ExportJSONQueryHandler {
     board.describeTo(projection);
 
     const exportedSlices: VerticalSliceSchema[] = [];
-    slices.describeTo({
+    resolvedSlices.describeTo({
       onSlice(_id, name, commandId, eventIds, readModelId, scenarios) {
         const exportedScenarios: ScenarioSchema[] = scenarios.map((s) => ({
           given: [...s.given],

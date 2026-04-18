@@ -1,5 +1,5 @@
-import { GridBoard } from '../../src/core/domain/GridBoard';
-import { type BoardProjection } from '../../src/core/domain/BoardProjection';
+import { GridBoard } from '../../src/core/domain/board/GridBoard';
+import { type BoardProjection } from '../../src/core/domain/board/BoardProjection';
 
 export interface CollectedNode {
   id: string;

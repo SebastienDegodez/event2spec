@@ -1,5 +1,5 @@
 import { type ConnectionType } from './ConnectionType';
-import { type NodeKind } from './NodeKind';
+import { type NodeKind } from './node/NodeKind';
 
 /**
  * Returns the semantic connection type for the given source → target node kinds,

@@ -1,19 +1,21 @@
 import { describe, it, expect } from 'vitest';
-import { GridBoard } from '../../../../src/core/domain/GridBoard';
+import { GridBoard } from '../../../../src/core/domain/board/GridBoard';
 import { AddDomainEventNodeCommand } from '../../../../src/core/usecases/commands/AddDomainEventNode/AddDomainEventNodeCommand';
 import { AddDomainEventNodeCommandHandler } from '../../../../src/core/usecases/commands/AddDomainEventNode/AddDomainEventNodeCommandHandler';
 import { UpdateNodeLabelCommand } from '../../../../src/core/usecases/commands/UpdateNodeLabel/UpdateNodeLabelCommand';
 import { UpdateNodeLabelCommandHandler } from '../../../../src/core/usecases/commands/UpdateNodeLabel/UpdateNodeLabelCommandHandler';
 import { collectNodes } from '../../../helpers/collectNodes';
-
-const addHandler = new AddDomainEventNodeCommandHandler();
-const handler = new UpdateNodeLabelCommandHandler();
+import { InMemoryGridBoardRepository } from '../../../helpers/InMemoryGridBoardRepository';
 
 describe('UpdateNodeLabelCommandHandler', () => {
   it('updates the label of an existing node', () => {
-    const board = addHandler.handle(GridBoard.empty(), new AddDomainEventNodeCommand('n1', 'OldLabel', 0, 0));
+    const repository = new InMemoryGridBoardRepository(GridBoard.empty());
+    const addHandler = new AddDomainEventNodeCommandHandler(repository);
+    addHandler.handle(new AddDomainEventNodeCommand('n1', 'OldLabel', 0, 0));
+    const handler = new UpdateNodeLabelCommandHandler(repository);
 
-    const result = handler.handle(board, new UpdateNodeLabelCommand('n1', 'NewLabel'));
+    handler.handle(new UpdateNodeLabelCommand('n1', 'NewLabel'));
+    const result = repository.load();
     const nodes = collectNodes(result);
     const updated = nodes[0];
 
@@ -21,12 +23,17 @@ describe('UpdateNodeLabelCommandHandler', () => {
   });
 
   it('leaves other nodes unchanged when updating a label', () => {
-    const board = [
+    const repository = new InMemoryGridBoardRepository(GridBoard.empty());
+    const addHandler = new AddDomainEventNodeCommandHandler(repository);
+
+    [
       new AddDomainEventNodeCommand('n1', 'First', 0, 0),
       new AddDomainEventNodeCommand('n2', 'Second', 1, 0),
-    ].reduce((b, cmd) => addHandler.handle(b, cmd), GridBoard.empty());
+    ].forEach((command) => addHandler.handle(command));
+    const handler = new UpdateNodeLabelCommandHandler(repository);
 
-    const result = handler.handle(board, new UpdateNodeLabelCommand('n1', 'Updated'));
+    handler.handle(new UpdateNodeLabelCommand('n1', 'Updated'));
+    const result = repository.load();
     const nodes = collectNodes(result);
 
     const n1 = nodes.find((n) => n.id === 'n1');
