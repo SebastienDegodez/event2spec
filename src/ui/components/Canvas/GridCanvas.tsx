@@ -35,8 +35,9 @@ import { BoundedContextModalLayer } from './BoundedContextModalLayer';
 import { CanvasFlowDecorations } from './CanvasFlowDecorations';
 import { buildBoundedContextRowRenderData } from './buildBoundedContextRowRenderData';
 import { buildBoardRenderData } from './buildBoardRenderData';
+import { buildReactFlowEdges } from './buildReactFlowEdges';
 import { canvasNodeTypes } from './canvasNodeTypes';
-import { GRID_SIZE, NOTE_SIZE, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
+import { GRID_SIZE, NOTE_SIZE, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 import { useViewportCells } from '../../hooks/useViewportCells';
 
 const ROW_BACKGROUND_OFFSET_X = 0;
@@ -188,32 +189,7 @@ function GridCanvasInner() {
 
   // Create edges from links
   const reactFlowEdges = useMemo<Edge[]>(
-    () => {
-      const HANDLE_MAP: Record<string, { sourceHandle: string; targetHandle: string }> = {
-        'triggers':        { sourceHandle: 'bottom',     targetHandle: 'top' },        // Command→DomainEvent ↓
-        'feeds':           { sourceHandle: 'top-out',    targetHandle: 'bottom' },     // DomainEvent→ReadModel ↑
-        'triggers policy': { sourceHandle: 'top-out',    targetHandle: 'bottom' },     // DomainEvent→Policy ↑
-        'executes':        { sourceHandle: 'right',      targetHandle: 'left' },       // Policy→Command →
-        'user action':     { sourceHandle: 'bottom-out', targetHandle: 'top' },        // UIScreen→Command ↓
-        'displays':        { sourceHandle: 'top',        targetHandle: 'bottom' },     // ReadModel→UIScreen ↑
-      };
-      return links.map((link) => {
-        const handles = HANDLE_MAP[link.connectionType] ?? { sourceHandle: null, targetHandle: null };
-        return {
-          id: `edge-${link.sourceNodeId}-${link.targetNodeId}`,
-          source: link.sourceNodeId,
-          target: link.targetNodeId,
-          sourceHandle: handles.sourceHandle,
-          targetHandle: handles.targetHandle,
-          type: 'default',
-          animated: true,
-          label: link.connectionType,
-          style: { stroke: EDGE_COLOR, strokeWidth: 2 },
-          labelStyle: { fill: '#fff', fontWeight: 600, fontSize: 11 },
-          labelBgStyle: { fill: 'rgba(30,30,40,0.75)', rx: 4 },
-        };
-      });
-    },
+    () => buildReactFlowEdges(links),
     [links]
   );
 
