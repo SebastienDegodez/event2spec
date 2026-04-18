@@ -45,4 +45,11 @@ describe('legacy swimlane cleanup', () => {
     const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
     expect(gridCanvas.includes('function FixedRowLabelColumn(')).toBe(false);
   });
+
+  it('extracts the slice header strip into a dedicated canvas component', () => {
+    expect(existsSync(pathInRepo('src/ui/components/Canvas/SliceHeaderStrip.tsx'))).toBe(true);
+
+    const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
+    expect(gridCanvas.includes('function SliceHeaderStrip(')).toBe(false);
+  });
 });
