@@ -1,5 +1,5 @@
 import { type GridBoardRepository } from '../../../domain/board/GridBoardRepository';
-import { UIScreenNode } from '../../../domain/UIScreenNode';
+import { UIScreenNode } from '../../../domain/node/UIScreenNode';
 import { AddUIScreenNodeCommand } from './AddUIScreenNodeCommand';
 
 export class AddUIScreenNodeCommandHandler {

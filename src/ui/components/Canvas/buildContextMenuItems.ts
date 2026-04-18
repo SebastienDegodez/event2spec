@@ -1,4 +1,4 @@
-import { type NodeKind } from '../../../core/domain/NodeKind';
+import { type NodeKind } from '../../../core/domain/node/NodeKind';
 import { cellNodeOptions } from '../../../core/domain/CellNodeOptions';
 import { type ContextMenuState } from './ContextMenuState';
 import { type ContextMenuItem } from './ContextMenuItem';

@@ -1,5 +1,5 @@
 import { type GridBoardRepository } from '../../../domain/board/GridBoardRepository';
-import { ReadModelNode } from '../../../domain/ReadModelNode';
+import { ReadModelNode } from '../../../domain/node/ReadModelNode';
 import { AddReadModelNodeCommand } from './AddReadModelNodeCommand';
 
 export class AddReadModelNodeCommandHandler {

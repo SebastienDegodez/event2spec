@@ -1,4 +1,4 @@
-import { type ConnectionType } from './ConnectionType';
+import { type ConnectionType } from '../ConnectionType';
 
 /** A directed, typed link between two board nodes. */
 export interface NodeLink {

@@ -1,5 +1,5 @@
 import { type GridBoardRepository } from '../../../domain/board/GridBoardRepository';
-import { DomainEventNode } from '../../../domain/DomainEventNode';
+import { DomainEventNode } from '../../../domain/node/DomainEventNode';
 import { AddDomainEventNodeCommand } from './AddDomainEventNodeCommand';
 
 export class AddDomainEventNodeCommandHandler {

@@ -1,6 +1,6 @@
 import { GridBoard } from '../../../domain/board/GridBoard';
 import { type BoardProjection } from '../../../domain/board/BoardProjection';
-import { type NodeLink } from '../../../domain/NodeLink';
+import { type NodeLink } from '../../../domain/node/NodeLink';
 import { type ValidationWarning } from '../../../domain/ValidationWarning';
 import { validateModel, type ValidatableNode } from '../../../domain/ModelValidator';
 import { ValidateModelQuery } from './ValidateModelQuery';

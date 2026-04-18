@@ -1,5 +1,5 @@
 import { type GridBoardRepository } from '../../../domain/board/GridBoardRepository';
-import { CommandNode } from '../../../domain/CommandNode';
+import { CommandNode } from '../../../domain/node/CommandNode';
 import { AddCommandNodeCommand } from './AddCommandNodeCommand';
 
 export class AddCommandNodeCommandHandler {

@@ -1,4 +1,4 @@
-import { type NodeKind } from './NodeKind';
+import { type NodeKind } from './node/NodeKind';
 
 /** Visual descriptor for a quick-add button inside a cell. */
 export interface CellNodeOption {

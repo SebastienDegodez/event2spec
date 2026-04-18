@@ -1,6 +1,6 @@
-import { BoardNode } from './board/BoardNode';
-import type { BoardProjection } from './board/BoardProjection';
-import { GridPosition } from './board/GridPosition';
+import { BoardNode } from '../board/BoardNode';
+import type { BoardProjection } from '../board/BoardProjection';
+import { GridPosition } from '../board/GridPosition';
 
 export class DomainEventNode extends BoardNode {
   readonly boundedContextId: string | undefined;

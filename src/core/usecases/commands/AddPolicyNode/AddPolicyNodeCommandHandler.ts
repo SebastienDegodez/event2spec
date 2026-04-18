@@ -1,5 +1,5 @@
 import { type GridBoardRepository } from '../../../domain/board/GridBoardRepository';
-import { PolicyNode } from '../../../domain/PolicyNode';
+import { PolicyNode } from '../../../domain/node/PolicyNode';
 import { AddPolicyNodeCommand } from './AddPolicyNodeCommand';
 
 export class AddPolicyNodeCommandHandler {

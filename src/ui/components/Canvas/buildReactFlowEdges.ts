@@ -1,5 +1,5 @@
 import { type Edge } from '@xyflow/react';
-import { type NodeLink } from '../../../core/domain/NodeLink';
+import { type NodeLink } from '../../../core/domain/node/NodeLink';
 import { EDGE_COLOR } from './gridConstants';
 
 const HANDLE_MAP: Record<string, { sourceHandle: string; targetHandle: string }> = {

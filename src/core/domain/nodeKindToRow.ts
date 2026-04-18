@@ -1,4 +1,4 @@
-import { type NodeKind } from './NodeKind';
+import { type NodeKind } from './node/NodeKind';
 
 export function nodeKindToRow(kind: NodeKind, bcIndex?: number): number {
   if (kind === 'uiScreen') return 0;

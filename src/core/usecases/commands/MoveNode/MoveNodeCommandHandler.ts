@@ -1,7 +1,7 @@
 import { type GridBoard } from '../../../domain/board/GridBoard';
 import { type GridBoardRepository } from '../../../domain/board/GridBoardRepository';
 import { isRowValidForKind } from '../../../domain/isRowValidForKind';
-import { type NodeKind } from '../../../domain/NodeKind';
+import { type NodeKind } from '../../../domain/node/NodeKind';
 import { MoveNodeCommand } from './MoveNodeCommand';
 
 export class MoveNodeCommandHandler {

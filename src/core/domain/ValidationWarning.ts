@@ -1,4 +1,4 @@
-import { type NodeKind } from './NodeKind';
+import { type NodeKind } from './node/NodeKind';
 import { type ValidationWarningType } from './ValidationWarningType';
 
 /** A completeness warning for a specific board node. */

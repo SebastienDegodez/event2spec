@@ -212,4 +212,15 @@ describe('legacy swimlane cleanup', () => {
     expect(existsSync(pathInRepo('src/core/domain/board/BoardProjection.ts'))).toBe(true);
     expect(existsSync(pathInRepo('src/core/domain/board/GridPosition.ts'))).toBe(true);
   });
+
+  it('groups node files under a dedicated domain subfolder', () => {
+    const nodeFiles = [
+      'DomainEventNode.ts', 'CommandNode.ts', 'ReadModelNode.ts',
+      'PolicyNode.ts', 'UIScreenNode.ts', 'NodeKind.ts', 'NodeLink.ts', 'NodeProperties.ts',
+    ];
+    for (const f of nodeFiles) {
+      expect(existsSync(pathInRepo(`src/core/domain/${f}`))).toBe(false);
+      expect(existsSync(pathInRepo(`src/core/domain/node/${f}`))).toBe(true);
+    }
+  });
 });

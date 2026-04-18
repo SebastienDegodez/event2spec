@@ -17,7 +17,7 @@ import '@xyflow/react/dist/style.css';
 
 import { useBoard, useBoardActions, useLinks, useSlices, useSliceActions, useSelectedSliceRange, useColumnSelectionActions, useBoundedContexts, useBoundedContextActions } from '../../../core/store/useBoardStore';
 import { type SwimlaneColor } from '../../../core/domain/SwimlaneColor';
-import { type NodeKind } from '../../../core/domain/NodeKind';
+import { type NodeKind } from '../../../core/domain/node/NodeKind';
 import { resolveConnectionType } from '../../../core/domain/resolveConnectionType';
 import { type DomainEventNodeData } from './DomainEventNode';
 import { ContextMenuLayer } from './ContextMenuLayer';

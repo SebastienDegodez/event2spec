@@ -1,8 +1,8 @@
 import { GridBoard } from '../../../domain/board/GridBoard';
 import { type BoardProjection } from '../../../domain/board/BoardProjection';
 import { type EventModel, type DomainEventEntry, type CommandEntry, type ReadModelEntry, type PolicyEntry, type UIScreenEntry, type VerticalSlice as VerticalSliceSchema, type Scenario as ScenarioSchema } from '../../../domain/EventModelSchema';
-import { type NodeLink } from '../../../domain/NodeLink';
-import { type NodeProperties } from '../../../domain/NodeProperties';
+import { type NodeLink } from '../../../domain/node/NodeLink';
+import { type NodeProperties } from '../../../domain/node/NodeProperties';
 import { VerticalSliceCollection } from '../../../domain/vertical-slice/VerticalSliceCollection';
 import { ExportJSONQuery } from './ExportJSONQuery';
 
