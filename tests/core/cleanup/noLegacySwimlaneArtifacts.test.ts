@@ -186,4 +186,16 @@ describe('legacy swimlane cleanup', () => {
     expect(existsSync(pathInRepo('src/core/domain/vertical-slice/VerticalSliceCollection.ts'))).toBe(true);
     expect(existsSync(pathInRepo('src/core/domain/vertical-slice/VerticalSliceProjection.ts'))).toBe(true);
   });
+
+  it('groups bounded context files under a dedicated domain subfolder', () => {
+    expect(existsSync(pathInRepo('src/core/domain/BoundedContext.ts'))).toBe(false);
+    expect(existsSync(pathInRepo('src/core/domain/BoundedContextCollection.ts'))).toBe(false);
+    expect(existsSync(pathInRepo('src/core/domain/BoundedContextProjection.ts'))).toBe(false);
+    expect(existsSync(pathInRepo('src/core/domain/BoundedContextRepository.ts'))).toBe(false);
+
+    expect(existsSync(pathInRepo('src/core/domain/bounded-context/BoundedContext.ts'))).toBe(true);
+    expect(existsSync(pathInRepo('src/core/domain/bounded-context/BoundedContextCollection.ts'))).toBe(true);
+    expect(existsSync(pathInRepo('src/core/domain/bounded-context/BoundedContextProjection.ts'))).toBe(true);
+    expect(existsSync(pathInRepo('src/core/domain/bounded-context/BoundedContextRepository.ts'))).toBe(true);
+  });
 });

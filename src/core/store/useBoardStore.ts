@@ -58,9 +58,9 @@ import { VerticalSliceCollection } from '../domain/vertical-slice/VerticalSliceC
 import { type VerticalSliceRepository } from '../domain/VerticalSliceRepository';
 import { VerticalSlice } from '../domain/vertical-slice/VerticalSlice';
 import { Scenario } from '../domain/Scenario';
-import { BoundedContextCollection } from '../domain/BoundedContextCollection';
-import { type BoundedContextRepository } from '../domain/BoundedContextRepository';
-import { BoundedContext } from '../domain/BoundedContext';
+import { BoundedContextCollection } from '../domain/bounded-context/BoundedContextCollection';
+import { type BoundedContextRepository } from '../domain/bounded-context/BoundedContextRepository';
+import { BoundedContext } from '../domain/bounded-context/BoundedContext';
 import { resolveAutoLinks, type BoardNodeSummary } from '../domain/resolveAutoLinks';
 
 export type { NodeLink };
