@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useBoard, useSlices, useSliceActions, useBoardStore } from '../../../core/store/useBoardStore';
 import { type BoardProjection } from '../../../core/domain/BoardProjection';
-import { type VerticalSliceProjection, type ScenarioProjection } from '../../../core/domain/VerticalSliceProjection';
+import { type VerticalSliceProjection, type ScenarioProjection } from '../../../core/domain/vertical-slice/VerticalSliceProjection';
 import { ScenarioDialog } from './ScenarioDialog';
 
 interface SliceInspectorEntry {

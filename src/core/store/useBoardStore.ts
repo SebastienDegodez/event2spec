@@ -54,9 +54,9 @@ import { ExportMarkdownQuery } from '../usecases/queries/ExportMarkdown/ExportMa
 import { ExportMarkdownQueryHandler } from '../usecases/queries/ExportMarkdown/ExportMarkdownQueryHandler';
 import { type NodeLink } from '../domain/NodeLink';
 import { type ConnectionType } from '../domain/ConnectionType';
-import { VerticalSliceCollection } from '../domain/VerticalSliceCollection';
+import { VerticalSliceCollection } from '../domain/vertical-slice/VerticalSliceCollection';
 import { type VerticalSliceRepository } from '../domain/VerticalSliceRepository';
-import { VerticalSlice } from '../domain/VerticalSlice';
+import { VerticalSlice } from '../domain/vertical-slice/VerticalSlice';
 import { Scenario } from '../domain/Scenario';
 import { BoundedContextCollection } from '../domain/BoundedContextCollection';
 import { type BoundedContextRepository } from '../domain/BoundedContextRepository';

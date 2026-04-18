@@ -1,5 +1,5 @@
 import { type VerticalSliceRepository } from '../../../domain/VerticalSliceRepository';
-import { VerticalSlice } from '../../../domain/VerticalSlice';
+import { VerticalSlice } from '../../../domain/vertical-slice/VerticalSlice';
 import { CreateSliceCommand } from './CreateSliceCommand';
 
 export class CreateSliceCommandHandler {

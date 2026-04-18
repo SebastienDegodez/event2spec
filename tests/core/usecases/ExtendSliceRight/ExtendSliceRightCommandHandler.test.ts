@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { VerticalSlice } from '../../../../src/core/domain/VerticalSlice';
-import { VerticalSliceCollection } from '../../../../src/core/domain/VerticalSliceCollection';
+import { VerticalSlice } from '../../../../src/core/domain/vertical-slice/VerticalSlice';
+import { VerticalSliceCollection } from '../../../../src/core/domain/vertical-slice/VerticalSliceCollection';
 import { ExtendSliceRightCommand } from '../../../../src/core/usecases/commands/ExtendSliceRight/ExtendSliceRightCommand';
 import { ExtendSliceRightCommandHandler } from '../../../../src/core/usecases/commands/ExtendSliceRight/ExtendSliceRightCommandHandler';
 import { InMemoryVerticalSliceRepository } from '../../../helpers/InMemoryVerticalSliceRepository';

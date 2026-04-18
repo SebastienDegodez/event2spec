@@ -1,4 +1,4 @@
-import { type VerticalSliceCollection } from '../../../core/domain/VerticalSliceCollection';
+import { type VerticalSliceCollection } from '../../../core/domain/vertical-slice/VerticalSliceCollection';
 
 export interface SliceOverlayEntry {
   id: string;

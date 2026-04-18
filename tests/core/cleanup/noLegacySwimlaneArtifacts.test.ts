@@ -82,4 +82,14 @@ describe('legacy swimlane cleanup', () => {
     const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
     expect(gridCanvas.includes('for (let column = 0; column <= 20; column += 1)')).toBe(false);
   });
+
+  it('groups vertical slice aggregate files under a dedicated domain subfolder', () => {
+    expect(existsSync(pathInRepo('src/core/domain/VerticalSlice.ts'))).toBe(false);
+    expect(existsSync(pathInRepo('src/core/domain/VerticalSliceCollection.ts'))).toBe(false);
+    expect(existsSync(pathInRepo('src/core/domain/VerticalSliceProjection.ts'))).toBe(false);
+
+    expect(existsSync(pathInRepo('src/core/domain/vertical-slice/VerticalSlice.ts'))).toBe(true);
+    expect(existsSync(pathInRepo('src/core/domain/vertical-slice/VerticalSliceCollection.ts'))).toBe(true);
+    expect(existsSync(pathInRepo('src/core/domain/vertical-slice/VerticalSliceProjection.ts'))).toBe(true);
+  });
 });

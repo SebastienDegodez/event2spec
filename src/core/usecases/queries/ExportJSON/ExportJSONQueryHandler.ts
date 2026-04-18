@@ -3,7 +3,7 @@ import { type BoardProjection } from '../../../domain/BoardProjection';
 import { type EventModel, type DomainEventEntry, type CommandEntry, type ReadModelEntry, type PolicyEntry, type UIScreenEntry, type VerticalSlice as VerticalSliceSchema, type Scenario as ScenarioSchema } from '../../../domain/EventModelSchema';
 import { type NodeLink } from '../../../domain/NodeLink';
 import { type NodeProperties } from '../../../domain/NodeProperties';
-import { VerticalSliceCollection } from '../../../domain/VerticalSliceCollection';
+import { VerticalSliceCollection } from '../../../domain/vertical-slice/VerticalSliceCollection';
 import { ExportJSONQuery } from './ExportJSONQuery';
 
 export interface ExportJSONQueryRepository {

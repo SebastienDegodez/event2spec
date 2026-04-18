@@ -1,7 +1,7 @@
 import { GridBoard } from '../../../domain/GridBoard';
 import { type BoardProjection } from '../../../domain/BoardProjection';
 import { type NodeLink } from '../../../domain/NodeLink';
-import { VerticalSliceCollection } from '../../../domain/VerticalSliceCollection';
+import { VerticalSliceCollection } from '../../../domain/vertical-slice/VerticalSliceCollection';
 import { ExportMarkdownQuery } from './ExportMarkdownQuery';
 
 interface NamedEntry {

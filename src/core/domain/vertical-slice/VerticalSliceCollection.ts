@@ -1,5 +1,5 @@
 import { VerticalSlice } from './VerticalSlice';
-import { Scenario } from './Scenario';
+import { Scenario } from '../Scenario';
 import { type VerticalSliceProjection } from './VerticalSliceProjection';
 
 /** First-class collection of VerticalSlice domain objects. */

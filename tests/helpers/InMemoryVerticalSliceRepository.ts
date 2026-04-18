@@ -1,5 +1,5 @@
 import { type VerticalSliceRepository } from '../../src/core/domain/VerticalSliceRepository';
-import { VerticalSliceCollection } from '../../src/core/domain/VerticalSliceCollection';
+import { VerticalSliceCollection } from '../../src/core/domain/vertical-slice/VerticalSliceCollection';
 
 /** In-memory implementation of VerticalSliceRepository for testing command handlers. */
 export class InMemoryVerticalSliceRepository implements VerticalSliceRepository {
