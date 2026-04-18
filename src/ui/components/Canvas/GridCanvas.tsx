@@ -44,8 +44,7 @@ import { buildSliceHeaderEntries } from './buildSliceHeaderEntries';
 import { buildVisibleColumns } from './buildVisibleColumns';
 import { buildSliceHitboxColumns } from './buildSliceHitboxColumns';
 import { resolveMiniMapNodeColor } from './resolveMiniMapNodeColor';
-import { RenameModal } from '../RenameModal';
-import { ConfirmDeleteModal } from '../ConfirmDeleteModal';
+import { BoundedContextModalLayer } from './BoundedContextModalLayer';
 import { GRID_SIZE, NOTE_SIZE, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 import { useViewportCells } from '../../hooks/useViewportCells';
 
@@ -533,24 +532,16 @@ function GridCanvasInner() {
           />
         </div>
       </div>
-      {editingBoundedContextId && (
-        <RenameModal
-          title="Rename Bounded Context"
-          currentValue={editingBoundedContextName}
-          onConfirm={handleConfirmRenameBoundedContext}
-          onCancel={handleCancelRenameBoundedContext}
-        />
-      )}
-      {deleteConfirmingBcId && (
-        <ConfirmDeleteModal
-          title="Delete Bounded Context?"
-          message={`Are you sure you want to delete "${deleteConfirmingBcName}"?`}
-          confirmLabel="Delete"
-          cancelLabel="Cancel"
-          onConfirm={handleConfirmDeleteBoundedContext}
-          onCancel={handleCancelDeleteBoundedContext}
-        />
-      )}
+      <BoundedContextModalLayer
+        editingBoundedContextId={editingBoundedContextId}
+        editingBoundedContextName={editingBoundedContextName}
+        onConfirmRename={handleConfirmRenameBoundedContext}
+        onCancelRename={handleCancelRenameBoundedContext}
+        deleteConfirmingBcId={deleteConfirmingBcId}
+        deleteConfirmingBcName={deleteConfirmingBcName}
+        onConfirmDelete={handleConfirmDeleteBoundedContext}
+        onCancelDelete={handleCancelDeleteBoundedContext}
+      />
     </div>
   );
 }

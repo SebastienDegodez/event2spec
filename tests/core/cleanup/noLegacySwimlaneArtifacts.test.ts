@@ -111,6 +111,14 @@ describe('legacy swimlane cleanup', () => {
     expect(gridCanvas.includes('{contextMenu && (')).toBe(false);
   });
 
+  it('extracts bounded context modal rendering into a dedicated canvas component', () => {
+    expect(existsSync(pathInRepo('src/ui/components/Canvas/BoundedContextModalLayer.tsx'))).toBe(true);
+
+    const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
+    expect(gridCanvas.includes('title="Rename Bounded Context"')).toBe(false);
+    expect(gridCanvas.includes('title="Delete Bounded Context?"')).toBe(false);
+  });
+
   it('groups vertical slice aggregate files under a dedicated domain subfolder', () => {
     expect(existsSync(pathInRepo('src/core/domain/VerticalSlice.ts'))).toBe(false);
     expect(existsSync(pathInRepo('src/core/domain/VerticalSliceCollection.ts'))).toBe(false);
