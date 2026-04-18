@@ -287,8 +287,8 @@ function GridCanvasInner() {
   }, [deleteSlice, openSliceInspector, slices]);
 
   const visibleColumns = useMemo(() => {
-    return buildVisibleColumns(viewportCells);
-  }, [viewportCells]);
+    return buildVisibleColumns(viewport, containerSize.width);
+  }, [viewport, containerSize.width]);
 
   const allHeaderEntries = useMemo<SliceHeaderEntry[]>(() => {
     return buildSliceHeaderEntries({
