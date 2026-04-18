@@ -16,7 +16,6 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import { useBoard, useBoardActions, useLinks, useSlices, useSliceActions, useSelectedSliceRange, useColumnSelectionActions, useBoundedContexts, useBoundedContextActions } from '../../../core/store/useBoardStore';
-import { type BoardProjection } from '../../../core/domain/BoardProjection';
 import { type SwimlaneColor } from '../../../core/domain/SwimlaneColor';
 import { type NodeKind } from '../../../core/domain/NodeKind';
 import { resolveConnectionType } from '../../../core/domain/resolveConnectionType';
@@ -35,6 +34,7 @@ import { buildSliceHitboxColumns } from './buildSliceHitboxColumns';
 import { BoundedContextModalLayer } from './BoundedContextModalLayer';
 import { CanvasFlowDecorations } from './CanvasFlowDecorations';
 import { buildBoundedContextRowRenderData } from './buildBoundedContextRowRenderData';
+import { buildBoardRenderData } from './buildBoardRenderData';
 import { canvasNodeTypes } from './canvasNodeTypes';
 import { GRID_SIZE, NOTE_SIZE, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 import { useViewportCells } from '../../hooks/useViewportCells';
@@ -144,30 +144,14 @@ function GridCanvasInner() {
   ]);
 
   const boardRenderData = useMemo(() => {
-    const actualNodes: Node[] = [
-      ...boundedContextRowRenderData.bgNodes,
-    ];
-    const occupiedCells = new Set<string>();
-
-    const createFlowNode = (id: string, label: string, column: number, row: number, type: 'domainEvent' | 'command' | 'readModel' | 'policy' | 'uiScreen') => {
-      const position = domainNodeToPixelPosition({ column, row });
-      actualNodes.push({ id, type, position, data: { label, column, row }, style: { width: NOTE_SIZE, height: NOTE_SIZE } });
-      occupiedCells.add(`${column},${row}`);
-    };
-
-    const projection: BoardProjection = {
-      onDomainEventNode(id, label, column, row) { createFlowNode(id, label, column, row, 'domainEvent'); },
-      onCommandNode(id, label, column, row) { createFlowNode(id, label, column, row, 'command'); },
-      onReadModelNode(id, label, column, row) { createFlowNode(id, label, column, row, 'readModel'); },
-      onPolicyNode(id, label, column, row) { createFlowNode(id, label, column, row, 'policy'); },
-      onUIScreenNode(id, label, column, row) { createFlowNode(id, label, column, row, 'uiScreen'); },
-    };
-    board.describeTo(projection);
-
-    const boundedContextRows = boundedContextRowRenderData.rows.map((entry) => 2 + entry.index);
-    const rowsToRender = [...FIXED_ROWS, ...boundedContextRows];
-
-    return { actualNodes, occupiedCells, rowsToRender };
+    return buildBoardRenderData({
+      board,
+      boundedContextRowBackgroundNodes: boundedContextRowRenderData.bgNodes,
+      boundedContextRows: boundedContextRowRenderData.rows,
+      fixedRows: FIXED_ROWS,
+      noteSize: NOTE_SIZE,
+      positionFor: domainNodeToPixelPosition,
+    });
   }, [board, boundedContextRowRenderData]);
 
   const viewportCells = useViewportCells({
