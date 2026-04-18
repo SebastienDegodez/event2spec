@@ -50,7 +50,7 @@ import { ExportMarkdownQueryHandler } from '../usecases/queries/ExportMarkdown/E
 import { type NodeLink } from '../domain/node/NodeLink';
 import { type ConnectionType } from '../domain/ConnectionType';
 import { VerticalSliceCollection } from '../domain/vertical-slice/VerticalSliceCollection';
-import { type VerticalSliceRepository } from '../domain/VerticalSliceRepository';
+import { type VerticalSliceRepository } from '../domain/vertical-slice/VerticalSliceRepository';
 import { BoundedContextCollection } from '../domain/bounded-context/BoundedContextCollection';
 import { type BoundedContextRepository } from '../domain/bounded-context/BoundedContextRepository';
 import { resolveAutoLinks } from '../domain/resolveAutoLinks';
