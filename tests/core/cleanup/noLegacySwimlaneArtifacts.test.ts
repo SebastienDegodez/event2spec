@@ -38,4 +38,11 @@ describe('legacy swimlane cleanup', () => {
     expect(appCss.includes('.swimlane-label')).toBe(false);
     expect(appCss.includes('.swimlane-category-label')).toBe(false);
   });
+
+  it('extracts fixed row labels into a dedicated canvas component', () => {
+    expect(existsSync(pathInRepo('src/ui/components/Canvas/FixedRowLabelColumn.tsx'))).toBe(true);
+
+    const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
+    expect(gridCanvas.includes('function FixedRowLabelColumn(')).toBe(false);
+  });
 });
