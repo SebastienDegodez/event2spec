@@ -83,6 +83,13 @@ describe('legacy swimlane cleanup', () => {
     expect(gridCanvas.includes('for (let column = 0; column <= 20; column += 1)')).toBe(false);
   });
 
+  it('extracts slice hitbox column calculation into a dedicated helper', () => {
+    expect(existsSync(pathInRepo('src/ui/components/Canvas/buildSliceHitboxColumns.ts'))).toBe(true);
+
+    const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
+    expect(gridCanvas.includes('visibleColumns.filter((col) => !slices.isColumnCovered(col))')).toBe(false);
+  });
+
   it('groups vertical slice aggregate files under a dedicated domain subfolder', () => {
     expect(existsSync(pathInRepo('src/core/domain/VerticalSlice.ts'))).toBe(false);
     expect(existsSync(pathInRepo('src/core/domain/VerticalSliceCollection.ts'))).toBe(false);

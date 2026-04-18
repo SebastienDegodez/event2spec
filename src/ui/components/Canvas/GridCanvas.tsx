@@ -42,6 +42,7 @@ import { buildContextMenuItems } from './buildContextMenuItems';
 import { buildSliceOverlayEntries } from './buildSliceOverlayEntries';
 import { buildSliceHeaderEntries } from './buildSliceHeaderEntries';
 import { buildVisibleColumns } from './buildVisibleColumns';
+import { buildSliceHitboxColumns } from './buildSliceHitboxColumns';
 import { RenameModal } from '../RenameModal';
 import { ConfirmDeleteModal } from '../ConfirmDeleteModal';
 import { GRID_SIZE, NOTE_SIZE, COMMAND_NODE_COLOR, DOMAIN_EVENT_NODE_COLOR, READ_MODEL_NODE_COLOR, POLICY_NODE_COLOR, UI_SCREEN_NODE_COLOR, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
@@ -466,7 +467,7 @@ function GridCanvasInner() {
         <SliceHeaderStrip
           entries={allHeaderEntries}
           viewport={viewport}
-          hitboxColumns={visibleColumns.filter((col) => !slices.isColumnCovered(col))}
+          hitboxColumns={buildSliceHitboxColumns(visibleColumns, (column) => slices.isColumnCovered(column))}
           onHitboxClick={startSliceSelection}
         />
       </div>
