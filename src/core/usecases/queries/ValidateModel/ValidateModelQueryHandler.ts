@@ -22,18 +22,30 @@ export class ValidateModelQueryHandler {
     board: GridBoard,
     links: ReadonlyArray<NodeLink>,
     query: ValidateModelQuery,
+  ): ReadonlyArray<ValidationWarning>;
+  handle(
+    boardOrQuery: GridBoard | ValidateModelQuery,
+    links?: ReadonlyArray<NodeLink>,
+    query?: ValidateModelQuery,
   ): ReadonlyArray<ValidationWarning> {
-    let resolvedBoard = board;
-    let resolvedLinks = links;
-    let resolvedQuery = query;
+    let resolvedBoard: GridBoard;
+    let resolvedLinks: ReadonlyArray<NodeLink>;
+    let resolvedQuery: ValidateModelQuery;
 
-    if (board instanceof ValidateModelQuery) {
+    if (boardOrQuery instanceof ValidateModelQuery) {
       if (!this.repository) {
         throw new Error('ValidateModelQueryRepository is required when calling handle(query)');
       }
       resolvedBoard = this.repository.loadBoard();
       resolvedLinks = this.repository.loadLinks();
-      resolvedQuery = board;
+      resolvedQuery = boardOrQuery;
+    } else {
+      if (!links || !query) {
+        throw new Error('board, links, and query are required when calling handle(board, links, query)');
+      }
+      resolvedBoard = boardOrQuery;
+      resolvedLinks = links;
+      resolvedQuery = query;
     }
 
     void resolvedQuery;
