@@ -38,6 +38,7 @@ import { type ContextMenuState } from './ContextMenuState';
 import { SliceOverlay } from './SliceOverlay';
 import { FixedRowLabelColumn, type FixedRowLabelEntry } from './FixedRowLabelColumn';
 import { SliceHeaderStrip, type SliceHeaderEntry } from './SliceHeaderStrip';
+import { buildContextMenuItems } from './buildContextMenuItems';
 import { RenameModal } from '../RenameModal';
 import { ConfirmDeleteModal } from '../ConfirmDeleteModal';
 import { GRID_SIZE, NOTE_SIZE, COMMAND_NODE_COLOR, DOMAIN_EVENT_NODE_COLOR, READ_MODEL_NODE_COLOR, POLICY_NODE_COLOR, UI_SCREEN_NODE_COLOR, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
@@ -423,26 +424,11 @@ function GridCanvasInner() {
   );
 
   const contextMenuItems = useMemo(() => {
-    if (!contextMenu) return [];
-
-    // Offer category-specific node types for empty pane clicks
-    if (!contextMenu.nodeId) {
-      const options = cellNodeOptions(contextMenu.row);
-      return options.map((opt) => ({
-        label: `Add ${opt.label}`,
-        onClick: () => addNodeAtPosition(opt.kind, opt.label, contextMenu.column, contextMenu.row),
-      }));
-    }
-
-    if (contextMenu.nodeId) {
-      return [
-        { label: 'Insert event before', onClick: () => addEventAtPosition(contextMenu.column, contextMenu.row) },
-        { label: 'Insert event after', onClick: () => addEventAtPosition(contextMenu.column + 1, contextMenu.row) },
-      ];
-    }
-    return [
-      { label: 'Add domain event', onClick: () => addEventAtPosition(contextMenu.column, contextMenu.row) },
-    ];
+    return buildContextMenuItems({
+      contextMenu,
+      addEventAtPosition,
+      addNodeAtPosition,
+    });
   }, [contextMenu, addEventAtPosition, addNodeAtPosition]);
 
   const sliceOverlayEntries = useMemo(() => {

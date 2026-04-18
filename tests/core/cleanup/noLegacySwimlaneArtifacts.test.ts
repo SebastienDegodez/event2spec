@@ -52,4 +52,13 @@ describe('legacy swimlane cleanup', () => {
     const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
     expect(gridCanvas.includes('function SliceHeaderStrip(')).toBe(false);
   });
+
+  it('extracts context menu item construction into a dedicated helper', () => {
+    expect(existsSync(pathInRepo('src/ui/components/Canvas/buildContextMenuItems.ts'))).toBe(true);
+
+    const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
+    expect(gridCanvas.includes('Insert event before')).toBe(false);
+    expect(gridCanvas.includes('Insert event after')).toBe(false);
+    expect(gridCanvas.includes('Add domain event')).toBe(false);
+  });
 });
