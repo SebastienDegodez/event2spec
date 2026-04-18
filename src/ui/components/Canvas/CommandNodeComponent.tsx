@@ -1,8 +1,8 @@
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback } from 'react';
 import { Handle, Position, useReactFlow, type NodeProps } from '@xyflow/react';
 import { useBoardActions } from '../../../core/store/useBoardStore';
 import { useNodeValidationWarning } from '../../hooks/useNodeValidationWarning';
-import { useAutoEdit } from '../../hooks/useAutoEdit';
+import { useNodeInlineEditing } from '../../hooks/useNodeInlineEditing';
 import { ValidationBadge } from '../Validation/ValidationBadge';
 
 export type CommandNodeData = {
@@ -15,23 +15,12 @@ export const CommandNodeComponent = memo(({ id, data, selected }: NodeProps) => 
   const nodeData = data as CommandNodeData;
   const { updateLabel, removeNode } = useBoardActions();
   const warningType = useNodeValidationWarning(id);
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(nodeData.label);
+  const { editing, draft, setDraft, commitEdit, cancelEdit } = useNodeInlineEditing({
+    id,
+    label: nodeData.label,
+    updateLabel,
+  });
   const { deleteElements } = useReactFlow();
-
-  const startEditing = useCallback(() => {
-    setDraft(nodeData.label);
-    setEditing(true);
-  }, [nodeData.label]);
-
-  useAutoEdit(id, startEditing);
-
-  const commitEdit = useCallback(() => {
-    const trimmed = draft.trim();
-    if (trimmed) updateLabel(id, trimmed);
-    else setDraft(nodeData.label);
-    setEditing(false);
-  }, [draft, id, updateLabel, nodeData.label]);
 
   const handleDelete = useCallback(() => {
     removeNode(id);
@@ -64,8 +53,7 @@ export const CommandNodeComponent = memo(({ id, data, selected }: NodeProps) => 
                 commitEdit();
               }
               if (e.key === 'Escape') {
-                setDraft(nodeData.label);
-                setEditing(false);
+                cancelEdit();
               }
             }}
           />

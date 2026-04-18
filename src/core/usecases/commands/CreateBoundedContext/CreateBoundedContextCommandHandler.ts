@@ -1,5 +1,5 @@
-import { BoundedContext } from '../../../domain/BoundedContext';
-import { type BoundedContextRepository } from '../../../domain/BoundedContextRepository';
+import { BoundedContext } from '../../../domain/bounded-context/BoundedContext';
+import { type BoundedContextRepository } from '../../../domain/bounded-context/BoundedContextRepository';
 import { type CreateBoundedContextCommand } from './CreateBoundedContextCommand';
 
 export class CreateBoundedContextCommandHandler {

@@ -1,4 +1,4 @@
-import { Scenario } from './Scenario';
+import { Scenario } from '../Scenario';
 
 /** Domain object representing a vertical slice grouping Command → Events → ReadModel with scenarios. */
 export class VerticalSlice {

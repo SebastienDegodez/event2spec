@@ -1,4 +1,4 @@
-import { type BoundedContextRepository } from '../../../domain/BoundedContextRepository';
+import { type BoundedContextRepository } from '../../../domain/bounded-context/BoundedContextRepository';
 import { type RenameBoundedContextCommand } from './RenameBoundedContextCommand';
 
 export class RenameBoundedContextCommandHandler {

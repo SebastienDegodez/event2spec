@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { useSelectedNode, useNodeProperties, useBoardActions, type NodeProperties } from '../../../core/store/useBoardStore';
-import { createDefaultNodeProperties } from '../../../core/domain/NodeProperties';
+import { createDefaultNodeProperties } from '../../../core/domain/node/NodeProperties';
 import { KeyValueEditor } from './KeyValueEditor';
 import { StringListEditor } from './StringListEditor';
 

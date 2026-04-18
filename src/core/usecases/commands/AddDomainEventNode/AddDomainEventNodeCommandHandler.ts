@@ -1,9 +1,16 @@
-import { GridBoard } from '../../../domain/GridBoard';
-import { DomainEventNode } from '../../../domain/DomainEventNode';
+import { type GridBoardRepository } from '../../../domain/board/GridBoardRepository';
+import { DomainEventNode } from '../../../domain/node/DomainEventNode';
 import { AddDomainEventNodeCommand } from './AddDomainEventNodeCommand';
 
 export class AddDomainEventNodeCommandHandler {
-  handle(board: GridBoard, command: AddDomainEventNodeCommand): GridBoard {
+  private readonly repository: GridBoardRepository;
+
+  constructor(repository: GridBoardRepository) {
+    this.repository = repository;
+  }
+
+  handle(command: AddDomainEventNodeCommand): void {
+    const board = this.repository.load();
     const node = DomainEventNode.create(
       command.id,
       command.label,
@@ -11,6 +18,6 @@ export class AddDomainEventNodeCommandHandler {
       command.row,
       command.boundedContextId
     );
-    return board.insertNode(node);
+    this.repository.save(board.insertNode(node));
   }
 }

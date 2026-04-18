@@ -1,8 +1,15 @@
-import { GridBoard } from '../../../domain/GridBoard';
+import { type GridBoardRepository } from '../../../domain/board/GridBoardRepository';
 import { UpdateNodeLabelCommand } from './UpdateNodeLabelCommand';
 
 export class UpdateNodeLabelCommandHandler {
-  handle(board: GridBoard, command: UpdateNodeLabelCommand): GridBoard {
-    return board.updateLabel(command.id, command.label);
+  private readonly repository: GridBoardRepository;
+
+  constructor(repository: GridBoardRepository) {
+    this.repository = repository;
+  }
+
+  handle(command: UpdateNodeLabelCommand): void {
+    const board = this.repository.load();
+    this.repository.save(board.updateLabel(command.id, command.label));
   }
 }

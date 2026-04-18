@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { GridBoard } from '../../../../src/core/domain/GridBoard';
-import { DomainEventNode } from '../../../../src/core/domain/DomainEventNode';
-import { CommandNode } from '../../../../src/core/domain/CommandNode';
-import { ReadModelNode } from '../../../../src/core/domain/ReadModelNode';
-import { PolicyNode } from '../../../../src/core/domain/PolicyNode';
-import { UIScreenNode } from '../../../../src/core/domain/UIScreenNode';
-import { type NodeLink } from '../../../../src/core/domain/NodeLink';
+import { GridBoard } from '../../../../src/core/domain/board/GridBoard';
+import { DomainEventNode } from '../../../../src/core/domain/node/DomainEventNode';
+import { CommandNode } from '../../../../src/core/domain/node/CommandNode';
+import { ReadModelNode } from '../../../../src/core/domain/node/ReadModelNode';
+import { PolicyNode } from '../../../../src/core/domain/node/PolicyNode';
+import { UIScreenNode } from '../../../../src/core/domain/node/UIScreenNode';
+import { type NodeLink } from '../../../../src/core/domain/node/NodeLink';
 import { ValidateModelQuery } from '../../../../src/core/usecases/queries/ValidateModel/ValidateModelQuery';
 import { ValidateModelQueryHandler } from '../../../../src/core/usecases/queries/ValidateModel/ValidateModelQueryHandler';
 

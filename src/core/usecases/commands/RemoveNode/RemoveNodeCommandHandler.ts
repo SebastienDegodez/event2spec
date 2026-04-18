@@ -1,8 +1,15 @@
-import { GridBoard } from '../../../domain/GridBoard';
+import { type GridBoardRepository } from '../../../domain/board/GridBoardRepository';
 import { RemoveNodeCommand } from './RemoveNodeCommand';
 
 export class RemoveNodeCommandHandler {
-  handle(board: GridBoard, command: RemoveNodeCommand): GridBoard {
-    return board.removeNode(command.id);
+  private readonly repository: GridBoardRepository;
+
+  constructor(repository: GridBoardRepository) {
+    this.repository = repository;
+  }
+
+  handle(command: RemoveNodeCommand): void {
+    const board = this.repository.load();
+    this.repository.save(board.removeNode(command.id));
   }
 }

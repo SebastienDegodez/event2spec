@@ -1,4 +1,4 @@
-import { type NodeKind } from './NodeKind';
+import { type NodeKind } from './node/NodeKind';
 import { type ConnectionType } from './ConnectionType';
 import { resolveConnectionType } from './resolveConnectionType';
 

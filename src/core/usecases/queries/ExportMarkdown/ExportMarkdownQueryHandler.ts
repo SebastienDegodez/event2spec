@@ -1,7 +1,7 @@
-import { GridBoard } from '../../../domain/GridBoard';
-import { type BoardProjection } from '../../../domain/BoardProjection';
-import { type NodeLink } from '../../../domain/NodeLink';
-import { VerticalSliceCollection } from '../../../domain/VerticalSliceCollection';
+import { GridBoard } from '../../../domain/board/GridBoard';
+import { type BoardProjection } from '../../../domain/board/BoardProjection';
+import { type NodeLink } from '../../../domain/node/NodeLink';
+import { VerticalSliceCollection } from '../../../domain/vertical-slice/VerticalSliceCollection';
 import { ExportMarkdownQuery } from './ExportMarkdownQuery';
 
 interface NamedEntry {
@@ -9,9 +9,48 @@ interface NamedEntry {
   label: string;
 }
 
+export interface ExportMarkdownQueryRepository {
+  loadBoard(): GridBoard;
+  loadLinks(): ReadonlyArray<NodeLink>;
+  loadSlices(): VerticalSliceCollection;
+}
+
 export class ExportMarkdownQueryHandler {
-  handle(board: GridBoard, links: ReadonlyArray<NodeLink>, slices: VerticalSliceCollection, query: ExportMarkdownQuery): string {
-    void query;
+  private readonly repository: ExportMarkdownQueryRepository | undefined;
+
+  constructor(repository?: ExportMarkdownQueryRepository) {
+    this.repository = repository;
+  }
+
+  handle(query: ExportMarkdownQuery): string;
+  handle(board: GridBoard, links: ReadonlyArray<NodeLink>, slices: VerticalSliceCollection, query: ExportMarkdownQuery): string;
+  handle(
+    boardOrQuery: GridBoard | ExportMarkdownQuery,
+    links?: ReadonlyArray<NodeLink>,
+    slices?: VerticalSliceCollection,
+    query?: ExportMarkdownQuery,
+  ): string {
+    let board: GridBoard;
+    let resolvedLinks: ReadonlyArray<NodeLink>;
+    let resolvedSlices: VerticalSliceCollection;
+    let resolvedQuery: ExportMarkdownQuery;
+
+    if (boardOrQuery instanceof ExportMarkdownQuery) {
+      if (!this.repository) {
+        throw new Error('ExportMarkdownQueryRepository is required when calling handle(query)');
+      }
+      board = this.repository.loadBoard();
+      resolvedLinks = this.repository.loadLinks();
+      resolvedSlices = this.repository.loadSlices();
+      resolvedQuery = boardOrQuery;
+    } else {
+      board = boardOrQuery;
+      resolvedLinks = links ?? [];
+      resolvedSlices = slices ?? VerticalSliceCollection.empty();
+      resolvedQuery = query ?? new ExportMarkdownQuery();
+    }
+
+    void resolvedQuery;
 
     const domainEvents: NamedEntry[] = [];
     const commands: NamedEntry[] = [];
@@ -30,7 +69,7 @@ export class ExportMarkdownQueryHandler {
     board.describeTo(projection);
 
     const triggersLinks = new Map<string, string>(
-      links.filter((l) => l.connectionType === 'triggers').map((l) => [l.sourceNodeId, l.targetNodeId])
+      resolvedLinks.filter((l) => l.connectionType === 'triggers').map((l) => [l.sourceNodeId, l.targetNodeId])
     );
     const feedsLinks = new Map<string, string[]>();
     const policyEventLinks = new Map<string, string>();
@@ -38,7 +77,7 @@ export class ExportMarkdownQueryHandler {
     const uiScreenCommandLinks = new Map<string, string>();
     const readModelScreenLinks = new Map<string, string>();
 
-    for (const link of links) {
+    for (const link of resolvedLinks) {
       if (link.connectionType === 'feeds') {
         const existing = feedsLinks.get(link.targetNodeId) ?? [];
         feedsLinks.set(link.targetNodeId, [...existing, link.sourceNodeId]);
@@ -132,7 +171,7 @@ export class ExportMarkdownQueryHandler {
       scenarios: ReadonlyArray<{ given: ReadonlyArray<string>; when: string; then: ReadonlyArray<string> }>;
     }
     const sliceEntries: SliceEntry[] = [];
-    slices.describeTo({
+    resolvedSlices.describeTo({
       onSlice(_id, name, commandId, eventIds, readModelId, scenarios) {
         sliceEntries.push({ name, commandId, eventIds, readModelId, scenarios });
       },

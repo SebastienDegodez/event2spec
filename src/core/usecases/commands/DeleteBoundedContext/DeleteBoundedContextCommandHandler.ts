@@ -1,5 +1,5 @@
-import { type BoundedContextRepository } from '../../../domain/BoundedContextRepository';
-import { type VerticalSliceRepository } from '../../../domain/VerticalSliceRepository';
+import { type BoundedContextRepository } from '../../../domain/bounded-context/BoundedContextRepository';
+import { type VerticalSliceRepository } from '../../../domain/vertical-slice/VerticalSliceRepository';
 import { type DeleteBoundedContextCommand } from './DeleteBoundedContextCommand';
 
 export class DeleteBoundedContextCommandHandler {

@@ -1,4 +1,4 @@
-import { type VerticalSliceRepository } from '../../../domain/VerticalSliceRepository';
+import { type VerticalSliceRepository } from '../../../domain/vertical-slice/VerticalSliceRepository';
 import { type AssignSliceToBoundedContextCommand } from './AssignSliceToBoundedContextCommand';
 
 export class AssignSliceToBoundedContextCommandHandler {

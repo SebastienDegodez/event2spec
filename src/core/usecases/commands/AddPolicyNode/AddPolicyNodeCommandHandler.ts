@@ -1,10 +1,17 @@
-import { GridBoard } from '../../../domain/GridBoard';
-import { PolicyNode } from '../../../domain/PolicyNode';
+import { type GridBoardRepository } from '../../../domain/board/GridBoardRepository';
+import { PolicyNode } from '../../../domain/node/PolicyNode';
 import { AddPolicyNodeCommand } from './AddPolicyNodeCommand';
 
 export class AddPolicyNodeCommandHandler {
-  handle(board: GridBoard, command: AddPolicyNodeCommand): GridBoard {
+  private readonly repository: GridBoardRepository;
+
+  constructor(repository: GridBoardRepository) {
+    this.repository = repository;
+  }
+
+  handle(command: AddPolicyNodeCommand): void {
+    const board = this.repository.load();
     const node = PolicyNode.create(command.id, command.label, command.column, command.row);
-    return board.insertNode(node);
+    this.repository.save(board.insertNode(node));
   }
 }

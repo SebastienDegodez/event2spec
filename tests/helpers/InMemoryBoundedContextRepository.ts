@@ -1,5 +1,5 @@
-import { type BoundedContextRepository } from '../../src/core/domain/BoundedContextRepository';
-import { BoundedContextCollection } from '../../src/core/domain/BoundedContextCollection';
+import { type BoundedContextRepository } from '../../src/core/domain/bounded-context/BoundedContextRepository';
+import { BoundedContextCollection } from '../../src/core/domain/bounded-context/BoundedContextCollection';
 
 /** In-memory implementation of BoundedContextRepository for testing command handlers. */
 export class InMemoryBoundedContextRepository implements BoundedContextRepository {

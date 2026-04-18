@@ -1,22 +1,25 @@
 import { describe, it, expect } from 'vitest';
-import { GridBoard } from '../../../../src/core/domain/GridBoard';
+import { GridBoard } from '../../../../src/core/domain/board/GridBoard';
 import { AddDomainEventNodeCommand } from '../../../../src/core/usecases/commands/AddDomainEventNode/AddDomainEventNodeCommand';
 import { AddDomainEventNodeCommandHandler } from '../../../../src/core/usecases/commands/AddDomainEventNode/AddDomainEventNodeCommandHandler';
 import { RemoveNodeCommand } from '../../../../src/core/usecases/commands/RemoveNode/RemoveNodeCommand';
 import { RemoveNodeCommandHandler } from '../../../../src/core/usecases/commands/RemoveNode/RemoveNodeCommandHandler';
 import { collectNodes } from '../../../helpers/collectNodes';
-
-const addHandler = new AddDomainEventNodeCommandHandler();
-const handler = new RemoveNodeCommandHandler();
+import { InMemoryGridBoardRepository } from '../../../helpers/InMemoryGridBoardRepository';
 
 describe('RemoveNodeCommandHandler', () => {
   it('removes a node by id', () => {
-    const board = [
+    const repository = new InMemoryGridBoardRepository(GridBoard.empty());
+    const addHandler = new AddDomainEventNodeCommandHandler(repository);
+
+    [
       new AddDomainEventNodeCommand('keep', 'Keep', 0, 0),
       new AddDomainEventNodeCommand('remove', 'Remove', 1, 0),
-    ].reduce((b, cmd) => addHandler.handle(b, cmd), GridBoard.empty());
+    ].forEach((command) => addHandler.handle(command));
+    const handler = new RemoveNodeCommandHandler(repository);
 
-    const result = handler.handle(board, new RemoveNodeCommand('remove'));
+    handler.handle(new RemoveNodeCommand('remove'));
+    const result = repository.load();
     const nodes = collectNodes(result);
 
     expect(nodes).toHaveLength(1);
@@ -24,9 +27,13 @@ describe('RemoveNodeCommandHandler', () => {
   });
 
   it('leaves the board unchanged when removing an unknown id', () => {
-    const board = addHandler.handle(GridBoard.empty(), new AddDomainEventNodeCommand('a', 'A', 0, 0));
+    const repository = new InMemoryGridBoardRepository(GridBoard.empty());
+    const addHandler = new AddDomainEventNodeCommandHandler(repository);
+    addHandler.handle(new AddDomainEventNodeCommand('a', 'A', 0, 0));
+    const handler = new RemoveNodeCommandHandler(repository);
 
-    const result = handler.handle(board, new RemoveNodeCommand('unknown'));
+    handler.handle(new RemoveNodeCommand('unknown'));
+    const result = repository.load();
 
     expect(collectNodes(result)).toHaveLength(1);
   });
