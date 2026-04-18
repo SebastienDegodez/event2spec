@@ -90,6 +90,13 @@ describe('legacy swimlane cleanup', () => {
     expect(gridCanvas.includes('visibleColumns.filter((col) => !slices.isColumnCovered(col))')).toBe(false);
   });
 
+  it('extracts minimap node color mapping into a dedicated helper', () => {
+    expect(existsSync(pathInRepo('src/ui/components/Canvas/resolveMiniMapNodeColor.ts'))).toBe(true);
+
+    const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
+    expect(gridCanvas.includes("if (node.type === 'command') return COMMAND_NODE_COLOR;")).toBe(false);
+  });
+
   it('groups vertical slice aggregate files under a dedicated domain subfolder', () => {
     expect(existsSync(pathInRepo('src/core/domain/VerticalSlice.ts'))).toBe(false);
     expect(existsSync(pathInRepo('src/core/domain/VerticalSliceCollection.ts'))).toBe(false);

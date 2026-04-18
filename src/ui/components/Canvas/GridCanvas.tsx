@@ -43,9 +43,10 @@ import { buildSliceOverlayEntries } from './buildSliceOverlayEntries';
 import { buildSliceHeaderEntries } from './buildSliceHeaderEntries';
 import { buildVisibleColumns } from './buildVisibleColumns';
 import { buildSliceHitboxColumns } from './buildSliceHitboxColumns';
+import { resolveMiniMapNodeColor } from './resolveMiniMapNodeColor';
 import { RenameModal } from '../RenameModal';
 import { ConfirmDeleteModal } from '../ConfirmDeleteModal';
-import { GRID_SIZE, NOTE_SIZE, COMMAND_NODE_COLOR, DOMAIN_EVENT_NODE_COLOR, READ_MODEL_NODE_COLOR, POLICY_NODE_COLOR, UI_SCREEN_NODE_COLOR, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
+import { GRID_SIZE, NOTE_SIZE, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 import { useViewportCells } from '../../hooks/useViewportCells';
 
 const ROW_BACKGROUND_OFFSET_X = 0;
@@ -513,13 +514,7 @@ function GridCanvasInner() {
             />
             <Controls position="bottom-right" />
             <MiniMap
-              nodeColor={(node) => {
-                if (node.type === 'command') return COMMAND_NODE_COLOR;
-                if (node.type === 'readModel') return READ_MODEL_NODE_COLOR;
-                if (node.type === 'policy') return POLICY_NODE_COLOR;
-                if (node.type === 'uiScreen') return UI_SCREEN_NODE_COLOR;
-                return DOMAIN_EVENT_NODE_COLOR;
-              }}
+              nodeColor={(node) => resolveMiniMapNodeColor(node.type)}
               maskColor="rgba(15,15,25,0.7)"
               position="bottom-left"
             />
