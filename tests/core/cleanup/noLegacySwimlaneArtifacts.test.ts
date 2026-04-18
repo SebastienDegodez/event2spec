@@ -68,4 +68,11 @@ describe('legacy swimlane cleanup', () => {
     const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
     expect(gridCanvas.includes('slices.describeTo({')).toBe(false);
   });
+
+  it('extracts slice header entry construction into a dedicated helper', () => {
+    expect(existsSync(pathInRepo('src/ui/components/Canvas/buildSliceHeaderEntries.ts'))).toBe(true);
+
+    const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
+    expect(gridCanvas.includes('label: `Columns ${selectedSliceRange.startColumn}-${selectedSliceRange.startColumn + selectedSliceRange.columnCount - 1}`')).toBe(false);
+  });
 });

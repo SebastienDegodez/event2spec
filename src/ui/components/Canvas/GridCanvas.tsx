@@ -40,6 +40,7 @@ import { FixedRowLabelColumn, type FixedRowLabelEntry } from './FixedRowLabelCol
 import { SliceHeaderStrip, type SliceHeaderEntry } from './SliceHeaderStrip';
 import { buildContextMenuItems } from './buildContextMenuItems';
 import { buildSliceOverlayEntries } from './buildSliceOverlayEntries';
+import { buildSliceHeaderEntries } from './buildSliceHeaderEntries';
 import { RenameModal } from '../RenameModal';
 import { ConfirmDeleteModal } from '../ConfirmDeleteModal';
 import { GRID_SIZE, NOTE_SIZE, COMMAND_NODE_COLOR, DOMAIN_EVENT_NODE_COLOR, READ_MODEL_NODE_COLOR, POLICY_NODE_COLOR, UI_SCREEN_NODE_COLOR, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
@@ -457,30 +458,12 @@ function GridCanvasInner() {
   }, [viewportCells]);
 
   const allHeaderEntries = useMemo<SliceHeaderEntry[]>(() => {
-    const entries: SliceHeaderEntry[] = sliceOverlayEntries.map((e) => ({
-      id: e.id,
-      label: e.label,
-      startColumn: e.startColumn,
-      columnCount: e.columnCount,
-      isTemporary: false,
-      canExtendRight: false,
-      onExtendRight: () => {},
-      onEdit: e.onEdit,
-      onScenarios: e.onScenarios,
-      onDelete: e.onDelete,
-    }));
-    if (selectedSliceRange) {
-      entries.push({
-        id: 'temporary-selection',
-        label: `Columns ${selectedSliceRange.startColumn}-${selectedSliceRange.startColumn + selectedSliceRange.columnCount - 1}`,
-        startColumn: selectedSliceRange.startColumn,
-        columnCount: selectedSliceRange.columnCount,
-        isTemporary: true,
-        canExtendRight: !slices.isColumnCovered(selectedSliceRange.startColumn + selectedSliceRange.columnCount),
-        onExtendRight: extendSelectedSliceRangeRight,
-      });
-    }
-    return entries;
+    return buildSliceHeaderEntries({
+      sliceOverlayEntries,
+      selectedSliceRange,
+      isColumnCovered: (column: number) => slices.isColumnCovered(column),
+      extendSelectedSliceRangeRight,
+    });
   }, [sliceOverlayEntries, selectedSliceRange, slices, extendSelectedSliceRangeRight]);
 
   return (
