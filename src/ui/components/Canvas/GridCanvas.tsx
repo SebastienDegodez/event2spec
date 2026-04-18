@@ -28,6 +28,7 @@ import { SliceHeaderStrip, type SliceHeaderEntry } from './SliceHeaderStrip';
 import { buildContextMenuItems } from './buildContextMenuItems';
 import { buildSliceOverlayEntries } from './buildSliceOverlayEntries';
 import { buildSliceHeaderEntries } from './buildSliceHeaderEntries';
+import { buildSliceHitboxColumns } from './buildSliceHitboxColumns';
 import { buildVisibleColumns } from './buildVisibleColumns';
 import { BoundedContextModalLayer } from './BoundedContextModalLayer';
 import { CanvasFlowDecorations } from './CanvasFlowDecorations';
@@ -310,7 +311,7 @@ function GridCanvasInner() {
         <SliceHeaderStrip
           entries={allHeaderEntries}
           viewport={viewport}
-          hitboxColumns={visibleColumns}
+          hitboxColumns={buildSliceHitboxColumns(visibleColumns, (column) => slices.isColumnCovered(column))}
           onHitboxClick={startSliceSelection}
         />
       </div>
