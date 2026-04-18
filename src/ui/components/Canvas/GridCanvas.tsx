@@ -39,6 +39,7 @@ import { SliceOverlay } from './SliceOverlay';
 import { FixedRowLabelColumn, type FixedRowLabelEntry } from './FixedRowLabelColumn';
 import { SliceHeaderStrip, type SliceHeaderEntry } from './SliceHeaderStrip';
 import { buildContextMenuItems } from './buildContextMenuItems';
+import { buildSliceOverlayEntries } from './buildSliceOverlayEntries';
 import { RenameModal } from '../RenameModal';
 import { ConfirmDeleteModal } from '../ConfirmDeleteModal';
 import { GRID_SIZE, NOTE_SIZE, COMMAND_NODE_COLOR, DOMAIN_EVENT_NODE_COLOR, READ_MODEL_NODE_COLOR, POLICY_NODE_COLOR, UI_SCREEN_NODE_COLOR, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
@@ -432,31 +433,11 @@ function GridCanvasInner() {
   }, [contextMenu, addEventAtPosition, addNodeAtPosition]);
 
   const sliceOverlayEntries = useMemo(() => {
-    const entries: Array<{
-      id: string;
-      label: string;
-      startColumn: number;
-      columnCount: number;
-      onEdit: () => void;
-      onScenarios: () => void;
-      onDelete: () => void;
-    }> = [];
-
-    slices.describeTo({
-      onSlice(id, name, _commandId, _eventIds, _readModelId, _scenarios, _boundedContextId, startColumn, columnCount) {
-        entries.push({
-          id,
-          label: name,
-          startColumn,
-          columnCount,
-          onEdit: () => openSliceInspector(id, 'details'),
-          onScenarios: () => openSliceInspector(id, 'scenarios'),
-          onDelete: () => deleteSlice(id),
-        });
-      },
+    return buildSliceOverlayEntries({
+      slices,
+      openSliceInspector,
+      deleteSlice,
     });
-
-    return entries;
   }, [deleteSlice, openSliceInspector, slices]);
 
   const visibleColumns = useMemo(() => {
