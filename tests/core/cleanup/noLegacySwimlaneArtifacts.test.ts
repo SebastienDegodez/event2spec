@@ -141,6 +141,13 @@ describe('legacy swimlane cleanup', () => {
     expect(gridCanvas.includes('domainEventCountByBoundedContextId')).toBe(false);
   });
 
+  it('extracts canvas node type mapping into a dedicated module', () => {
+    expect(existsSync(pathInRepo('src/ui/components/Canvas/canvasNodeTypes.ts'))).toBe(true);
+
+    const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
+    expect(gridCanvas.includes('const nodeTypes = {')).toBe(false);
+  });
+
   it('groups vertical slice aggregate files under a dedicated domain subfolder', () => {
     expect(existsSync(pathInRepo('src/core/domain/VerticalSlice.ts'))).toBe(false);
     expect(existsSync(pathInRepo('src/core/domain/VerticalSliceCollection.ts'))).toBe(false);

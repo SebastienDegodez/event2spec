@@ -21,13 +21,7 @@ import { type SwimlaneColor } from '../../../core/domain/SwimlaneColor';
 import { type NodeKind } from '../../../core/domain/NodeKind';
 import { resolveConnectionType } from '../../../core/domain/resolveConnectionType';
 import { cellNodeOptions } from '../../../core/domain/CellNodeOptions';
-import { DomainEventNode, type DomainEventNodeData } from './DomainEventNode';
-import { CommandNodeComponent } from './CommandNodeComponent';
-import { ReadModelNodeComponent } from './ReadModelNodeComponent';
-import { PolicyNodeComponent } from './PolicyNodeComponent';
-import { UIScreenNodeComponent } from './UIScreenNodeComponent';
-import { BoundedContextRowBackgroundNode } from './BoundedContextRowBackgroundNode';
-import { CellQuickAddNode } from './CellQuickAddNode';
+import { type DomainEventNodeData } from './DomainEventNode';
 import { ContextMenuLayer } from './ContextMenuLayer';
 import { type ContextMenuState } from './ContextMenuState';
 import { SliceOverlayLayer } from './SliceOverlayLayer';
@@ -41,22 +35,13 @@ import { buildSliceHitboxColumns } from './buildSliceHitboxColumns';
 import { BoundedContextModalLayer } from './BoundedContextModalLayer';
 import { CanvasFlowDecorations } from './CanvasFlowDecorations';
 import { buildBoundedContextRowRenderData } from './buildBoundedContextRowRenderData';
+import { canvasNodeTypes } from './canvasNodeTypes';
 import { GRID_SIZE, NOTE_SIZE, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 import { useViewportCells } from '../../hooks/useViewportCells';
 
 const ROW_BACKGROUND_OFFSET_X = 0;
 const FIXED_ROWS: readonly number[] = [0, 1] as const;
 const BOUNDED_CONTEXT_ROW_COLORS: readonly SwimlaneColor[] = ['yellow', 'blue', 'red', 'grey'] as const;
-
-const nodeTypes = {
-  domainEvent: DomainEventNode,
-  command: CommandNodeComponent,
-  readModel: ReadModelNodeComponent,
-  policy: PolicyNodeComponent,
-  uiScreen: UIScreenNodeComponent,
-  boundedContextRowBackground: BoundedContextRowBackgroundNode,
-  cellQuickAdd: CellQuickAddNode,
-};
 
 function GridCanvasInner() {
   const board = useBoard();
@@ -454,7 +439,7 @@ function GridCanvasInner() {
             onPaneContextMenu={onPaneContextMenu}
             onPaneClick={onPaneClick}
             onMoveStart={closeContextMenu}
-            nodeTypes={nodeTypes}
+            nodeTypes={canvasNodeTypes}
             snapToGrid
             snapGrid={[GRID_SIZE, GRID_SIZE]}
             translateExtent={[[0, 0], [Infinity, Infinity]]}
