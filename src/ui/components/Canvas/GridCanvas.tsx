@@ -33,7 +33,7 @@ import { PolicyNodeComponent } from './PolicyNodeComponent';
 import { UIScreenNodeComponent } from './UIScreenNodeComponent';
 import { BoundedContextRowBackgroundNode, type BoundedContextRowBackgroundNodeData } from './BoundedContextRowBackgroundNode';
 import { CellQuickAddNode } from './CellQuickAddNode';
-import { ContextMenu } from './ContextMenu';
+import { ContextMenuLayer } from './ContextMenuLayer';
 import { type ContextMenuState } from './ContextMenuState';
 import { SliceOverlayLayer } from './SliceOverlayLayer';
 import { FixedRowLabelColumn, type FixedRowLabelEntry } from './FixedRowLabelColumn';
@@ -526,14 +526,11 @@ function GridCanvasInner() {
             viewport={viewport}
             height={containerSize.height}
           />
-          {contextMenu && (
-            <ContextMenu
-              x={contextMenu.x}
-              y={contextMenu.y}
-              items={contextMenuItems}
-              onClose={closeContextMenu}
-            />
-          )}
+          <ContextMenuLayer
+            contextMenu={contextMenu}
+            items={contextMenuItems}
+            onClose={closeContextMenu}
+          />
         </div>
       </div>
       {editingBoundedContextId && (
