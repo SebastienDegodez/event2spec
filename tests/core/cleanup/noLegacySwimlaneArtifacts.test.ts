@@ -119,6 +119,13 @@ describe('legacy swimlane cleanup', () => {
     expect(gridCanvas.includes('title="Delete Bounded Context?"')).toBe(false);
   });
 
+  it('extracts minimap rendering into a dedicated canvas component', () => {
+    expect(existsSync(pathInRepo('src/ui/components/Canvas/CanvasMiniMap.tsx'))).toBe(true);
+
+    const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
+    expect(gridCanvas.includes('maskColor="rgba(15,15,25,0.7)"')).toBe(false);
+  });
+
   it('groups vertical slice aggregate files under a dedicated domain subfolder', () => {
     expect(existsSync(pathInRepo('src/core/domain/VerticalSlice.ts'))).toBe(false);
     expect(existsSync(pathInRepo('src/core/domain/VerticalSliceCollection.ts'))).toBe(false);

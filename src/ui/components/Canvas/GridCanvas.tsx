@@ -4,7 +4,6 @@ import {
   Background,
   BackgroundVariant,
   Controls,
-  MiniMap,
   useNodesState,
   useEdgesState,
   useReactFlow,
@@ -43,8 +42,8 @@ import { buildSliceOverlayEntries } from './buildSliceOverlayEntries';
 import { buildSliceHeaderEntries } from './buildSliceHeaderEntries';
 import { buildVisibleColumns } from './buildVisibleColumns';
 import { buildSliceHitboxColumns } from './buildSliceHitboxColumns';
-import { resolveMiniMapNodeColor } from './resolveMiniMapNodeColor';
 import { BoundedContextModalLayer } from './BoundedContextModalLayer';
+import { CanvasMiniMap } from './CanvasMiniMap';
 import { GRID_SIZE, NOTE_SIZE, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 import { useViewportCells } from '../../hooks/useViewportCells';
 
@@ -512,11 +511,7 @@ function GridCanvasInner() {
               color="rgba(255,255,255,0.18)"
             />
             <Controls position="bottom-right" />
-            <MiniMap
-              nodeColor={(node) => resolveMiniMapNodeColor(node.type)}
-              maskColor="rgba(15,15,25,0.7)"
-              position="bottom-left"
-            />
+            <CanvasMiniMap />
           </ReactFlow>
 
           <SliceOverlayLayer
