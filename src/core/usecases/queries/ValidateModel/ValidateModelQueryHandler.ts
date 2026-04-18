@@ -5,13 +5,38 @@ import { type ValidationWarning } from '../../../domain/ValidationWarning';
 import { validateModel, type ValidatableNode } from '../../../domain/ModelValidator';
 import { ValidateModelQuery } from './ValidateModelQuery';
 
+export interface ValidateModelQueryRepository {
+  loadBoard(): GridBoard;
+  loadLinks(): ReadonlyArray<NodeLink>;
+}
+
 export class ValidateModelQueryHandler {
+  private readonly repository: ValidateModelQueryRepository | undefined;
+
+  constructor(repository?: ValidateModelQueryRepository) {
+    this.repository = repository;
+  }
+
+  handle(query: ValidateModelQuery): ReadonlyArray<ValidationWarning>;
   handle(
     board: GridBoard,
     links: ReadonlyArray<NodeLink>,
     query: ValidateModelQuery,
   ): ReadonlyArray<ValidationWarning> {
-    void query;
+    let resolvedBoard = board;
+    let resolvedLinks = links;
+    let resolvedQuery = query;
+
+    if (board instanceof ValidateModelQuery) {
+      if (!this.repository) {
+        throw new Error('ValidateModelQueryRepository is required when calling handle(query)');
+      }
+      resolvedBoard = this.repository.loadBoard();
+      resolvedLinks = this.repository.loadLinks();
+      resolvedQuery = board;
+    }
+
+    void resolvedQuery;
 
     const nodes: ValidatableNode[] = [];
 
@@ -33,8 +58,8 @@ export class ValidateModelQueryHandler {
       },
     };
 
-    board.describeTo(projection);
+    resolvedBoard.describeTo(projection);
 
-    return validateModel(nodes, links);
+    return validateModel(nodes, resolvedLinks);
   }
 }

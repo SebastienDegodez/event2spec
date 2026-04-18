@@ -329,9 +329,6 @@ interface BoardActions {
   exportMarkdown: () => string;
 }
 
-const exportJSONHandler = new ExportJSONQueryHandler();
-const exportMarkdownHandler = new ExportMarkdownQueryHandler();
-
 const initialState = loadFromStorage();
 
 export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) => {
@@ -365,6 +362,17 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
   const deleteBoundedContextHandler = new DeleteBoundedContextCommandHandler(boundedContextRepository, sliceRepository);
   const renameBoundedContextHandler = new RenameBoundedContextCommandHandler(boundedContextRepository);
   const assignSliceToBoundedContextHandler = new AssignSliceToBoundedContextCommandHandler(sliceRepository);
+  const exportJSONHandler = new ExportJSONQueryHandler({
+    loadBoard: () => get().board,
+    loadLinks: () => get().links,
+    loadSlices: () => get().slices,
+    loadNodeProperties: () => get().nodeProperties,
+  });
+  const exportMarkdownHandler = new ExportMarkdownQueryHandler({
+    loadBoard: () => get().board,
+    loadLinks: () => get().links,
+    loadSlices: () => get().slices,
+  });
 
   return {
     board: initialState.board,
@@ -699,13 +707,11 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
     clearAutoEditNodeId: () => set({ autoEditNodeId: null }),
 
     exportJSON: () => {
-      const { board, links, slices, nodeProperties } = get();
-      return exportJSONHandler.handle(board, links, slices, nodeProperties, new ExportJSONQuery());
+      return exportJSONHandler.handle(new ExportJSONQuery());
     },
 
     exportMarkdown: () => {
-      const { board, links, slices } = get();
-      return exportMarkdownHandler.handle(board, links, slices, new ExportMarkdownQuery());
+      return exportMarkdownHandler.handle(new ExportMarkdownQuery());
     },
   };
 });
