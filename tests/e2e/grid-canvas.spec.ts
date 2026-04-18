@@ -128,7 +128,9 @@ test.describe('GridCanvas — Snap-to-Grid Acceptance', () => {
     // Create a note from row-2 quick-add
     const eventCell = page.locator('.cell-quick-add[data-row="2"]').first();
     await eventCell.hover();
-    await eventCell.locator('.cell-quick-add-btn[aria-label="Add Domain Event"]').click();
+    const addBtn = eventCell.locator('.cell-quick-add-btn[aria-label="Add Domain Event"]');
+    await expect(addBtn).toBeVisible();
+    await addBtn.click();
     await expect(page.locator('.domain-event-node')).toHaveCount(1);
 
     // Right-click the note to get the node context menu
