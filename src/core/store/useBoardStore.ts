@@ -329,9 +329,6 @@ interface BoardActions {
   exportMarkdown: () => string;
 }
 
-const moveNodeHandler = new MoveNodeCommandHandler();
-const updateLabelHandler = new UpdateNodeLabelCommandHandler();
-const removeNodeHandler = new RemoveNodeCommandHandler();
 const exportJSONHandler = new ExportJSONQueryHandler();
 const exportMarkdownHandler = new ExportMarkdownQueryHandler();
 
@@ -471,14 +468,30 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
     moveNode: (id, column, row) =>
       set((state) => {
-        const board = moveNodeHandler.handle(state.board, new MoveNodeCommand(id, column, row));
+        let board = state.board;
+        const boardRepository: GridBoardRepository = {
+          load: () => board,
+          save: (nextBoard) => {
+            board = nextBoard;
+          },
+        };
+        const moveNodeHandler = new MoveNodeCommandHandler(boardRepository);
+        moveNodeHandler.handle(new MoveNodeCommand(id, column, row));
         saveToStorage(board, state.links, state.slices, state.boundedContexts, state.nodeProperties);
         return { board };
       }),
 
     updateLabel: (id, label) =>
       set((state) => {
-        const board = updateLabelHandler.handle(state.board, new UpdateNodeLabelCommand(id, label));
+        let board = state.board;
+        const boardRepository: GridBoardRepository = {
+          load: () => board,
+          save: (nextBoard) => {
+            board = nextBoard;
+          },
+        };
+        const updateLabelHandler = new UpdateNodeLabelCommandHandler(boardRepository);
+        updateLabelHandler.handle(new UpdateNodeLabelCommand(id, label));
         saveToStorage(board, state.links, state.slices, state.boundedContexts, state.nodeProperties);
         const selectedNode = state.selectedNode?.id === id ? { ...state.selectedNode, label } : state.selectedNode;
         return { board, selectedNode };
@@ -486,7 +499,15 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
     removeNode: (id) =>
       set((state) => {
-        const board = removeNodeHandler.handle(state.board, new RemoveNodeCommand(id));
+        let board = state.board;
+        const boardRepository: GridBoardRepository = {
+          load: () => board,
+          save: (nextBoard) => {
+            board = nextBoard;
+          },
+        };
+        const removeNodeHandler = new RemoveNodeCommandHandler(boardRepository);
+        removeNodeHandler.handle(new RemoveNodeCommand(id));
         const links = state.links.filter((link) => link.sourceNodeId !== id && link.targetNodeId !== id);
         const { [id]: _, ...nodeProperties } = state.nodeProperties;
         void _;

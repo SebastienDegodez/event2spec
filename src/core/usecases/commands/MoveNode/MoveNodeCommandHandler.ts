@@ -1,14 +1,22 @@
-import { GridBoard } from '../../../domain/GridBoard';
+import { type GridBoard } from '../../../domain/GridBoard';
+import { type GridBoardRepository } from '../../../domain/GridBoardRepository';
 import { isRowValidForKind } from '../../../domain/isRowValidForKind';
 import { type NodeKind } from '../../../domain/NodeKind';
 import { MoveNodeCommand } from './MoveNodeCommand';
 
 export class MoveNodeCommandHandler {
-  handle(board: GridBoard, command: MoveNodeCommand): GridBoard {
+  private readonly repository: GridBoardRepository;
+
+  constructor(repository: GridBoardRepository) {
+    this.repository = repository;
+  }
+
+  handle(command: MoveNodeCommand): void {
+    const board = this.repository.load();
     const kind = this.findKind(board, command.id);
-    if (!kind) return board;
-    if (!isRowValidForKind(kind, command.row)) return board;
-    return board.moveNode(command.id, command.column, command.row);
+    if (!kind) return;
+    if (!isRowValidForKind(kind, command.row)) return;
+    this.repository.save(board.moveNode(command.id, command.column, command.row));
   }
 
   private findKind(board: GridBoard, id: string): NodeKind | undefined {

@@ -7,16 +7,15 @@ import { UpdateNodeLabelCommandHandler } from '../../../../src/core/usecases/com
 import { collectNodes } from '../../../helpers/collectNodes';
 import { InMemoryGridBoardRepository } from '../../../helpers/InMemoryGridBoardRepository';
 
-const handler = new UpdateNodeLabelCommandHandler();
-
 describe('UpdateNodeLabelCommandHandler', () => {
   it('updates the label of an existing node', () => {
     const repository = new InMemoryGridBoardRepository(GridBoard.empty());
     const addHandler = new AddDomainEventNodeCommandHandler(repository);
     addHandler.handle(new AddDomainEventNodeCommand('n1', 'OldLabel', 0, 0));
-    const board = repository.load();
+    const handler = new UpdateNodeLabelCommandHandler(repository);
 
-    const result = handler.handle(board, new UpdateNodeLabelCommand('n1', 'NewLabel'));
+    handler.handle(new UpdateNodeLabelCommand('n1', 'NewLabel'));
+    const result = repository.load();
     const nodes = collectNodes(result);
     const updated = nodes[0];
 
@@ -31,10 +30,10 @@ describe('UpdateNodeLabelCommandHandler', () => {
       new AddDomainEventNodeCommand('n1', 'First', 0, 0),
       new AddDomainEventNodeCommand('n2', 'Second', 1, 0),
     ].forEach((command) => addHandler.handle(command));
+    const handler = new UpdateNodeLabelCommandHandler(repository);
 
-    const board = repository.load();
-
-    const result = handler.handle(board, new UpdateNodeLabelCommand('n1', 'Updated'));
+    handler.handle(new UpdateNodeLabelCommand('n1', 'Updated'));
+    const result = repository.load();
     const nodes = collectNodes(result);
 
     const n1 = nodes.find((n) => n.id === 'n1');
