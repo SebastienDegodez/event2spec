@@ -156,6 +156,13 @@ describe('legacy swimlane cleanup', () => {
     expect(gridCanvas.includes('const createFlowNode = (')).toBe(false);
   });
 
+  it('extracts react flow nodes builder into a dedicated helper', () => {
+    expect(existsSync(pathInRepo('src/ui/components/Canvas/buildReactFlowNodes.ts'))).toBe(true);
+
+    const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
+    expect(gridCanvas.includes("type: 'cellQuickAdd'")).toBe(false);
+  });
+
   it('extracts react flow edges builder into a dedicated helper', () => {
     expect(existsSync(pathInRepo('src/ui/components/Canvas/buildReactFlowEdges.ts'))).toBe(true);
 

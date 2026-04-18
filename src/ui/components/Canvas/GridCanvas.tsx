@@ -19,7 +19,6 @@ import { useBoard, useBoardActions, useLinks, useSlices, useSliceActions, useSel
 import { type SwimlaneColor } from '../../../core/domain/SwimlaneColor';
 import { type NodeKind } from '../../../core/domain/NodeKind';
 import { resolveConnectionType } from '../../../core/domain/resolveConnectionType';
-import { cellNodeOptions } from '../../../core/domain/CellNodeOptions';
 import { type DomainEventNodeData } from './DomainEventNode';
 import { ContextMenuLayer } from './ContextMenuLayer';
 import { type ContextMenuState } from './ContextMenuState';
@@ -36,6 +35,7 @@ import { CanvasFlowDecorations } from './CanvasFlowDecorations';
 import { buildBoundedContextRowRenderData } from './buildBoundedContextRowRenderData';
 import { buildBoardRenderData } from './buildBoardRenderData';
 import { buildReactFlowEdges } from './buildReactFlowEdges';
+import { buildReactFlowNodes } from './buildReactFlowNodes';
 import { canvasNodeTypes } from './canvasNodeTypes';
 import { GRID_SIZE, NOTE_SIZE, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 import { useViewportCells } from '../../hooks/useViewportCells';
@@ -164,26 +164,7 @@ function GridCanvasInner() {
   });
 
   const reactFlowNodes = useMemo<Node[]>(
-    () => {
-      const result: Node[] = [...boardRenderData.actualNodes];
-
-      for (const { column, row } of viewportCells) {
-        const options = cellNodeOptions(row);
-        const position = domainNodeToPixelPosition({ column, row });
-        result.push({
-          id: `quick-add-${column}-${row}`,
-          type: 'cellQuickAdd',
-          position,
-          data: { column, row, options },
-          style: { width: NOTE_SIZE, height: NOTE_SIZE },
-          draggable: false,
-          selectable: false,
-          focusable: false,
-        });
-      }
-
-      return result;
-    },
+    () => buildReactFlowNodes(boardRenderData.actualNodes, viewportCells, NOTE_SIZE),
     [boardRenderData, viewportCells]
   );
 
