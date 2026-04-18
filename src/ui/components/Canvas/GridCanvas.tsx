@@ -41,6 +41,7 @@ import { SliceHeaderStrip, type SliceHeaderEntry } from './SliceHeaderStrip';
 import { buildContextMenuItems } from './buildContextMenuItems';
 import { buildSliceOverlayEntries } from './buildSliceOverlayEntries';
 import { buildSliceHeaderEntries } from './buildSliceHeaderEntries';
+import { buildVisibleColumns } from './buildVisibleColumns';
 import { RenameModal } from '../RenameModal';
 import { ConfirmDeleteModal } from '../ConfirmDeleteModal';
 import { GRID_SIZE, NOTE_SIZE, COMMAND_NODE_COLOR, DOMAIN_EVENT_NODE_COLOR, READ_MODEL_NODE_COLOR, POLICY_NODE_COLOR, UI_SCREEN_NODE_COLOR, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
@@ -442,19 +443,7 @@ function GridCanvasInner() {
   }, [deleteSlice, openSliceInspector, slices]);
 
   const visibleColumns = useMemo(() => {
-    const columns = new Set<number>();
-
-    viewportCells.forEach((cell) => {
-      columns.add(cell.column);
-    });
-
-    if (columns.size === 0) {
-      for (let column = 0; column <= 20; column += 1) {
-        columns.add(column);
-      }
-    }
-
-    return [...columns].sort((left, right) => left - right);
+    return buildVisibleColumns(viewportCells);
   }, [viewportCells]);
 
   const allHeaderEntries = useMemo<SliceHeaderEntry[]>(() => {

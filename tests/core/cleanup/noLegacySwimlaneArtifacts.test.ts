@@ -75,4 +75,11 @@ describe('legacy swimlane cleanup', () => {
     const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
     expect(gridCanvas.includes('label: `Columns ${selectedSliceRange.startColumn}-${selectedSliceRange.startColumn + selectedSliceRange.columnCount - 1}`')).toBe(false);
   });
+
+  it('extracts visible column calculation into a dedicated helper', () => {
+    expect(existsSync(pathInRepo('src/ui/components/Canvas/buildVisibleColumns.ts'))).toBe(true);
+
+    const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
+    expect(gridCanvas.includes('for (let column = 0; column <= 20; column += 1)')).toBe(false);
+  });
 });
