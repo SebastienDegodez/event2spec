@@ -1,4 +1,4 @@
-import { type ValidationWarningType } from '../../../core/domain/ValidationWarningType';
+import { type ValidationWarningType } from '../../../core/domain/validation/ValidationWarningType';
 
 const BADGE_LABELS: Record<ValidationWarningType, string> = {
   orphan: 'orphan',
