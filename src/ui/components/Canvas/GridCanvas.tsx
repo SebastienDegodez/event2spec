@@ -17,7 +17,6 @@ import '@xyflow/react/dist/style.css';
 
 import { useBoard, useBoardActions, useLinks, useSlices, useSliceActions, useSelectedSliceRange, useColumnSelectionActions, useBoundedContexts, useBoundedContextActions } from '../../../core/store/useBoardStore';
 import { type BoardProjection } from '../../../core/domain/BoardProjection';
-import { type BoundedContextProjection } from '../../../core/domain/BoundedContextProjection';
 import { type SwimlaneColor } from '../../../core/domain/SwimlaneColor';
 import { type NodeKind } from '../../../core/domain/NodeKind';
 import { resolveConnectionType } from '../../../core/domain/resolveConnectionType';
@@ -27,12 +26,12 @@ import { CommandNodeComponent } from './CommandNodeComponent';
 import { ReadModelNodeComponent } from './ReadModelNodeComponent';
 import { PolicyNodeComponent } from './PolicyNodeComponent';
 import { UIScreenNodeComponent } from './UIScreenNodeComponent';
-import { BoundedContextRowBackgroundNode, type BoundedContextRowBackgroundNodeData } from './BoundedContextRowBackgroundNode';
+import { BoundedContextRowBackgroundNode } from './BoundedContextRowBackgroundNode';
 import { CellQuickAddNode } from './CellQuickAddNode';
 import { ContextMenuLayer } from './ContextMenuLayer';
 import { type ContextMenuState } from './ContextMenuState';
 import { SliceOverlayLayer } from './SliceOverlayLayer';
-import { FixedRowLabelColumn, type FixedRowLabelEntry } from './FixedRowLabelColumn';
+import { FixedRowLabelColumn } from './FixedRowLabelColumn';
 import { SliceHeaderStrip, type SliceHeaderEntry } from './SliceHeaderStrip';
 import { buildContextMenuItems } from './buildContextMenuItems';
 import { buildSliceOverlayEntries } from './buildSliceOverlayEntries';
@@ -41,6 +40,7 @@ import { buildVisibleColumns } from './buildVisibleColumns';
 import { buildSliceHitboxColumns } from './buildSliceHitboxColumns';
 import { BoundedContextModalLayer } from './BoundedContextModalLayer';
 import { CanvasFlowDecorations } from './CanvasFlowDecorations';
+import { buildBoundedContextRowRenderData } from './buildBoundedContextRowRenderData';
 import { GRID_SIZE, NOTE_SIZE, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 import { useViewportCells } from '../../hooks/useViewportCells';
 
@@ -146,49 +146,13 @@ function GridCanvasInner() {
 
   // Collect bounded-context row backgrounds (rows 2+).
   const boundedContextRowRenderData = useMemo(() => {
-    const bgNodes: Node<BoundedContextRowBackgroundNodeData>[] = [];
-    const rows: FixedRowLabelEntry[] = [];
-    const domainEventCountByBoundedContextId = new Map<string, number>();
-
-    const boardProjection: BoardProjection = {
-      onDomainEventNode(_id, _label, _column, _row, boundedContextId) {
-        if (!boundedContextId) return;
-        domainEventCountByBoundedContextId.set(
-          boundedContextId,
-          (domainEventCountByBoundedContextId.get(boundedContextId) ?? 0) + 1,
-        );
-      },
-      onCommandNode() {},
-      onReadModelNode() {},
-      onPolicyNode() {},
-      onUIScreenNode() {},
-    };
-    board.describeTo(boardProjection);
-
-    const projection: BoundedContextProjection = {
-      onBoundedContext(id, name) {
-        const index = rows.length;
-        const row = 2 + index;
-        const color = BOUNDED_CONTEXT_ROW_COLORS[index % BOUNDED_CONTEXT_ROW_COLORS.length];
-        const startX = ROW_BACKGROUND_OFFSET_X;
-        const domainEventCount = domainEventCountByBoundedContextId.get(id) ?? 0;
-        bgNodes.push({
-          id: `bounded-context-row-bg-${id}`,
-          type: 'boundedContextRowBackground',
-          position: { x: startX, y: row * GRID_SIZE },
-          data: { name, color },
-          style: { width: 20000, height: GRID_SIZE },
-          draggable: false,
-          selectable: false,
-          focusable: false,
-          zIndex: -1,
-        });
-
-        rows.push({ id, name, index, color, domainEventCount });
-      },
-    };
-    boundedContexts.describeTo(projection);
-    return { bgNodes, rows };
+    return buildBoundedContextRowRenderData({
+      board,
+      boundedContexts,
+      rowColors: BOUNDED_CONTEXT_ROW_COLORS,
+      rowBackgroundOffsetX: ROW_BACKGROUND_OFFSET_X,
+      gridSize: GRID_SIZE,
+    });
   }, [
     board,
     boundedContexts,

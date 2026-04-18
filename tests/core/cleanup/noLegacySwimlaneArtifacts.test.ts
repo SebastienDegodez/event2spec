@@ -134,6 +134,13 @@ describe('legacy swimlane cleanup', () => {
     expect(gridCanvas.includes('<Controls position="bottom-right"')).toBe(false);
   });
 
+  it('extracts bounded context row render-data builder into a dedicated helper', () => {
+    expect(existsSync(pathInRepo('src/ui/components/Canvas/buildBoundedContextRowRenderData.ts'))).toBe(true);
+
+    const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
+    expect(gridCanvas.includes('domainEventCountByBoundedContextId')).toBe(false);
+  });
+
   it('groups vertical slice aggregate files under a dedicated domain subfolder', () => {
     expect(existsSync(pathInRepo('src/core/domain/VerticalSlice.ts'))).toBe(false);
     expect(existsSync(pathInRepo('src/core/domain/VerticalSliceCollection.ts'))).toBe(false);
