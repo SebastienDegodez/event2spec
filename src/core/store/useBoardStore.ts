@@ -53,7 +53,8 @@ import { VerticalSliceCollection } from '../domain/vertical-slice/VerticalSliceC
 import { type VerticalSliceRepository } from '../domain/VerticalSliceRepository';
 import { BoundedContextCollection } from '../domain/bounded-context/BoundedContextCollection';
 import { type BoundedContextRepository } from '../domain/bounded-context/BoundedContextRepository';
-import { resolveAutoLinks, type BoardNodeSummary } from '../domain/resolveAutoLinks';
+import { resolveAutoLinks } from '../domain/resolveAutoLinks';
+import { collectBoardNodeSummaries } from '../domain/board/collectBoardNodeSummaries';
 import { loadFromStorage, saveToStorage } from './boardPersistence';
 
 export type { NodeLink };
@@ -65,20 +66,6 @@ export interface SelectedNode {
   id: string;
   type: NodeKind;
   label: string;
-}
-
-/** Collects all board nodes as summaries for auto-link resolution. */
-function collectBoardNodeSummaries(board: GridBoard): BoardNodeSummary[] {
-  const summaries: BoardNodeSummary[] = [];
-  const projection: BoardProjection = {
-    onDomainEventNode(id, _label, column, row) { summaries.push({ id, kind: 'domainEvent', column, row }); },
-    onCommandNode(id, _label, column, row) { summaries.push({ id, kind: 'command', column, row }); },
-    onReadModelNode(id, _label, column, row) { summaries.push({ id, kind: 'readModel', column, row }); },
-    onPolicyNode(id, _label, column, row) { summaries.push({ id, kind: 'policy', column, row }); },
-    onUIScreenNode(id, _label, column, row) { summaries.push({ id, kind: 'uiScreen', column, row }); },
-  };
-  board.describeTo(projection);
-  return summaries;
 }
 
 interface BoardStoreState {

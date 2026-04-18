@@ -231,4 +231,19 @@ describe('legacy swimlane cleanup', () => {
       expect(existsSync(pathInRepo(`src/core/domain/validation/${f}`))).toBe(true);
     }
   });
+
+  it('extracts board persistence into a dedicated module', () => {
+    expect(existsSync(pathInRepo('src/core/store/boardPersistence.ts'))).toBe(true);
+
+    const store = readFileSync(pathInRepo('src/core/store/useBoardStore.ts'), 'utf8');
+    expect(store.includes('localStorage.getItem')).toBe(false);
+    expect(store.includes('localStorage.setItem')).toBe(false);
+  });
+
+  it('extracts collectBoardNodeSummaries into the board domain subfolder', () => {
+    expect(existsSync(pathInRepo('src/core/domain/board/collectBoardNodeSummaries.ts'))).toBe(true);
+
+    const store = readFileSync(pathInRepo('src/core/store/useBoardStore.ts'), 'utf8');
+    expect(store.includes('function collectBoardNodeSummaries')).toBe(false);
+  });
 });
