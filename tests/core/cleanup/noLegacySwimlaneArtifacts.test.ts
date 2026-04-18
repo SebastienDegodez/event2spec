@@ -223,4 +223,12 @@ describe('legacy swimlane cleanup', () => {
       expect(existsSync(pathInRepo(`src/core/domain/node/${f}`))).toBe(true);
     }
   });
+
+  it('groups validation files under a dedicated domain subfolder', () => {
+    const validationFiles = ['ModelValidator.ts', 'ValidationWarning.ts', 'ValidationWarningType.ts'];
+    for (const f of validationFiles) {
+      expect(existsSync(pathInRepo(`src/core/domain/${f}`))).toBe(false);
+      expect(existsSync(pathInRepo(`src/core/domain/validation/${f}`))).toBe(true);
+    }
+  });
 });

@@ -1,4 +1,4 @@
-import { type ValidationWarning } from '../../../core/domain/ValidationWarning';
+import { type ValidationWarning } from '../../../core/domain/validation/ValidationWarning';
 
 const KIND_ICONS: Record<string, string> = {
   domainEvent: '🟠',

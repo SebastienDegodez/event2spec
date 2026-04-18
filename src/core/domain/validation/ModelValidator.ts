@@ -1,5 +1,5 @@
-import { type NodeKind } from './node/NodeKind';
-import { type NodeLink } from './node/NodeLink';
+import { type NodeKind } from '../node/NodeKind';
+import { type NodeLink } from '../node/NodeLink';
 import { type ValidationWarning } from './ValidationWarning';
 
 /** Minimal node info needed for validation. */
