@@ -1,7 +1,7 @@
 import { type Node } from '@xyflow/react';
 import { type BoardProjection } from '../../../core/domain/board/BoardProjection';
 import { type BoundedContextProjection } from '../../../core/domain/bounded-context/BoundedContextProjection';
-import { type SwimlaneColor } from '../../../core/domain/SwimlaneColor';
+import { type BoundedContextRowColor } from './BoundedContextRowColor';
 import { type BoundedContextRowBackgroundNodeData } from './BoundedContextRowBackgroundNode';
 import { type FixedRowLabelEntry } from './FixedRowLabelColumn';
 
@@ -16,7 +16,7 @@ interface BoundedContextsLike {
 interface BuildBoundedContextRowRenderDataOptions {
   board: BoardLike;
   boundedContexts: BoundedContextsLike;
-  rowColors: readonly SwimlaneColor[];
+  rowColors: readonly BoundedContextRowColor[];
   rowBackgroundOffsetX: number;
   gridSize: number;
 }

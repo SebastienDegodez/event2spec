@@ -16,7 +16,7 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import { useBoard, useBoardActions, useLinks, useSlices, useSliceActions, useSelectedSliceRange, useColumnSelectionActions, useBoundedContexts, useBoundedContextActions } from '../../../core/store/useBoardStore';
-import { type SwimlaneColor } from '../../../core/domain/SwimlaneColor';
+import { type BoundedContextRowColor } from './BoundedContextRowColor';
 import { type NodeKind } from '../../../core/domain/node/NodeKind';
 import { resolveConnectionType } from '../../../core/domain/resolveConnectionType';
 import { type DomainEventNodeData } from './DomainEventNode';
@@ -43,7 +43,7 @@ import { useBoundedContextModals } from '../../hooks/useBoundedContextModals';
 
 const ROW_BACKGROUND_OFFSET_X = 0;
 const FIXED_ROWS: readonly number[] = [0, 1] as const;
-const BOUNDED_CONTEXT_ROW_COLORS: readonly SwimlaneColor[] = ['yellow', 'blue', 'red', 'grey'] as const;
+const BOUNDED_CONTEXT_ROW_COLORS: readonly BoundedContextRowColor[] = ['yellow', 'blue', 'red', 'grey'] as const;
 
 function GridCanvasInner() {
   const board = useBoard();

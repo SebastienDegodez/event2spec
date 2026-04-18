@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { type SwimlaneColor } from '../../../core/domain/SwimlaneColor';
+import { type BoundedContextRowColor } from './BoundedContextRowColor';
 import { GRID_SIZE } from './gridConstants';
 
 const FIXED_ROW_LABEL_COLOR: Record<string, string> = {
@@ -13,7 +13,7 @@ export interface FixedRowLabelEntry {
   id: string;
   name: string;
   index: number;
-  color: SwimlaneColor;
+  color: BoundedContextRowColor;
   domainEventCount: number;
 }
 
