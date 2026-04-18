@@ -1,5 +1,5 @@
-import { type GridBoardRepository } from '../../src/core/domain/GridBoardRepository';
-import { type GridBoard } from '../../src/core/domain/GridBoard';
+import { type GridBoardRepository } from '../../src/core/domain/board/GridBoardRepository';
+import { type GridBoard } from '../../src/core/domain/board/GridBoard';
 
 export class InMemoryGridBoardRepository implements GridBoardRepository {
   private board: GridBoard;

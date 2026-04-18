@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useBoard, useLinks, useSlices, useSliceActions, useColumnSelectionActions } from '../../../core/store/useBoardStore';
-import { type BoardProjection } from '../../../core/domain/BoardProjection';
+import { type BoardProjection } from '../../../core/domain/board/BoardProjection';
 import { type VerticalSliceProjection, type ScenarioProjection } from '../../../core/domain/vertical-slice/VerticalSliceProjection';
 
 interface NodeEntry {

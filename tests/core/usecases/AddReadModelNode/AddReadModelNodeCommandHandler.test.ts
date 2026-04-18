@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { GridBoard } from '../../../../src/core/domain/GridBoard';
+import { GridBoard } from '../../../../src/core/domain/board/GridBoard';
 import { AddReadModelNodeCommand } from '../../../../src/core/usecases/commands/AddReadModelNode/AddReadModelNodeCommand';
 import { AddReadModelNodeCommandHandler } from '../../../../src/core/usecases/commands/AddReadModelNode/AddReadModelNodeCommandHandler';
 import { collectNodes } from '../../../helpers/collectNodes';

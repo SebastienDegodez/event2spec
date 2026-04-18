@@ -1,5 +1,5 @@
-import { GridBoard } from '../../../domain/GridBoard';
-import { type BoardProjection } from '../../../domain/BoardProjection';
+import { GridBoard } from '../../../domain/board/GridBoard';
+import { type BoardProjection } from '../../../domain/board/BoardProjection';
 import { type EventModel, type DomainEventEntry, type CommandEntry, type ReadModelEntry, type PolicyEntry, type UIScreenEntry, type VerticalSlice as VerticalSliceSchema, type Scenario as ScenarioSchema } from '../../../domain/EventModelSchema';
 import { type NodeLink } from '../../../domain/NodeLink';
 import { type NodeProperties } from '../../../domain/NodeProperties';

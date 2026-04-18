@@ -198,4 +198,18 @@ describe('legacy swimlane cleanup', () => {
     expect(existsSync(pathInRepo('src/core/domain/bounded-context/BoundedContextProjection.ts'))).toBe(true);
     expect(existsSync(pathInRepo('src/core/domain/bounded-context/BoundedContextRepository.ts'))).toBe(true);
   });
+
+  it('groups board files under a dedicated domain subfolder', () => {
+    expect(existsSync(pathInRepo('src/core/domain/GridBoard.ts'))).toBe(false);
+    expect(existsSync(pathInRepo('src/core/domain/GridBoardRepository.ts'))).toBe(false);
+    expect(existsSync(pathInRepo('src/core/domain/BoardNode.ts'))).toBe(false);
+    expect(existsSync(pathInRepo('src/core/domain/BoardProjection.ts'))).toBe(false);
+    expect(existsSync(pathInRepo('src/core/domain/GridPosition.ts'))).toBe(false);
+
+    expect(existsSync(pathInRepo('src/core/domain/board/GridBoard.ts'))).toBe(true);
+    expect(existsSync(pathInRepo('src/core/domain/board/GridBoardRepository.ts'))).toBe(true);
+    expect(existsSync(pathInRepo('src/core/domain/board/BoardNode.ts'))).toBe(true);
+    expect(existsSync(pathInRepo('src/core/domain/board/BoardProjection.ts'))).toBe(true);
+    expect(existsSync(pathInRepo('src/core/domain/board/GridPosition.ts'))).toBe(true);
+  });
 });

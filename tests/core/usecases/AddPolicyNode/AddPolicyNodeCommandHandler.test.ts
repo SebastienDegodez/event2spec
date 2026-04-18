@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { GridBoard } from '../../../../src/core/domain/GridBoard';
+import { GridBoard } from '../../../../src/core/domain/board/GridBoard';
 import { AddPolicyNodeCommand } from '../../../../src/core/usecases/commands/AddPolicyNode/AddPolicyNodeCommand';
 import { AddPolicyNodeCommandHandler } from '../../../../src/core/usecases/commands/AddPolicyNode/AddPolicyNodeCommandHandler';
 import { collectNodes } from '../../../helpers/collectNodes';

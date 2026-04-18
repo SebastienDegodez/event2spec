@@ -1,4 +1,4 @@
-import { type GridBoardRepository } from '../../../domain/GridBoardRepository';
+import { type GridBoardRepository } from '../../../domain/board/GridBoardRepository';
 import { CommandNode } from '../../../domain/CommandNode';
 import { AddCommandNodeCommand } from './AddCommandNodeCommand';
 

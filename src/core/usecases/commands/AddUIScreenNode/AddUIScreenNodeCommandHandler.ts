@@ -1,4 +1,4 @@
-import { type GridBoardRepository } from '../../../domain/GridBoardRepository';
+import { type GridBoardRepository } from '../../../domain/board/GridBoardRepository';
 import { UIScreenNode } from '../../../domain/UIScreenNode';
 import { AddUIScreenNodeCommand } from './AddUIScreenNodeCommand';
 

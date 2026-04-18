@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
-import { GridBoard } from '../domain/GridBoard';
-import { type BoardProjection } from '../domain/BoardProjection';
+import { GridBoard } from '../domain/board/GridBoard';
+import { type BoardProjection } from '../domain/board/BoardProjection';
 import { DomainEventNode } from '../domain/DomainEventNode';
 import { CommandNode } from '../domain/CommandNode';
-import { type GridBoardRepository } from '../domain/GridBoardRepository';
+import { type GridBoardRepository } from '../domain/board/GridBoardRepository';
 import { ReadModelNode } from '../domain/ReadModelNode';
 import { PolicyNode } from '../domain/PolicyNode';
 import { UIScreenNode } from '../domain/UIScreenNode';

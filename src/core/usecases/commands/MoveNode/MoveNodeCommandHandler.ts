@@ -1,5 +1,5 @@
-import { type GridBoard } from '../../../domain/GridBoard';
-import { type GridBoardRepository } from '../../../domain/GridBoardRepository';
+import { type GridBoard } from '../../../domain/board/GridBoard';
+import { type GridBoardRepository } from '../../../domain/board/GridBoardRepository';
 import { isRowValidForKind } from '../../../domain/isRowValidForKind';
 import { type NodeKind } from '../../../domain/NodeKind';
 import { MoveNodeCommand } from './MoveNodeCommand';

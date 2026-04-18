@@ -1,5 +1,5 @@
 import { type Node } from '@xyflow/react';
-import { type BoardProjection } from '../../../core/domain/BoardProjection';
+import { type BoardProjection } from '../../../core/domain/board/BoardProjection';
 
 interface BoardLike {
   describeTo(projection: BoardProjection): void;

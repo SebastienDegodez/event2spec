@@ -1,5 +1,5 @@
-import { GridBoard } from '../../../domain/GridBoard';
-import { type BoardProjection } from '../../../domain/BoardProjection';
+import { GridBoard } from '../../../domain/board/GridBoard';
+import { type BoardProjection } from '../../../domain/board/BoardProjection';
 import { type NodeLink } from '../../../domain/NodeLink';
 import { VerticalSliceCollection } from '../../../domain/vertical-slice/VerticalSliceCollection';
 import { ExportMarkdownQuery } from './ExportMarkdownQuery';

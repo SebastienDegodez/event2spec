@@ -1,5 +1,5 @@
 import { type Node } from '@xyflow/react';
-import { type BoardProjection } from '../../../core/domain/BoardProjection';
+import { type BoardProjection } from '../../../core/domain/board/BoardProjection';
 import { type BoundedContextProjection } from '../../../core/domain/bounded-context/BoundedContextProjection';
 import { type SwimlaneColor } from '../../../core/domain/SwimlaneColor';
 import { type BoundedContextRowBackgroundNodeData } from './BoundedContextRowBackgroundNode';
