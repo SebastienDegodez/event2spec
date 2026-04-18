@@ -35,7 +35,7 @@ import { BoundedContextRowBackgroundNode, type BoundedContextRowBackgroundNodeDa
 import { CellQuickAddNode } from './CellQuickAddNode';
 import { ContextMenu } from './ContextMenu';
 import { type ContextMenuState } from './ContextMenuState';
-import { SliceOverlay } from './SliceOverlay';
+import { SliceOverlayLayer } from './SliceOverlayLayer';
 import { FixedRowLabelColumn, type FixedRowLabelEntry } from './FixedRowLabelColumn';
 import { SliceHeaderStrip, type SliceHeaderEntry } from './SliceHeaderStrip';
 import { buildContextMenuItems } from './buildContextMenuItems';
@@ -520,28 +520,12 @@ function GridCanvasInner() {
             />
           </ReactFlow>
 
-          <div className="slice-overlay-layer" aria-hidden="true">
-            {sliceOverlayEntries.map((entry) => (
-              <SliceOverlay
-                key={entry.id}
-                startColumn={entry.startColumn}
-                columnCount={entry.columnCount}
-                viewport={viewport}
-                topOffset={0}
-                height={containerSize.height}
-              />
-            ))}
-            {selectedSliceRange && (
-              <SliceOverlay
-                startColumn={selectedSliceRange.startColumn}
-                columnCount={selectedSliceRange.columnCount}
-                viewport={viewport}
-                topOffset={0}
-                height={containerSize.height}
-                isTemporary
-              />
-            )}
-          </div>
+          <SliceOverlayLayer
+            sliceOverlayEntries={sliceOverlayEntries}
+            selectedSliceRange={selectedSliceRange}
+            viewport={viewport}
+            height={containerSize.height}
+          />
           {contextMenu && (
             <ContextMenu
               x={contextMenu.x}
