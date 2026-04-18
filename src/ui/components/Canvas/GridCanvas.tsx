@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ReactFlow,
-  Background,
-  BackgroundVariant,
-  Controls,
   useNodesState,
   useEdgesState,
   useReactFlow,
@@ -43,7 +40,7 @@ import { buildSliceHeaderEntries } from './buildSliceHeaderEntries';
 import { buildVisibleColumns } from './buildVisibleColumns';
 import { buildSliceHitboxColumns } from './buildSliceHitboxColumns';
 import { BoundedContextModalLayer } from './BoundedContextModalLayer';
-import { CanvasMiniMap } from './CanvasMiniMap';
+import { CanvasFlowDecorations } from './CanvasFlowDecorations';
 import { GRID_SIZE, NOTE_SIZE, EDGE_COLOR, domainNodeToPixelPosition, pixelToGrid } from './gridConstants';
 import { useViewportCells } from '../../hooks/useViewportCells';
 
@@ -504,14 +501,7 @@ function GridCanvasInner() {
             deleteKeyCode="Delete"
             proOptions={{ hideAttribution: false }}
           >
-            <Background
-              variant={BackgroundVariant.Cross}
-              gap={GRID_SIZE}
-              size={6}
-              color="rgba(255,255,255,0.18)"
-            />
-            <Controls position="bottom-right" />
-            <CanvasMiniMap />
+            <CanvasFlowDecorations />
           </ReactFlow>
 
           <SliceOverlayLayer

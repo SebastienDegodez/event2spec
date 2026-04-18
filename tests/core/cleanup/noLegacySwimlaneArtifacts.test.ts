@@ -126,6 +126,14 @@ describe('legacy swimlane cleanup', () => {
     expect(gridCanvas.includes('maskColor="rgba(15,15,25,0.7)"')).toBe(false);
   });
 
+  it('extracts react flow visual decorations into a dedicated canvas component', () => {
+    expect(existsSync(pathInRepo('src/ui/components/Canvas/CanvasFlowDecorations.tsx'))).toBe(true);
+
+    const gridCanvas = readFileSync(pathInRepo('src/ui/components/Canvas/GridCanvas.tsx'), 'utf8');
+    expect(gridCanvas.includes('<Background')).toBe(false);
+    expect(gridCanvas.includes('<Controls position="bottom-right"')).toBe(false);
+  });
+
   it('groups vertical slice aggregate files under a dedicated domain subfolder', () => {
     expect(existsSync(pathInRepo('src/core/domain/VerticalSlice.ts'))).toBe(false);
     expect(existsSync(pathInRepo('src/core/domain/VerticalSliceCollection.ts'))).toBe(false);
