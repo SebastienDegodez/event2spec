@@ -1,10 +1,17 @@
-import { GridBoard } from '../../../domain/GridBoard';
+import { type GridBoardRepository } from '../../../domain/GridBoardRepository';
 import { ReadModelNode } from '../../../domain/ReadModelNode';
 import { AddReadModelNodeCommand } from './AddReadModelNodeCommand';
 
 export class AddReadModelNodeCommandHandler {
-  handle(board: GridBoard, command: AddReadModelNodeCommand): GridBoard {
+  private readonly repository: GridBoardRepository;
+
+  constructor(repository: GridBoardRepository) {
+    this.repository = repository;
+  }
+
+  handle(command: AddReadModelNodeCommand): void {
+    const board = this.repository.load();
     const node = ReadModelNode.create(command.id, command.label, command.column, command.row);
-    return board.insertNode(node);
+    this.repository.save(board.insertNode(node));
   }
 }

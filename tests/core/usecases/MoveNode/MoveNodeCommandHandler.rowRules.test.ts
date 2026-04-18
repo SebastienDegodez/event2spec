@@ -11,15 +11,14 @@ import { MoveNodeCommandHandler } from '../../../../src/core/usecases/commands/M
 import { collectNodes } from '../../../helpers/collectNodes';
 import { InMemoryGridBoardRepository } from '../../../helpers/InMemoryGridBoardRepository';
 
-const addScreenHandler = new AddUIScreenNodeCommandHandler();
 const moveHandler = new MoveNodeCommandHandler();
 
 describe('MoveNodeCommandHandler row rules', () => {
   it('ignores invalid uiScreen move to row 1', () => {
-    const board = addScreenHandler.handle(
-      GridBoard.empty(),
-      new AddUIScreenNodeCommand('ui-1', 'Checkout', 0, 0)
-    );
+    const repository = new InMemoryGridBoardRepository(GridBoard.empty());
+    const addScreenHandler = new AddUIScreenNodeCommandHandler(repository);
+    addScreenHandler.handle(new AddUIScreenNodeCommand('ui-1', 'Checkout', 0, 0));
+    const board = repository.load();
 
     const result = moveHandler.handle(board, new MoveNodeCommand('ui-1', 1, 1));
     const node = collectNodes(result).find((n) => n.id === 'ui-1');

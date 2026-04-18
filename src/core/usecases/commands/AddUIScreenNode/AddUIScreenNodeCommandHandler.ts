@@ -1,10 +1,17 @@
-import { GridBoard } from '../../../domain/GridBoard';
+import { type GridBoardRepository } from '../../../domain/GridBoardRepository';
 import { UIScreenNode } from '../../../domain/UIScreenNode';
 import { AddUIScreenNodeCommand } from './AddUIScreenNodeCommand';
 
 export class AddUIScreenNodeCommandHandler {
-  handle(board: GridBoard, command: AddUIScreenNodeCommand): GridBoard {
+  private readonly repository: GridBoardRepository;
+
+  constructor(repository: GridBoardRepository) {
+    this.repository = repository;
+  }
+
+  handle(command: AddUIScreenNodeCommand): void {
+    const board = this.repository.load();
     const node = UIScreenNode.create(command.id, command.label, command.column, command.row);
-    return board.insertNode(node);
+    this.repository.save(board.insertNode(node));
   }
 }

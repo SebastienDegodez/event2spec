@@ -329,9 +329,6 @@ interface BoardActions {
   exportMarkdown: () => string;
 }
 
-const addReadModelNodeHandler = new AddReadModelNodeCommandHandler();
-const addPolicyNodeHandler = new AddPolicyNodeCommandHandler();
-const addUIScreenNodeHandler = new AddUIScreenNodeCommandHandler();
 const moveNodeHandler = new MoveNodeCommandHandler();
 const updateLabelHandler = new UpdateNodeLabelCommandHandler();
 const removeNodeHandler = new RemoveNodeCommandHandler();
@@ -426,7 +423,15 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
     addReadModelNode: (id, label, column, row) =>
       set((state) => {
-        const board = addReadModelNodeHandler.handle(state.board, new AddReadModelNodeCommand(id, label, column, row));
+        let board = state.board;
+        const boardRepository: GridBoardRepository = {
+          load: () => board,
+          save: (nextBoard) => {
+            board = nextBoard;
+          },
+        };
+        const addReadModelNodeHandler = new AddReadModelNodeCommandHandler(boardRepository);
+        addReadModelNodeHandler.handle(new AddReadModelNodeCommand(id, label, column, row));
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('readModel') };
         saveToStorage(board, state.links, state.slices, state.boundedContexts, nodeProperties);
         return { board, nodeProperties };
@@ -434,7 +439,15 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
     addPolicyNode: (id, label, column, row) =>
       set((state) => {
-        const board = addPolicyNodeHandler.handle(state.board, new AddPolicyNodeCommand(id, label, column, row));
+        let board = state.board;
+        const boardRepository: GridBoardRepository = {
+          load: () => board,
+          save: (nextBoard) => {
+            board = nextBoard;
+          },
+        };
+        const addPolicyNodeHandler = new AddPolicyNodeCommandHandler(boardRepository);
+        addPolicyNodeHandler.handle(new AddPolicyNodeCommand(id, label, column, row));
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('policy') };
         saveToStorage(board, state.links, state.slices, state.boundedContexts, nodeProperties);
         return { board, nodeProperties };
@@ -442,7 +455,15 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
     addUIScreenNode: (id, label, column, row) =>
       set((state) => {
-        const board = addUIScreenNodeHandler.handle(state.board, new AddUIScreenNodeCommand(id, label, column, row));
+        let board = state.board;
+        const boardRepository: GridBoardRepository = {
+          load: () => board,
+          save: (nextBoard) => {
+            board = nextBoard;
+          },
+        };
+        const addUIScreenNodeHandler = new AddUIScreenNodeCommandHandler(boardRepository);
+        addUIScreenNodeHandler.handle(new AddUIScreenNodeCommand(id, label, column, row));
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('uiScreen') };
         saveToStorage(board, state.links, state.slices, state.boundedContexts, nodeProperties);
         return { board, nodeProperties };
@@ -631,11 +652,14 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
           const addCommandNodeHandler = new AddCommandNodeCommandHandler(boardRepository);
           addCommandNodeHandler.handle(new AddCommandNodeCommand(id, label, column, row, ''));
         } else if (kind === 'readModel') {
-          board = addReadModelNodeHandler.handle(board, new AddReadModelNodeCommand(id, label, column, row));
+          const addReadModelNodeHandler = new AddReadModelNodeCommandHandler(boardRepository);
+          addReadModelNodeHandler.handle(new AddReadModelNodeCommand(id, label, column, row));
         } else if (kind === 'policy') {
-          board = addPolicyNodeHandler.handle(board, new AddPolicyNodeCommand(id, label, column, row));
+          const addPolicyNodeHandler = new AddPolicyNodeCommandHandler(boardRepository);
+          addPolicyNodeHandler.handle(new AddPolicyNodeCommand(id, label, column, row));
         } else if (kind === 'uiScreen') {
-          board = addUIScreenNodeHandler.handle(board, new AddUIScreenNodeCommand(id, label, column, row));
+          const addUIScreenNodeHandler = new AddUIScreenNodeCommandHandler(boardRepository);
+          addUIScreenNodeHandler.handle(new AddUIScreenNodeCommand(id, label, column, row));
         }
         // Resolve auto-links using the updated board (after insertion and collision shifts)
         const existingNodes = collectBoardNodeSummaries(board);
