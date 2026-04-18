@@ -246,4 +246,10 @@ describe('legacy swimlane cleanup', () => {
     const store = readFileSync(pathInRepo('src/core/store/useBoardStore.ts'), 'utf8');
     expect(store.includes('function collectBoardNodeSummaries')).toBe(false);
   });
+
+  it('uses a board repository factory instead of inline repository creation', () => {
+    const store = readFileSync(pathInRepo('src/core/store/useBoardStore.ts'), 'utf8');
+    const inlinePatternCount = (store.match(/const boardRepository: GridBoardRepository/g) || []).length;
+    expect(inlinePatternCount).toBe(0);
+  });
 });

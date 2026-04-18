@@ -68,6 +68,15 @@ export interface SelectedNode {
   label: string;
 }
 
+function createBoardRepository(initialBoard: GridBoard) {
+  let board = initialBoard;
+  const repository: GridBoardRepository = {
+    load: () => board,
+    save: (nextBoard) => { board = nextBoard; },
+  };
+  return { repository, getBoard: () => board };
+}
+
 interface BoardStoreState {
   board: GridBoard;
   links: ReadonlyArray<NodeLink>;
@@ -215,15 +224,10 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
         state.boundedContexts.describeTo({ onBoundedContext(bcId) { bcIds.push(bcId); } });
         const bcIndex = row - 2;
         const boundedContextId = bcIndex >= 0 && bcIndex < bcIds.length ? bcIds[bcIndex] : undefined;
-        let board = state.board;
-        const boardRepository: GridBoardRepository = {
-          load: () => board,
-          save: (nextBoard) => {
-            board = nextBoard;
-          },
-        };
-        const addDomainEventNodeHandler = new AddDomainEventNodeCommandHandler(boardRepository);
+        const { repository, getBoard } = createBoardRepository(state.board);
+        const addDomainEventNodeHandler = new AddDomainEventNodeCommandHandler(repository);
         addDomainEventNodeHandler.handle(new AddDomainEventNodeCommand(id, label, column, row, boundedContextId));
+        const board = getBoard();
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('domainEvent') };
         saveToStorage(board, state.links, state.slices, state.boundedContexts, nodeProperties);
         return { board, nodeProperties };
@@ -231,15 +235,10 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
     addCommandNode: (id, label, column, row, linkedEventId) =>
       set((state) => {
-        let board = state.board;
-        const boardRepository: GridBoardRepository = {
-          load: () => board,
-          save: (nextBoard) => {
-            board = nextBoard;
-          },
-        };
-        const addCommandNodeHandler = new AddCommandNodeCommandHandler(boardRepository);
+        const { repository, getBoard } = createBoardRepository(state.board);
+        const addCommandNodeHandler = new AddCommandNodeCommandHandler(repository);
         addCommandNodeHandler.handle(new AddCommandNodeCommand(id, label, column, row, linkedEventId ?? ''));
+        const board = getBoard();
         const links = linkedEventId
           ? [...state.links, { sourceNodeId: id, targetNodeId: linkedEventId, connectionType: 'triggers' as const }]
           : state.links;
@@ -250,15 +249,10 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
     addReadModelNode: (id, label, column, row) =>
       set((state) => {
-        let board = state.board;
-        const boardRepository: GridBoardRepository = {
-          load: () => board,
-          save: (nextBoard) => {
-            board = nextBoard;
-          },
-        };
-        const addReadModelNodeHandler = new AddReadModelNodeCommandHandler(boardRepository);
+        const { repository, getBoard } = createBoardRepository(state.board);
+        const addReadModelNodeHandler = new AddReadModelNodeCommandHandler(repository);
         addReadModelNodeHandler.handle(new AddReadModelNodeCommand(id, label, column, row));
+        const board = getBoard();
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('readModel') };
         saveToStorage(board, state.links, state.slices, state.boundedContexts, nodeProperties);
         return { board, nodeProperties };
@@ -266,15 +260,10 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
     addPolicyNode: (id, label, column, row) =>
       set((state) => {
-        let board = state.board;
-        const boardRepository: GridBoardRepository = {
-          load: () => board,
-          save: (nextBoard) => {
-            board = nextBoard;
-          },
-        };
-        const addPolicyNodeHandler = new AddPolicyNodeCommandHandler(boardRepository);
+        const { repository, getBoard } = createBoardRepository(state.board);
+        const addPolicyNodeHandler = new AddPolicyNodeCommandHandler(repository);
         addPolicyNodeHandler.handle(new AddPolicyNodeCommand(id, label, column, row));
+        const board = getBoard();
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('policy') };
         saveToStorage(board, state.links, state.slices, state.boundedContexts, nodeProperties);
         return { board, nodeProperties };
@@ -282,15 +271,10 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
     addUIScreenNode: (id, label, column, row) =>
       set((state) => {
-        let board = state.board;
-        const boardRepository: GridBoardRepository = {
-          load: () => board,
-          save: (nextBoard) => {
-            board = nextBoard;
-          },
-        };
-        const addUIScreenNodeHandler = new AddUIScreenNodeCommandHandler(boardRepository);
+        const { repository, getBoard } = createBoardRepository(state.board);
+        const addUIScreenNodeHandler = new AddUIScreenNodeCommandHandler(repository);
         addUIScreenNodeHandler.handle(new AddUIScreenNodeCommand(id, label, column, row));
+        const board = getBoard();
         const nodeProperties = { ...state.nodeProperties, [id]: createDefaultNodeProperties('uiScreen') };
         saveToStorage(board, state.links, state.slices, state.boundedContexts, nodeProperties);
         return { board, nodeProperties };
@@ -298,30 +282,20 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
     moveNode: (id, column, row) =>
       set((state) => {
-        let board = state.board;
-        const boardRepository: GridBoardRepository = {
-          load: () => board,
-          save: (nextBoard) => {
-            board = nextBoard;
-          },
-        };
-        const moveNodeHandler = new MoveNodeCommandHandler(boardRepository);
+        const { repository, getBoard } = createBoardRepository(state.board);
+        const moveNodeHandler = new MoveNodeCommandHandler(repository);
         moveNodeHandler.handle(new MoveNodeCommand(id, column, row));
+        const board = getBoard();
         saveToStorage(board, state.links, state.slices, state.boundedContexts, state.nodeProperties);
         return { board };
       }),
 
     updateLabel: (id, label) =>
       set((state) => {
-        let board = state.board;
-        const boardRepository: GridBoardRepository = {
-          load: () => board,
-          save: (nextBoard) => {
-            board = nextBoard;
-          },
-        };
-        const updateLabelHandler = new UpdateNodeLabelCommandHandler(boardRepository);
+        const { repository, getBoard } = createBoardRepository(state.board);
+        const updateLabelHandler = new UpdateNodeLabelCommandHandler(repository);
         updateLabelHandler.handle(new UpdateNodeLabelCommand(id, label));
+        const board = getBoard();
         saveToStorage(board, state.links, state.slices, state.boundedContexts, state.nodeProperties);
         const selectedNode = state.selectedNode?.id === id ? { ...state.selectedNode, label } : state.selectedNode;
         return { board, selectedNode };
@@ -329,15 +303,10 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
     removeNode: (id) =>
       set((state) => {
-        let board = state.board;
-        const boardRepository: GridBoardRepository = {
-          load: () => board,
-          save: (nextBoard) => {
-            board = nextBoard;
-          },
-        };
-        const removeNodeHandler = new RemoveNodeCommandHandler(boardRepository);
+        const { repository, getBoard } = createBoardRepository(state.board);
+        const removeNodeHandler = new RemoveNodeCommandHandler(repository);
         removeNodeHandler.handle(new RemoveNodeCommand(id));
+        const board = getBoard();
         const links = state.links.filter((link) => link.sourceNodeId !== id && link.targetNodeId !== id);
         const { [id]: _, ...nodeProperties } = state.nodeProperties;
         void _;
@@ -484,34 +453,29 @@ export const useBoardStore = create<BoardStoreState & BoardActions>((set, get) =
 
     addNodeWithAutoLinks: (id, kind, label, column, row) =>
       set((state) => {
-        let board = state.board;
-        const boardRepository: GridBoardRepository = {
-          load: () => board,
-          save: (nextBoard) => {
-            board = nextBoard;
-          },
-        };
+        const { repository, getBoard } = createBoardRepository(state.board);
         if (kind === 'domainEvent') {
           // Resolve bounded context from the row (row 2 → BC index 0, row 3 → BC index 1, etc.)
           const bcIds: string[] = [];
           state.boundedContexts.describeTo({ onBoundedContext(bcId) { bcIds.push(bcId); } });
           const bcIndex = row - 2;
           const boundedContextId = bcIndex >= 0 && bcIndex < bcIds.length ? bcIds[bcIndex] : undefined;
-          const addDomainEventNodeHandler = new AddDomainEventNodeCommandHandler(boardRepository);
+          const addDomainEventNodeHandler = new AddDomainEventNodeCommandHandler(repository);
           addDomainEventNodeHandler.handle(new AddDomainEventNodeCommand(id, label, column, row, boundedContextId));
         } else if (kind === 'command') {
-          const addCommandNodeHandler = new AddCommandNodeCommandHandler(boardRepository);
+          const addCommandNodeHandler = new AddCommandNodeCommandHandler(repository);
           addCommandNodeHandler.handle(new AddCommandNodeCommand(id, label, column, row, ''));
         } else if (kind === 'readModel') {
-          const addReadModelNodeHandler = new AddReadModelNodeCommandHandler(boardRepository);
+          const addReadModelNodeHandler = new AddReadModelNodeCommandHandler(repository);
           addReadModelNodeHandler.handle(new AddReadModelNodeCommand(id, label, column, row));
         } else if (kind === 'policy') {
-          const addPolicyNodeHandler = new AddPolicyNodeCommandHandler(boardRepository);
+          const addPolicyNodeHandler = new AddPolicyNodeCommandHandler(repository);
           addPolicyNodeHandler.handle(new AddPolicyNodeCommand(id, label, column, row));
         } else if (kind === 'uiScreen') {
-          const addUIScreenNodeHandler = new AddUIScreenNodeCommandHandler(boardRepository);
+          const addUIScreenNodeHandler = new AddUIScreenNodeCommandHandler(repository);
           addUIScreenNodeHandler.handle(new AddUIScreenNodeCommand(id, label, column, row));
         }
+        const board = getBoard();
         // Resolve auto-links using the updated board (after insertion and collision shifts)
         const existingNodes = collectBoardNodeSummaries(board);
         const autoLinks = resolveAutoLinks(id, kind, column, row, existingNodes);
