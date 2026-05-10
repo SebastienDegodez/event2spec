@@ -60,7 +60,7 @@ describe('useBoardStore persistence v3', () => {
       })
     );
 
-    const { useBoardStore } = await import('../../../src/core/store/useBoardStore');
+    const { useBoardStore } = await import('../../../src/ui/adapters/zustand/useBoardStore');
     const collected = collectSlices(useBoardStore.getState().slices);
 
     expect(collected[0].startColumn).toBe(6);
@@ -89,7 +89,7 @@ describe('useBoardStore persistence v3', () => {
       })
     );
 
-    const { useBoardStore } = await import('../../../src/core/store/useBoardStore');
+    const { useBoardStore } = await import('../../../src/ui/adapters/zustand/useBoardStore');
     const collected = collectSlices(useBoardStore.getState().slices);
 
     expect(collected[0].startColumn).toBe(0);
@@ -115,7 +115,7 @@ describe('useBoardStore persistence v2', () => {
       })
     );
 
-    const { useBoardStore } = await import('../../../src/core/store/useBoardStore');
+    const { useBoardStore } = await import('../../../src/ui/adapters/zustand/useBoardStore');
     const state = useBoardStore.getState();
 
     expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
@@ -141,7 +141,7 @@ describe('useBoardStore persistence v2', () => {
       })
     );
 
-    const { useBoardStore } = await import('../../../src/core/store/useBoardStore');
+    const { useBoardStore } = await import('../../../src/ui/adapters/zustand/useBoardStore');
     const state = useBoardStore.getState();
 
     expect(localStorage.getItem(STORAGE_KEY)).not.toBeNull();

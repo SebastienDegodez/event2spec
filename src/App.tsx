@@ -4,7 +4,7 @@ import { SliceEditorView } from './ui/components/Slices/SliceEditorView';
 import { SliceInspectorView } from './ui/components/Slices/SliceInspectorView';
 import { PropertiesPanel } from './ui/components/PropertiesPanel/PropertiesPanel';
 import { ValidationCounter } from './ui/components/Validation/ValidationCounter';
-import { useActiveSliceInspectorId, useSelectedSliceRange } from './core/store/useBoardStore';
+import { useActiveSliceInspectorId, useSelectedSliceRange } from './ui/adapters/zustand/useBoardStore';
 import './App.css';
 
 export default function App() {

@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react';
 import type { NodeProps } from '@xyflow/react';
 import { type CellNodeOption } from '../../../core/domain/CellNodeOptions';
-import { useBoardActions } from '../../../core/store/useBoardStore';
+import { useBoardActions } from '../../../ui/adapters/zustand/useBoardStore';
 
 export type CellQuickAddNodeData = {
   column: number;

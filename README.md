@@ -42,9 +42,14 @@ src/
         UpdateNodeLabel/      #   Rename a node
       queries/
         GetAllNodes/          #   Retrieve all board nodes
-    store/
-      useBoardStore.ts       # Zustand store (board + links + actions)
+  frontend/
+    application/
+      viewmodels/
+        BoardViewModel.ts    # Framework-agnostic frontend application view model
   ui/
+    adapters/
+      zustand/
+        useBoardStore.ts     # React/Zustand driving adapter
     components/
       Canvas/
         GridCanvas.tsx        # React Flow adapter (nodes, edges, context menu)
@@ -86,7 +91,7 @@ Each use case is a Command + CommandHandler pair grouped in its own folder. Test
 | **RemoveNode** | `RemoveNodeCommand` | `RemoveNodeCommandHandler` | Removes a node and cleans up links |
 | **UpdateNodeLabel** | `UpdateNodeLabelCommand` | `UpdateNodeLabelCommandHandler` | Renames a node |
 
-### Store
+### Store & frontend adapter
 
 The Zustand store holds two pieces of state:
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { useBoardStore } from '../../../src/core/store/useBoardStore';
+import { useBoardStore } from '../../../src/ui/adapters/zustand/useBoardStore';
 
 describe('store without swimlanes aggregate', () => {
   it('initializes with boundedContexts and fixed-row semantics only', () => {

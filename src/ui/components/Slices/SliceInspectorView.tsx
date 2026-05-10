@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useBoard, useSlices, useSliceActions, useBoardStore } from '../../../core/store/useBoardStore';
+import { useBoard, useSlices, useSliceActions, useBoardStore } from '../../../ui/adapters/zustand/useBoardStore';
 import { type BoardProjection } from '../../../core/domain/board/BoardProjection';
 import { type VerticalSliceProjection, type ScenarioProjection } from '../../../core/domain/vertical-slice/VerticalSliceProjection';
 import { ScenarioDialog } from './ScenarioDialog';

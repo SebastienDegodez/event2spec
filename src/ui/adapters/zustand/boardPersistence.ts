@@ -1,17 +1,17 @@
-import { GridBoard } from '../domain/board/GridBoard';
-import { type BoardProjection } from '../domain/board/BoardProjection';
-import { DomainEventNode } from '../domain/node/DomainEventNode';
-import { CommandNode } from '../domain/node/CommandNode';
-import { ReadModelNode } from '../domain/node/ReadModelNode';
-import { PolicyNode } from '../domain/node/PolicyNode';
-import { UIScreenNode } from '../domain/node/UIScreenNode';
-import { type NodeLink } from '../domain/node/NodeLink';
-import { type NodeProperties } from '../domain/node/NodeProperties';
-import { VerticalSliceCollection } from '../domain/vertical-slice/VerticalSliceCollection';
-import { VerticalSlice } from '../domain/vertical-slice/VerticalSlice';
-import { Scenario } from '../domain/Scenario';
-import { BoundedContextCollection } from '../domain/bounded-context/BoundedContextCollection';
-import { BoundedContext } from '../domain/bounded-context/BoundedContext';
+import { GridBoard } from '../../../core/domain/board/GridBoard';
+import { type BoardProjection } from '../../../core/domain/board/BoardProjection';
+import { DomainEventNode } from '../../../core/domain/node/DomainEventNode';
+import { CommandNode } from '../../../core/domain/node/CommandNode';
+import { ReadModelNode } from '../../../core/domain/node/ReadModelNode';
+import { PolicyNode } from '../../../core/domain/node/PolicyNode';
+import { UIScreenNode } from '../../../core/domain/node/UIScreenNode';
+import { type NodeLink } from '../../../core/domain/node/NodeLink';
+import { type NodeProperties } from '../../../core/domain/node/NodeProperties';
+import { VerticalSliceCollection } from '../../../core/domain/vertical-slice/VerticalSliceCollection';
+import { VerticalSlice } from '../../../core/domain/vertical-slice/VerticalSlice';
+import { Scenario } from '../../../core/domain/Scenario';
+import { BoundedContextCollection } from '../../../core/domain/bounded-context/BoundedContextCollection';
+import { BoundedContext } from '../../../core/domain/bounded-context/BoundedContext';
 
 /** Serialisable representation of a node for localStorage persistence. */
 interface PersistedNode {

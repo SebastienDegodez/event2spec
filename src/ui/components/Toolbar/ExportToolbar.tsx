@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useBoardActions } from '../../../core/store/useBoardStore';
+import { useBoardActions } from '../../../ui/adapters/zustand/useBoardStore';
 
 function downloadFile(content: string, filename: string, mimeType: string): void {
   const blob = new Blob([content], { type: mimeType });
