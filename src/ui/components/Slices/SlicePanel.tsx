@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useSlices } from '../../../core/store/useBoardStore';
+import { useSlices } from '../../../ui/adapters/zustand/useBoardStore';
 import { type VerticalSliceProjection } from '../../../core/domain/vertical-slice/VerticalSliceProjection';
 
 interface SlicePanelEntry {

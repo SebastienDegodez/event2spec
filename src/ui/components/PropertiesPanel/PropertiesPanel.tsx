@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
-import { useSelectedNode, useNodeProperties, useBoardActions, type NodeProperties } from '../../../core/store/useBoardStore';
-import { createDefaultNodeProperties } from '../../../core/domain/node/NodeProperties';
+import { type NodeProperties } from '../../../core/domain/node/NodeProperties';
+import { useBoardViewModel } from '../../adapters/zustand/useBoardViewModel';
 import { KeyValueEditor } from './KeyValueEditor';
 import { StringListEditor } from './StringListEditor';
 
@@ -13,14 +13,13 @@ const NODE_TYPE_LABELS: Record<string, string> = {
 };
 
 export function PropertiesPanel() {
-  const selectedNode = useSelectedNode();
-  const allNodeProperties = useNodeProperties();
-  const { deselectNode, updateNodeProperties, updateLabel } = useBoardActions();
+  const boardViewModel = useBoardViewModel();
+  const selectedNode = boardViewModel.selectedNode;
+  const { deselectNode, updateNodeProperties, updateLabel } = boardViewModel.commands();
 
   const properties = useMemo(() => {
-    if (!selectedNode) return null;
-    return allNodeProperties[selectedNode.id] ?? createDefaultNodeProperties(selectedNode.type);
-  }, [selectedNode, allNodeProperties]);
+    return boardViewModel.selectedNodeProperties();
+  }, [boardViewModel]);
 
   const handleUpdate = useCallback(
     (partial: Partial<NodeProperties>) => {

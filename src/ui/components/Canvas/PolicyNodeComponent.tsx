@@ -1,6 +1,6 @@
 import { memo, useCallback } from 'react';
 import { Handle, Position, useReactFlow, type NodeProps } from '@xyflow/react';
-import { useBoardActions } from '../../../core/store/useBoardStore';
+import { useBoardActions } from '../../../ui/adapters/zustand/useBoardStore';
 import { useNodeValidationWarning } from '../../hooks/useNodeValidationWarning';
 import { useNodeInlineEditing } from '../../hooks/useNodeInlineEditing';
 import { ValidationBadge } from '../Validation/ValidationBadge';

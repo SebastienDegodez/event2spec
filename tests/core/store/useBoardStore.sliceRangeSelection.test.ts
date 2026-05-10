@@ -35,7 +35,7 @@ describe('useBoardStore slice range selection', () => {
   });
 
   it('starts a new temporary range from a free column', async () => {
-    const { useBoardStore } = await import('../../../src/core/store/useBoardStore');
+    const { useBoardStore } = await import('../../../src/ui/adapters/zustand/useBoardStore');
     useBoardStore.getState().startSliceSelection(8);
 
     expect(useBoardStore.getState().selectedSliceRange).toEqual({ startColumn: 8, columnCount: 1 });
@@ -56,7 +56,7 @@ describe('useBoardStore slice range selection', () => {
       })
     );
 
-    const { useBoardStore } = await import('../../../src/core/store/useBoardStore');
+    const { useBoardStore } = await import('../../../src/ui/adapters/zustand/useBoardStore');
     useBoardStore.getState().startSliceSelection(5);
 
     expect(useBoardStore.getState().selectedSliceRange).toBeNull();
@@ -64,7 +64,7 @@ describe('useBoardStore slice range selection', () => {
   });
 
   it('extends the temporary range by one column to the right', async () => {
-    const { useBoardStore } = await import('../../../src/core/store/useBoardStore');
+    const { useBoardStore } = await import('../../../src/ui/adapters/zustand/useBoardStore');
     useBoardStore.getState().startSliceSelection(8);
     useBoardStore.getState().extendSelectedSliceRangeRight();
 

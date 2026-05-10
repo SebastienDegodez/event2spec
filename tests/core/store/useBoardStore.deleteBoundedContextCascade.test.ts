@@ -53,7 +53,7 @@ describe('useBoardStore deleteBoundedContext cascade', () => {
       })
     );
 
-    const { useBoardStore } = await import('../../../src/core/store/useBoardStore');
+    const { useBoardStore } = await import('../../../src/ui/adapters/zustand/useBoardStore');
     useBoardStore.getState().deleteBoundedContext('bc-1');
 
     const nodes = collectNodes(useBoardStore.getState().board);
@@ -85,7 +85,7 @@ describe('useBoardStore deleteBoundedContext cascade', () => {
       })
     );
 
-    const { useBoardStore } = await import('../../../src/core/store/useBoardStore');
+    const { useBoardStore } = await import('../../../src/ui/adapters/zustand/useBoardStore');
     useBoardStore.getState().deleteBoundedContext('bc-1');
 
     const { links } = useBoardStore.getState();

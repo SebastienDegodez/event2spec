@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useAutoEditNodeId, useBoardStore } from '../../core/store/useBoardStore';
+import { useAutoEditNodeId, useBoardStore } from '../../ui/adapters/zustand/useBoardStore';
 
 /**
  * Hook that checks whether a newly mounted node should start in

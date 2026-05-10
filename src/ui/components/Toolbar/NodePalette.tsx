@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useBoardActions } from '../../../core/store/useBoardStore';
+import { useBoardActions } from '../../../ui/adapters/zustand/useBoardStore';
 
 export function NodePalette() {
   const { addDomainEventNode, addCommandNode, addReadModelNode, addPolicyNode, addUIScreenNode } = useBoardActions();

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useBoard } from '../../../core/store/useBoardStore';
+import { useBoard } from '../../../ui/adapters/zustand/useBoardStore';
 import { type BoardProjection } from '../../../core/domain/board/BoardProjection';
 
 interface NodeEntry {

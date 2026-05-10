@@ -15,7 +15,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { useBoard, useBoardActions, useLinks, useSlices, useSliceActions, useSelectedSliceRange, useColumnSelectionActions, useBoundedContexts, useBoundedContextActions } from '../../../core/store/useBoardStore';
+import { useBoardViewModel } from '../../adapters/zustand/useBoardViewModel';
 import { type BoundedContextRowColor } from './BoundedContextRowColor';
 import { type NodeKind } from '../../../core/domain/node/NodeKind';
 import { resolveConnectionType } from '../../../core/domain/resolveConnectionType';
@@ -46,18 +46,32 @@ const FIXED_ROWS: readonly number[] = [0, 1] as const;
 const BOUNDED_CONTEXT_ROW_COLORS: readonly BoundedContextRowColor[] = ['yellow', 'blue', 'red', 'grey'] as const;
 
 function GridCanvasInner() {
-  const board = useBoard();
-  const links = useLinks();
-  const slices = useSlices();
-  const boundedContexts = useBoundedContexts();
-  const { createBoundedContext, renameBoundedContext, deleteBoundedContext } = useBoundedContextActions();
-  const { openSliceInspector, deleteSlice } = useSliceActions();
-  const { addDomainEventNode, addNodeWithAutoLinks, moveNode, addLink, removeLink, selectNode, deselectNode } = useBoardActions();
+  const boardViewModel = useBoardViewModel();
+  const board = boardViewModel.board;
+  const links = boardViewModel.links;
+  const slices = boardViewModel.slices;
+  const boundedContexts = boardViewModel.boundedContexts;
+  const selectedSliceRange = boardViewModel.selectedSliceRange;
+  const {
+    createBoundedContext,
+    renameBoundedContext,
+    deleteBoundedContext,
+    openSliceInspector,
+    deleteSlice,
+    addDomainEventNode,
+    addNodeWithAutoLinks,
+    moveNode,
+    addLink,
+    removeLink,
+    selectNode,
+    deselectNode,
+    startSliceSelection,
+    extendSelectedSliceRangeRight,
+    clearSliceSelection,
+  } = boardViewModel.commands();
   const { screenToFlowPosition } = useReactFlow();
   const viewport = useViewport();
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
-  const selectedSliceRange = useSelectedSliceRange();
-  const { startSliceSelection, extendSelectedSliceRangeRight, clearSliceSelection } = useColumnSelectionActions();
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 800, height: 600 });
 
