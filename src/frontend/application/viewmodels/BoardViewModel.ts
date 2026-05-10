@@ -77,8 +77,13 @@ export class BoardViewModel {
   readonly autoEditNodeId: string | null;
 
   private readonly actions: BoardViewModelActions;
+  private readonly cachedValidationWarnings: ReadonlyArray<ValidationWarning>;
 
-  constructor(state: BoardViewModelState, actions: BoardViewModelActions) {
+  constructor(
+    state: BoardViewModelState,
+    actions: BoardViewModelActions,
+    validationWarnings?: ReadonlyArray<ValidationWarning>
+  ) {
     this.board = state.board;
     this.links = state.links;
     this.slices = state.slices;
@@ -90,6 +95,7 @@ export class BoardViewModel {
     this.activeSliceInspectorMode = state.activeSliceInspectorMode;
     this.autoEditNodeId = state.autoEditNodeId;
     this.actions = actions;
+    this.cachedValidationWarnings = validationWarnings ?? BoardViewModel.calculateValidationWarnings(this.board, this.links);
   }
 
   selectedNodeProperties(): NodeProperties | null {
@@ -98,9 +104,13 @@ export class BoardViewModel {
   }
 
   validationWarnings(): ReadonlyArray<ValidationWarning> {
+    return this.cachedValidationWarnings;
+  }
+
+  static calculateValidationWarnings(board: GridBoard, links: ReadonlyArray<NodeLink>): ReadonlyArray<ValidationWarning> {
     const queryHandler = new ValidateModelQueryHandler({
-      loadBoard: () => this.board,
-      loadLinks: () => this.links,
+      loadBoard: () => board,
+      loadLinks: () => links,
     });
 
     return queryHandler.handle(new ValidateModelQuery());

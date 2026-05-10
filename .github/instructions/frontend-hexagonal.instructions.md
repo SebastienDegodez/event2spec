@@ -1,5 +1,5 @@
 ---
-applyTo: 'src/ui/**,src/core/store/**,src/frontend/**'
+applyTo: 'src/ui/**,src/ui/adapters/**,src/frontend/**'
 description: Enforces frontend hexagonal architecture boundaries between framework adapters and business/application logic
 ---
 # Frontend Hexagonal Architecture Rules

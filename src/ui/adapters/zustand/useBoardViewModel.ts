@@ -71,5 +71,10 @@ export function useBoardViewModel(): BoardViewModel {
     [boardActions, sliceActions, columnSelectionActions, boundedContextActions]
   );
 
-  return useMemo(() => new BoardViewModel(state, actions), [state, actions]);
+  const validationWarnings = useMemo(
+    () => BoardViewModel.calculateValidationWarnings(board, links),
+    [board, links]
+  );
+
+  return useMemo(() => new BoardViewModel(state, actions, validationWarnings), [state, actions, validationWarnings]);
 }
