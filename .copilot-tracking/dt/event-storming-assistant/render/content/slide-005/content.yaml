@@ -1,0 +1,107 @@
+slide: 5
+title: "Use Case — Dériver aggregates et bounded contexts depuis le mur"
+section: "Use Cases"
+layout: "blank"
+
+background:
+  fill: "#0F1117"
+
+elements:
+  - type: textbox
+    left: 0.6
+    top: 0.8
+    width: 12.0
+    height: 0.5
+    text: "USE CASE (Part 1 of 4)"
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#6FD2D9"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 1.3
+    width: 12.0
+    height: 0.8
+    text: "Use Case — Dériver aggregates et bounded contexts depuis le mur"
+    font: "Segoe UI"
+    font_size: 22
+    font_color: "#FFFFFF"
+    font_bold: true
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 2.2
+    width: 12.0
+    height: 0.4
+    text: "Description"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 2.7
+    width: 12.0
+    height: 0.8
+    text: "En séance de conception restreinte, l'assistant analyse le mur d'Event Storming produit par l'atelier de domaine et propose des candidats d'aggregates et de bounded contexts, chacun justifié par les éléments du modèle qui le fondent. Les architectes acceptent, amendent ou écartent."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 3.6
+    width: 12.0
+    height: 0.4
+    text: "Overview"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 4.1
+    width: 12.0
+    height: 0.8
+    text: "L'atelier de domaine a produit un mur riche mais plat : des dizaines d'événements sur une timeline, des commandes, des policies, des systèmes externes, des acteurs. Ce mur ne comporte aucune indication de frontière. Le passage au niveau Software Design demande d'identifier les zones de cohérence — quelles commandes opèrent sur les mêmes invariants, quels groupes d'événements partagent un même langage — ce qui exige aujourd'hui de tout relire manuellement plusieurs fois.\n\nL'assistant prend en charge la proposition initiale. Il analyse la structure du mur — dépendances, flux `Event → Policy → Command → System → Event`, acteurs impliqués, vocabulaire employé — et produit des candidats de découpage. Chaque candidat est accompagné des éléments qui le justifient et reste remontable jusqu'aux extraits de conversation dont ces éléments proviennent. Les architectes exercent leur jugement sur ces candidats.\n\nCe mode s'exécute **hors direct** et **sans dépendance à l'audio** : son entrée est le mur, pas la parole."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 5.0
+    width: 12.0
+    height: 0.4
+    text: "Business Value"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 5.5
+    width: 12.0
+    height: 0.9
+    text: "La valeur est double : réduire le délai entre l'atelier et une décision d'architecture défendable, et garantir que le découpage s'appuie sur le langage réel du métier plutôt que sur l'organigramme existant.\n\n| Bénéficiaire | Effet | |---|---| | Architectes | Exercent leur jugement sur des candidats argumentés au lieu d'une page blanche | | Développeurs praticiens | Contribuent au découpage sans le porter seuls | | Programme | Un découpage traçable jusqu'à la parole métier, opposable en comité | | Équipes de développement | La matière nécessaire au dossier d'architecture technique |\n\nIndicateurs pertinents : durée de la séance de conception, proportion de frontières retenues issues d'une proposition, nombre de découpages alternatifs examinés, capacité à justifier chaque frontière par un élément du mur."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 6.5
+    width: 12.0
+    height: 0.35
+    text: "Source: use-cases/deriver-aggregates-et-bounded-contexts.md | 2026-08-05"
+    font: "Segoe UI"
+    font_size: 8
+    font_color: "#77809A"

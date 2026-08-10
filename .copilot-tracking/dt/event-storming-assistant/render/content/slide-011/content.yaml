@@ -1,0 +1,139 @@
+slide: 11
+title: "Use Case — Matérialiser les échanges de l'atelier en post-its validés"
+section: "Use Cases"
+layout: "blank"
+
+background:
+  fill: "#0F1117"
+
+elements:
+  - type: textbox
+    left: 0.6
+    top: 0.8
+    width: 12.0
+    height: 0.5
+    text: "USE CASE (Part 3 of 4)"
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#6FD2D9"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 1.3
+    width: 12.0
+    height: 0.8
+    text: "Use Case — Matérialiser les échanges de l'atelier en post-its validés"
+    font: "Segoe UI"
+    font_size: 22
+    font_color: "#FFFFFF"
+    font_bold: true
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 2.2
+    width: 5.8
+    height: 0.4
+    text: "Equipment Requirements"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 6.6
+    top: 2.2
+    width: 5.8
+    height: 0.4
+    text: "Operating Environment"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 2.7
+    width: 5.8
+    height: 0.6
+    text: "Un poste par participant avec micro et navigateur. Un outil de visioconférence dont le flux audio est captable. Un accès à un service de transcription et à un modèle de langage — sous réserve de l'arbitrage sécurité IT sur l'envoi de contenu métier vers un service externe. Un écran partagé ou une vue synchronisée du mur pour les 23 participants."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 6.6
+    top: 2.7
+    width: 5.8
+    height: 0.6
+    text: "Séance en distanciel intégral, en journée, participants répartis sur plusieurs sites. Conditions audio hétérogènes : qualités de micro variables, bruit de fond, prises de parole qui se chevauchent, accents et jargon métier assurance. Contexte réglementé — assureur — impliquant des contraintes RGPD sur l'enregistrement, et des enjeux contractuels liés à la présence de consultants externes.\n\nL'environnement distanciel aggrave le risque central : à 23 en visio, la prise de parole est coûteuse et le silence est le comportement par défaut."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 3.5
+    width: 12.0
+    height: 0.4
+    text: "Success Criteria"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 4.0
+    width: 12.0
+    height: 1.0
+    text: "- Les deux développeurs praticiens ont contribué au contenu au lieu d'écrire.\n- Les six experts métier reconnaissent leur processus dans le mur produit.\n- Le coach agile a mené la séance sans avoir à arbitrer de question de notation.\n- Aucun élément du mur n'est absent de la conversation réelle.\n- Le modèle est exploitable immédiatement après la séance, sans reprise manuelle."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 5.1
+    width: 12.0
+    height: 0.4
+    text: "Pain Points"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 5.6
+    width: 12.0
+    height: 1.0
+    text: "Aujourd'hui : le praticien de la méthode est immobilisé au tableau blanc et se tait ; la correction de notation à voix haute interrompt le flux et inhibe les experts métier ; la chronologie se dégrade dès que la discussion revient en arrière ; la conversation disparaît une fois la séance terminée ; le résultat n'est pas exploitable par la chaîne de développement et impose une retranscription manuelle."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 6.7
+    width: 8.6
+    height: 0.25
+    text: "Source: use-cases/materialiser-les-echanges-en-post-its.md"
+    font: "Segoe UI"
+    font_size: 9
+    font_color: "#77809A"
+
+  - type: textbox
+    left: 10.7
+    top: 6.7
+    width: 1.9
+    height: 0.25
+    text: "Last Updated: 2026-08-05"
+    font: "Segoe UI"
+    font_size: 9
+    font_color: "#77809A"
