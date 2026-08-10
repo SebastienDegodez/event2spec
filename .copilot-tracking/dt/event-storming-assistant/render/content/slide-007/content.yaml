@@ -1,0 +1,139 @@
+slide: 7
+title: "Use Case — Dériver aggregates et bounded contexts depuis le mur"
+section: "Use Cases"
+layout: "blank"
+
+background:
+  fill: "#0F1117"
+
+elements:
+  - type: textbox
+    left: 0.6
+    top: 0.8
+    width: 12.0
+    height: 0.5
+    text: "USE CASE (Part 3 of 4)"
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#6FD2D9"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 1.3
+    width: 12.0
+    height: 0.8
+    text: "Use Case — Dériver aggregates et bounded contexts depuis le mur"
+    font: "Segoe UI"
+    font_size: 22
+    font_color: "#FFFFFF"
+    font_bold: true
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 2.2
+    width: 5.8
+    height: 0.4
+    text: "Equipment Requirements"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 6.6
+    top: 2.2
+    width: 5.8
+    height: 0.4
+    text: "Operating Environment"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 2.7
+    width: 5.8
+    height: 0.6
+    text: "Un poste par participant avec navigateur. Un accès à un modèle de langage pour l'analyse — sous réserve de l'arbitrage sécurité IT, mais avec une exigence moindre qu'en mode Captation puisqu'aucun flux audio n'est traité. Un écran suffisamment grand pour visualiser un mur dense et ses regroupements."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 6.6
+    top: 2.7
+    width: 5.8
+    height: 0.6
+    text: "Séance de travail restreinte, quatre participants, en distanciel ou en présentiel. Pas de contrainte temps réel : l'analyse peut prendre plusieurs secondes sans nuire à l'expérience. Contexte moins tendu que l'atelier à 23, ce qui autorise une interaction plus dense et plus technique."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 3.5
+    width: 12.0
+    height: 0.4
+    text: "Success Criteria"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 4.0
+    width: 12.0
+    height: 1.0
+    text: "- Les architectes retiennent au moins une frontière issue d'une proposition de l'assistant.\n- Chaque frontière retenue est justifiable par des éléments du mur.\n- La séance aboutit à un découpage utilisable, dans une durée sans commune mesure avec une analyse manuelle.\n- Aucune frontière n'est imposée : toutes sont amendables.\n- Le mur d'origine reste intact."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 5.1
+    width: 12.0
+    height: 0.4
+    text: "Pain Points"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 5.6
+    width: 12.0
+    height: 1.0
+    text: "Aujourd'hui : le découpage repose sur l'intuition d'un architecte et sa connaissance du système existant, ce qui reproduit souvent l'organisation actuelle plutôt que le domaine ; le lien entre la parole des experts métier et les frontières retenues est perdu ; l'analyse manuelle d'un mur dense est longue et faillible ; aucune alternative n'est examinée, faute de temps."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 6.7
+    width: 8.6
+    height: 0.25
+    text: "Source: use-cases/deriver-aggregates-et-bounded-contexts.md"
+    font: "Segoe UI"
+    font_size: 9
+    font_color: "#77809A"
+
+  - type: textbox
+    left: 10.7
+    top: 6.7
+    width: 1.9
+    height: 0.25
+    text: "Last Updated: 2026-08-05"
+    font: "Segoe UI"
+    font_size: 9
+    font_color: "#77809A"

@@ -1,0 +1,96 @@
+slide: 1
+title: "Event Storming Assistant — Vision"
+section: "Vision Statement"
+layout: "blank"
+
+background:
+  fill: "#0F1117"
+
+elements:
+  - type: textbox
+    left: 0.6
+    top: 0.8
+    width: 12.0
+    height: 0.5
+    text: "VISION STATEMENT"
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 1.3
+    width: 12.0
+    height: 0.8
+    text: "Event Storming Assistant — Vision"
+    font: "Segoe UI"
+    font_size: 22
+    font_color: "#FFFFFF"
+    font_bold: true
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 2.2
+    width: 12.0
+    height: 0.4
+    text: "Vision Statement"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 2.7
+    width: 12.0
+    height: 1.5
+    text: "Nous voulons que n'importe quelle organisation puisse conduire un Event Storming complet — de la découverte du domaine jusqu'au découpage en bounded contexts — sans dépendre de la disponibilité d'un expert de la méthode : un assistant écoute l'atelier et matérialise en direct ce que les participants disent, puis, en séance de conception restreinte, propose un découpage déduit du modèle — dans les deux cas sur validation humaine explicite, pendant que les humains gardent l'animation, le débat et la décision."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 4.3
+    width: 12.0
+    height: 0.4
+    text: "Why This Matters"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 4.8
+    width: 12.0
+    height: 1.8
+    text: "Dans un programme de transformation, le goulot d'étranglement n'est pas la vitesse d'écriture du code : c'est la vitesse à laquelle une organisation comprend son propre domaine. L'Event Storming est la méthode la plus efficace connue pour produire cette compréhension partagée, mais elle bute sur une rareté : très peu de gens savent l'animer, et ceux qui savent sont précisément ceux dont on a besoin comme contributeurs. Le résultat observé est un exercice mal cadré, non reproductible, dont la sortie n'alimente pas la chaîne de développement.\n\nRendre la méthode disponible sans consommer la compétence rare produit trois effets en cascade :\n\n- **Pour le programme** — le cadrage du domaine dommage aux biens devient prévisible en durée et en qualité, au lieu de dépendre d'une personne.\n- **Pour les équipes de développement** — la sortie devient un modèle structuré jusqu'au découpage en aggregates et bounded contexts, exploitable par des agents pour générer BRD, PRD et dossier d'architecture technique, au lieu de photos de post-its qu'il faut retranscrire à la main.\n- **Pour l'organisation** — la conversation métier cesse de s'évaporer. Chaque élément du modèle reste rattaché au passage de discussion qui l'a produit, ce qui rend le modèle défendable et révisable."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 6.85
+    width: 8.6
+    height: 0.25
+    text: "Source: vision-statement.md"
+    font: "Segoe UI"
+    font_size: 9
+    font_color: "#77809A"
+
+  - type: textbox
+    left: 10.7
+    top: 6.85
+    width: 2.0
+    height: 0.25
+    text: "2026-08-05"
+    font: "Segoe UI"
+    font_size: 9
+    font_color: "#77809A"
+    alignment: right

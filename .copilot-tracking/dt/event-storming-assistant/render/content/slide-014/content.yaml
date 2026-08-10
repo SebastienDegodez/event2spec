@@ -1,0 +1,140 @@
+slide: 14
+title: "Persona — L'expert métier dommage aux biens"
+section: "User Personas"
+layout: "blank"
+
+background:
+  fill: "#0F1117"
+
+elements:
+  - type: textbox
+    left: 0.6
+    top: 0.8
+    width: 12.0
+    height: 0.5
+    text: "PERSONA"
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#BA8CF5"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 1.3
+    width: 12.0
+    height: 0.8
+    text: "Persona — L'expert métier dommage aux biens"
+    font: "Segoe UI"
+    font_size: 22
+    font_color: "#FFFFFF"
+    font_bold: true
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 2.2
+    width: 12.0
+    height: 0.4
+    text: "Description"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 2.7
+    width: 12.0
+    height: 0.7
+    text: "Gestionnaire ou référent métier sur la branche dommage aux biens, avec plusieurs années de pratique des contrats, des déclarations de sinistre, de l'expertise et de l'indemnisation. Il connaît les cas particuliers que personne n'a documentés. Il fait partie des 6 experts métier de l'atelier de septembre, face à 17 personnes qui ne connaissent pas le domaine. Il est la source de vérité de l'Event Storming — sans sa parole, il n'y a pas de modèle."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 3.5
+    width: 12.0
+    height: 0.4
+    text: "Goal"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 4.0
+    width: 12.0
+    height: 0.7
+    text: "Que le système qui sera construit tienne compte de la réalité de son travail, y compris des cas tordus qu'on lui demande de gérer tous les jours et qui n'apparaissent dans aucun processus officiel."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 4.8
+    width: 12.0
+    height: 0.4
+    text: "Needs"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 5.3
+    width: 12.0
+    height: 0.7
+    text: "**Besoins explicites**\n\n- Comprendre à quoi sert l'atelier et ce qu'on attend de lui.\n- Pouvoir s'exprimer sans être corrigé sur la forme.\n\n**Besoins latents**\n\n- Ne pas être noyé par le vocabulaire technique des architectes et des consultants.\n- Que ce qu'il dit soit retenu fidèlement, y compris les nuances et les exceptions, et pas résumé en une formule qui trahit le sens.\n- Avoir la place de parler dans une visio à 23, où prendre la parole demande un effort actif."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 6.1
+    width: 12.0
+    height: 0.3
+    text: "Mindset"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 6.45
+    width: 12.0
+    height: 0.25
+    text: "Il n'est pas venu faire de la modélisation. Il est venu parce qu'on le lui a demandé, et il jugera l'exercice à un seul critère : est-ce qu'on l'a écouté ? Il décroche vite si la conversation dérive vers le découpage technique.\n\nIl a probablement déjà vécu des ateliers où l'on a « recueilli le besoin » sans que rien n'en sorte, et il aborde celui-ci avec une réserve polie. Il ne dira pas qu'il n'est pas d'accord ; il se taira. C'est ce silence, plus que le désaccord, qui menace la qualité du modèle.\n\n#### Questions to Ask\n\n1. Ces experts ont-ils déjà participé à un atelier de ce type dans le programme, et qu'en ont-ils retiré ?\n2. Qu'est-ce qui, dans leur quotidien, les fait tiquer quand on décrit leur processus « officiel » ?\n3. En visio, dans quelles conditions prennent-ils la parole spontanément ?\n4. Quel vocabulaire métier dommage aux biens est ambigu ou employé différemment selon les équipes ?"
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 6.85
+    width: 8.6
+    height: 0.25
+    text: "Source: personas/expert-metier-dommage-aux-biens.md"
+    font: "Segoe UI"
+    font_size: 9
+    font_color: "#77809A"
+
+  - type: textbox
+    left: 10.7
+    top: 6.85
+    width: 2.0
+    height: 0.25
+    text: "2026-08-05"
+    font: "Segoe UI"
+    font_size: 9
+    font_color: "#77809A"
+    alignment: right
