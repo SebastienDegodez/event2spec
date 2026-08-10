@@ -1,0 +1,46 @@
+{
+  "brdFile": "docs/brds/assistant-event-storming-brd.md",
+  "lastAccessed": "2026-08-07T00:00:00Z",
+  "currentPhase": "validation",
+  "questionsAsked": [
+    "business-objectives",
+    "stakeholders",
+    "scope-boundaries",
+    "success-metrics"
+  ],
+  "answeredQuestions": {
+    "source-authority": "Cadrage produit V0 du Product Manager Advisor, traité comme source unique et faisant autorité",
+    "scope-constraint": "Aucun autre fichier du workspace utilisé en entrée"
+  },
+  "referencesProcessed": [
+    {
+      "file": "v0-product-framing.md",
+      "status": "analyzed",
+      "keyFindings": "7 objectifs métier dérivés, 4 personas priorisés, 5 domaines fonctionnels dans le périmètre, 6 exclusions explicites, 8 indicateurs de succès, 5 hypothèses non validées, 4 contradictions internes relevées"
+    }
+  ],
+  "nextActions": [
+    "Faire arbitrer les contradictions CT-01 à CT-04 par le Product Owner",
+    "Obtenir les réponses aux questions Q-01 à Q-06",
+    "Compléter les informations manquantes MQ-01 à MQ-08",
+    "Faire confirmer la couverture des exigences auprès de P1, P2, P3 et P4"
+  ],
+  "qualityChecks": [
+    "objectives-defined",
+    "scope-clarified",
+    "requirements-traced-to-objectives",
+    "stakeholders-documented",
+    "assumptions-explicit",
+    "contradictions-flagged"
+  ],
+  "openGaps": {
+    "kpiBaseline": "Aucune référence de comparaison, KPI-01 et KPI-02 restent absolus",
+    "kpiThresholds": "Seuils d'alerte absents pour KPI-06, KPI-07 et KPI-08",
+    "stakeholderCoverage": "12 des 23 participants non caractérisés"
+  },
+  "userPreferences": {
+    "detail-level": "comprehensive",
+    "language": "fr",
+    "solution-neutrality": "strict"
+  }
+}
