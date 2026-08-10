@@ -371,6 +371,34 @@ Sept flux, chacun rattaché à un persona, un problème et un objectif métier.
 
 **Ce flux porte les risques UX-09 et UX-10.** Il est le seul du document dont la conception soulève un enjeu social autant qu'un enjeu d'interaction. Les réponses du 2026-08-10 les ont l'un et l'autre atténués.
 
+### UF-10 Ordonner les éléments sur la chronologie
+
+**P1, P2, P3, P5** · problèmes 1 et 2 · BO-01 · BR-004
+
+**Ajouté le 2026-08-10.** Ce flux manquait au document. La mise en chronologie est une activité distincte de la contribution et du vote, et c'est la plus longue de la première journée d'atelier.
+
+| # | Action utilisateur                            | Réponse système                                                    |
+|---|-----------------------------------------------|---------------------------------------------------------------------|
+| 1 | Le facilitateur ouvre la phase d'ordonnancement | Le mur passe en mode ordonnancement **[UX]**                      |
+| 2 | Le groupe identifie les extrémités            | Le premier et le dernier élément sont positionnés                   |
+| 3 | Un participant déplace un élément             | La position est mise à jour pour tous                              |
+| 4 | Un élément est inséré entre deux autres        | La séquence est recalculée sans chevauchement **[UX]**             |
+| 5 | Le groupe ne s'accorde pas sur un ordre       | Un élément de désaccord est posé, l'ordre reste en l'état          |
+| 6 | Le déplacement est tracé                      | L'historique enregistre l'opération comme les autres               |
+
+**Cas limites**
+
+| Situation                                                | Comportement attendu **[UX]**                                    |
+|----------------------------------------------------------|-------------------------------------------------------------------|
+| Deux participants déplacent le même élément simultanément | Le dernier déplacement prévaut, le précédent reste à l'historique |
+| Un élément n'a pas de position déterminée                | Il reste dans une zone d'attente plutôt que d'être placé au hasard |
+| Plusieurs éléments occupent le même instant             | La simultanéité est représentable, la chronologie n'est pas stricte |
+| Un élément supprimé conserve sa position                 | Il reste barré à sa place, sans occuper de rang                   |
+
+**Pattern extrait [UX]** : l'ordonnancement est une activité de conversation, pas de manipulation. Le geste doit rester assez simple pour se faire pendant qu'on parle, sinon la discussion s'arrête au profit de l'outil.
+
+**Tranché le 2026-08-10 [PMA]** : chacun déplace librement. Voir UX-15 pour les conséquences de conception.
+
 ---
 
 ## 4. Catalogue des vues
@@ -395,9 +423,18 @@ Sept vues. Le nombre est volontairement réduit : l'atelier se déroule sur un s
 | Objectif               | Représenter le modèle en construction                                       |
 | But utilisateur        | Voir ce qui se construit, s'y retrouver                                    |
 | Personas               | Tous                                                                        |
-| Éléments clés          | Éléments typés, chronologie, auteurs, couche des propositions, éléments supprimés barrés |
-| Interactions           | Naviguer, zoomer, déplacer, sélectionner, **masquer les éléments supprimés** |
+| Éléments clés          | Éléments typés, chronologie, auteurs, couche des propositions, éléments supprimés barrés, zone d'attente |
+| Interactions           | Naviguer, zoomer, **ordonner sur la chronologie**, sélectionner, masquer les éléments supprimés |
 | Exigences              | BR-004, BR-007, BR-016                                                      |
+
+**Modes du mur [UX]** : la même vue sert quatre activités successives, sans changement d'écran.
+
+| Mode           | Activité dominante                        | Flux    |
+|----------------|-------------------------------------------|---------|
+| Contribution   | Saisie simultanée                         | UF-01   |
+| Ordonnancement | Mise en chronologie                       | UF-10   |
+| Vote           | Convergence                               | UF-03   |
+| Propositions   | Adoption des éléments issus de l'échange  | UF-04   |
 
 **Vue centrale.** Toutes les autres vues sont des surcouches ou des panneaux qui l'accompagnent.
 
@@ -602,6 +639,44 @@ Correspond à V6, en surcouche de V2.
 
 **Contrainte critique [BRD]** : la distinction entre les deux couches ne peut reposer sur la seule couleur. Voir la section accessibilité.
 
+### W5 - Le mur en mode ordonnancement
+
+Variante de W1 pendant la phase de mise en chronologie. Ajouté le 2026-08-10.
+
+```
+┌────────────────────────────────────────────────────────┐
+│ ZONE A - Bandeau de conduite                                │
+│ Étape « mise en chronologie » · Temps restant               │
+├────────────────────────────────────────────────────────┤
+│ ZONE B - La chronologie                                     │
+│                                                             │
+│ Début ────────────────────────────────────────► Fin │
+│ Éléments placés, simultanéités empilées verticalement       │
+├────────────────────────────────────────────────────────┤
+│ ZONE C - Zone d'attente                                     │
+│ Éléments non encore positionnés, avec leur décompte         │
+├────────────────────────────────────────────────────────┤
+│ ZONE D - Placement de l'élément sélectionné                 │
+│ Placer avant · Placer après · Remettre en attente           │
+└────────────────────────────────────────────────────────┘
+```
+
+| Zone | Données affichées                                    | Points d'interaction                        |
+|------|------------------------------------------------------|---------------------------------------------|
+| A    | Étape et temps restant                              | Aucun pour les participants                 |
+| B    | Éléments positionnés sur l'axe du temps             | Déplacer, sélectionner                      |
+| C    | Éléments sans position, et leur nombre              | Sélectionner                                |
+| D    | Élément sélectionné                                 | Placer avant, placer après, remettre en attente |
+
+**Justifications [UX]**
+
+| Choix                                              | Motif                                                                       |
+|----------------------------------------------------|-------------------------------------------------------------------------------|
+| Une zone d'attente séparée                        | Un élément dont personne ne connaît la place ne doit pas être placé au hasard |
+| Le décompte des éléments en attente               | Donne au facilitateur le critère de progression qui lui manque, voir UX-08   |
+| La zone D existe indépendamment du glissement     | Le glisser-déposer ne peut être le seul moyen de placer un élément          |
+| Les simultanéités sont empilées verticalement     | Une chronologie d'Event Storming n'est pas une file, plusieurs faits coexistent |
+
 ---
 
 ## 6. Guidelines UX et accessibilité
@@ -643,6 +718,7 @@ Correspond à V6, en surcouche de V2.
 | 4 | La disparition automatique des propositions n'est pas perceptible sans regard permanent  | WCAG 2.2.1          | Annoncer la péremption, la rendre consultable, ne pas la faire silencieusement        |
 | 5 | Un mur dense n'est pas navigable au clavier sans structure                               | WCAG 2.1.1          | Parcours clavier complet, ordre de tabulation cohérent avec la chronologie            |
 | 6 | L'état barré d'un élément supprimé n'est pas restitué par un lecteur d'écran            | WCAG 1.3.1          | Doubler le barré d'une mention textuelle explicite, par exemple « supprimé »          |
+| 7 | Un ordonnancement reposant uniquement sur le glisser-déposer exclut une partie des utilisateurs | WCAG 2.5.7   | **Couvert le 2026-08-10.** Alternative « placer avant » et « placer après » confirmée |
 
 **Le point 1 est structurant.** L'exigence BR-016 impose une distinction sans ambiguïté entre les deux couches. Une distinction par couleur seule échoue pour un participant daltonien, et échoue aussi sur un écran partagé de mauvaise qualité, ce qui concerne tout le monde en visio.
 
@@ -684,6 +760,67 @@ Le parcours de contribution étant prioritairement une saisie au clavier, **la c
 | **UX-12** | Un élément supprimé devient invisible, donc irrécupérable en pratique                   | P3        | Clos     | Les éléments supprimés restent visibles en état barré                     |
 | **UX-13** | Les éléments barrés s'ajoutent à la densité d'un mur déjà saturé                        | Tous      | Clos     | Filtre de masquage acté le 2026-08-10, affichage visible par défaut       |
 | **UX-14** | L'historique n'est pas restitué et disparaît avec l'outil                               | P1, P4    | Faible   | À signaler si l'outil est décommissionné après septembre                  |
+| **UX-15** | Vingt-trois personnes déplaçant simultanément des éléments produisent du chaos          | Tous      | Clos     | Déplacement libre pour tous acté le 2026-08-10, coût de lisibilité assumé |
+| **UX-16** | Un ordonnancement reposant sur le glisser-déposer exclut une partie des participants     | Tous      | Clos     | Alternative « placer avant » et « placer après » confirmée le 2026-08-10  |
+| **UX-17** | Un mur qui bouge en permanence détourne l'attention de la conversation                   | Tous      | Moyenne  | Rendre les déplacements lisibles plutôt que de les empêcher                |
+
+### UX-15, nouveau
+
+La phase de mise en chronologie est la plus longue de la première journée. La modification est ouverte à tous **[PMA]**, ce qui autorise vingt-trois personnes à déplacer des éléments en même temps sur un mur partagé.
+
+| Conséquence probable                                              | Effet                                                       |
+|--------------------------------------------------------------------|--------------------------------------------------------------|
+| Déplacements concurrents sur les mêmes éléments                   | Le mur bouge sans qu'on sache qui a fait quoi               |
+| Impossibilité de suivre visuellement                              | Le groupe cesse de regarder le mur                          |
+| La conversation s'arrête au profit de la manipulation             | L'inverse de l'objectif de l'Event Storming                 |
+
+**Trois options [UX]**, à trancher par le Product Owner :
+
+| Option                                              | Ce qu'elle produit                                                     |
+|-----------------------------------------------------|-------------------------------------------------------------------------|
+| Le facilitateur seul déplace pendant cette phase   | Ordre maîtrisé, mais il redevient scribe, ce que le produit combat    |
+| Chacun déplace librement                            | Contribution maximale, lisibilité collective compromise                |
+| Chacun déplace, avec verrou temporaire par élément | Compromis, un élément en cours de déplacement n'est pas saisissable   |
+
+La première option reproduit exactement le problème que le produit cherche à résoudre, mais appliqué au facilitateur plutôt qu'au porteur de la méthode.
+
+### UX-15, clos le 2026-08-10
+
+**Décision du Product Owner [PMA]** : pendant la mise en chronologie, **chacun déplace librement**.
+
+Cette décision est cohérente avec l'ensemble du produit. Elle prolonge l'ouverture déjà actée sur la modification, et elle évite que le facilitateur ne redevienne scribe, ce qui aurait reproduit sur lui le problème que le produit résout pour le porteur de la méthode.
+
+**Coût assumé** : la lisibilité collective. Un mur où vingt-trois personnes déplacent en même temps est plus difficile à suivre qu'un mur piloté par une seule.
+
+**Conséquences de conception [UX]** : la réponse au désordre n'est pas de restreindre le geste, mais de le rendre lisible.
+
+| Recommandation                                                    | Motif                                                              |
+|--------------------------------------------------------------------|---------------------------------------------------------------------|
+| Un élément en cours de déplacement porte une marque passagère     | Évite que deux personnes se disputent le même élément              |
+| Les déplacements sont animés, jamais instantanés                  | Un élément qui se téléporte est perdu de vue par le groupe          |
+| L'animation respecte la préférence de réduction du mouvement      | Contrainte d'accessibilité déjà posée                              |
+| Les changements de position figurent à l'historique               | Un déplacement erroné reste identifiable et réversible             |
+
+**Protection héritée** : l'historique intégral et la double paternité déjà actés couvrent le cas où un non-expert déplace à tort l'élément d'un expert. L'opération est tracée, donc identifiable et réversible.
+
+### UX-17, nouveau
+
+Le déplacement libre produit un mur en mouvement continu pendant que le groupe discute. Le risque n'est plus le conflit d'édition, il est l'attention.
+
+La règle de conception qui en découle **[UX]** : pendant la phase d'ordonnancement, **le mur doit rester lisible à distance**. Un participant qui suit la conversation sans manipuler doit pouvoir comprendre ce qui change sans avoir à fixer l'écran.
+
+### UX-16, clos le 2026-08-10
+
+Un ordonnancement conçu autour du glisser-déposer pose deux difficultés.
+
+| Difficulté                                                        | Population concernée                                        |
+|--------------------------------------------------------------------|--------------------------------------------------------------|
+| Le glissement est inutilisable au clavier                          | Tout participant naviguant sans souris                      |
+| Le glissement précis est difficile sur écran tactile ou pavé tactile | Une part des 23 participants en distanciel                 |
+
+**Décision du Product Owner [PMA]** : l'alternative sans glissement est confirmée dans le périmètre. Un élément peut être positionné par sélection, au moyen de « placer avant » et « placer après ».
+
+Le glisser-déposer reste disponible. Il n'est plus le seul moyen de placer un élément, ce qui satisfait le critère d'accessibilité 7.
 
 ### UX-09, clos le 2026-08-10
 
@@ -786,6 +923,7 @@ Toutes sont exploratoires et peuvent être écartées sans conséquence sur le p
 | ~~QU-04~~ | ~~Un participant peut-il modifier ou supprimer un élément produit par un autre ?~~   | **Oui.** La modification et la suppression sont ouvertes à tous               |
 | **QU-05** | Le facilitateur contribue-t-il au contenu, ou se consacre-t-il à la conduite ?          | Ouverte, Product Owner et P2                                                  |
 | **QU-06** | Que devient un élément qui ne reçoit aucun vote ?                                      | Ouverte, Product Owner et P1                                                  |
+| ~~QU-12~~ | ~~Pendant la mise en chronologie, qui déplace les éléments ?~~                          | **Chacun déplace librement**                                                  |
 | ~~QU-07~~ | ~~Après modification par un tiers, qui est l'auteur ?~~                                | **Double paternité.** Auteur d'origine conservé, dernier modificateur tracé   |
 | ~~QU-08~~ | ~~Une suppression est-elle réversible, et par qui ?~~                                  | **Oui, par tous, et tracée**                                                  |
 | ~~QU-09~~ | ~~L'historique des modifications est-il conservé ?~~                                   | **Oui, intégralement**                                                        |
@@ -794,7 +932,18 @@ Toutes sont exploratoires et peuvent être écartées sans conséquence sur le p
 
 Deux questions restent ouvertes, QU-02, QU-03, QU-05 et QU-06. Aucune ne bloque la conception de la vue principale.
 
-### 8.3 Ce que ce document ne fait pas
+### 8.3 Ajouts de périmètre non couverts par le document d'exigences
+
+Deux capacités ont été décidées par le Product Owner au cours de cette session. Elles ne figurent dans aucune exigence du document d'exigences métier et devront y être reportées si elles doivent être opposables.
+
+| Capacité                                                        | Date       | Exigence de rattachement probable |
+|------------------------------------------------------------------|------------|------------------------------------|
+| Filtre de masquage des éléments supprimés                       | 2026-08-10 | BR-004 ou nouvelle exigence        |
+| Alternative de positionnement sans glissement                    | 2026-08-10 | BR-004 ou nouvelle exigence        |
+
+Ce document ne crée pas ces exigences. Leur report relève du Product Owner.
+
+### 8.4 Ce que ce document ne fait pas
 
 | | |
 |---|---|
