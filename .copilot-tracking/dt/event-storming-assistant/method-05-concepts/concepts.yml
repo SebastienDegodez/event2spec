@@ -1,0 +1,106 @@
+concepts:
+  - name: Le Fil Conducteur
+    description: >-
+      Un déroulé Event Storming pré-écrit affiche en permanence l'étape en cours,
+      ce qu'on attend du groupe et le temps restant, pour que le facilitateur
+      suive un chemin au lieu d'avoir à le connaître.
+    file: le-fil-conducteur.png
+    theme: 1
+    level: v0
+    purpose: >-
+      Rendre la méthode disponible à un coach agile qui ne la maîtrise pas.
+    validation_target: >-
+      Le coach mène les huit étapes des deux jours sans avoir à demander
+      « et maintenant, on fait quoi ? »
+    prompt: >-
+      Simple black and white napkin sketch, stick figures. A large screen split
+      in two: left side shows a vertical numbered list of workshop steps with
+      step three highlighted, right side shows an empty board. A stick figure
+      facilitator stands beside the screen pointing at step three. A small clock
+      icon in the corner. Minimal lines, plain white background, no colour, no
+      shading, hand drawn feel.
+
+  - name: La Tempête Silencieuse
+    description: >-
+      Pendant un temps chronométré, les vingt-trois participants saisissent leurs
+      événements simultanément au clavier ; rien ne se discute tant que le
+      minuteur tourne, puis le groupe trie le vrac par vote.
+    file: la-tempete-silencieuse.png
+    theme: 2
+    level: v0
+    purpose: >-
+      Supprimer la nécessité de prendre la parole pour contribuer, dans une
+      visioconférence où le silence est le comportement par défaut.
+    validation_target: >-
+      Les six experts métier produisent chacun au moins un événement pendant
+      la première tempête.
+    prompt: >-
+      Simple black and white napkin sketch, stick figures. Eight stick figures
+      arranged in a grid, each in front of a small laptop, each with a speech
+      bubble crossed out. Arrows from every laptop converge onto a shared board
+      covered with small rectangles. A large hourglass on the side. Minimal
+      lines, plain white background, no colour, no shading, hand drawn feel.
+
+  - name: Le Gardien de la Grammaire
+    description: >-
+      Au moment où quelqu'un écrit un post-it, l'outil vérifie la forme, propose
+      une reformulation conforme à la notation et suggère le type d'élément ;
+      l'auteur valide d'un clic ou ignore.
+    file: le-gardien-de-la-grammaire.png
+    theme: 3
+    level: v1
+    purpose: >-
+      Remplacer la connaissance de notation qui manque à l'équipe, sans qu'un
+      humain ait à corriger les autres à voix haute.
+    validation_target: >-
+      Les deux développeurs praticiens ne corrigent plus la notation oralement
+      pendant la séance.
+    prompt: >-
+      Simple black and white napkin sketch, stick figures. A stick figure typing
+      on a keyboard. Above, a sticky note reading "Payer la commande" with a
+      small tooltip beside it showing "Commande payée" and a checkmark button.
+      A tiny owl icon perched on the corner of the note. Minimal lines, plain
+      white background, no colour, no shading, hand drawn feel.
+
+  - name: La Couche Fantôme
+    description: >-
+      L'IA transcrit la séance en continu, puis matérialise ses propositions à
+      chaque pause dans une couche visuellement distincte des post-its du groupe ;
+      celles que personne n'adopte disparaissent à la fin de l'exercice.
+    file: la-couche-fantome.png
+    theme: 4
+    level: v1
+    purpose: >-
+      Matérialiser ce qui a été dit sans jamais imposer un choix au groupe, et
+      sans exiger de validation bloquante de vingt-trois personnes.
+    validation_target: >-
+      Le groupe adopte au moins une proposition fantôme, et aucun participant
+      ne confond une proposition de l'IA avec un post-it du groupe.
+    prompt: >-
+      Simple black and white napkin sketch, stick figures. A board with solid
+      outlined sticky notes and, interleaved, several dashed outline sticky notes
+      that look translucent. One dashed note is being tapped by a stick figure
+      hand and turning solid. Another dashed note fades away with small motion
+      lines. A pause symbol in the corner. Minimal lines, plain white background,
+      no colour, no shading, hand drawn feel.
+
+  - name: L'Instrument de Mesure
+    description: >-
+      L'architecte entoure une zone du mur au lasso et l'outil compte les liens
+      qui traversent la frontière, colorie le mur par acteur et signale les
+      événements orphelins, sans jamais proposer de découpage lui-même.
+    file: l-instrument-de-mesure.png
+    theme: 5
+    level: v0
+    purpose: >-
+      Donner aux architectes un instrument vérifiable plutôt qu'un verdict, pour
+      qu'ils exercent leur jugement sur des mesures et non sur une opinion.
+    validation_target: >-
+      Les deux architectes sortent de la séance B avec un découpage qu'ils
+      peuvent justifier frontière par frontière.
+    prompt: >-
+      Simple black and white napkin sketch, stick figures. A board of small
+      rectangles with a hand drawn lasso circling one cluster. Arrows crossing
+      the lasso boundary are tagged with a small number badge. A stick figure
+      architect stands beside, holding a ruler. Minimal lines, plain white
+      background, no colour, no shading, hand drawn feel.
