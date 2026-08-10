@@ -1,0 +1,95 @@
+slide: 8
+title: "Use Case — Dériver aggregates et bounded contexts depuis le mur"
+section: "Use Cases"
+layout: "blank"
+
+background:
+  fill: "#0F1117"
+
+elements:
+  - type: textbox
+    left: 0.6
+    top: 0.8
+    width: 12.0
+    height: 0.5
+    text: "USE CASE (Part 4 of 4)"
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#6FD2D9"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 1.3
+    width: 12.0
+    height: 0.8
+    text: "Use Case — Dériver aggregates et bounded contexts depuis le mur"
+    font: "Segoe UI"
+    font_size: 22
+    font_color: "#FFFFFF"
+    font_bold: true
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 2.2
+    width: 12.0
+    height: 0.4
+    text: "Extensions"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 2.7
+    width: 12.0
+    height: 2.8
+    text: "- **Découpages concurrents** — l'assistant propose plusieurs partitions différentes et les architectes les comparent.\n- **Mur importé** — le découpage s'applique à un Event Storming réalisé ailleurs, sans passer par le mode Captation.\n- **Mur incomplet** — l'assistant signale les zones trop pauvres pour fonder une frontière plutôt que de proposer à l'aveugle.\n- **Reprise itérative** — le découpage est révisé après un atelier complémentaire.\n- **Désaccord entre architectes** — les deux découpages sont conservés côte à côte, à la manière d'un hotspot."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 5.6
+    width: 12.0
+    height: 0.4
+    text: "Evidence"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 6.1
+    width: 12.0
+    height: 0.7
+    text: "- Verbatim, session de cadrage du 2026-08-04 : « Il faut que dans le MVP on ait le Aggregate, Bounded Context. »\n- Verbatim : « En séance séparée pour le niveau software. »\n- Verbatim : « l'IA ne fait pas de choix, elle pose les post-it seulement s'ils sont validés par le groupe » — principe étendu ici aux architectes comme valideurs.\n- [scope-boundaries.md](../../method-01-scope/scope-boundaries.md) — arbitrage T10 et tableau des deux séances.\n- [assumptions-log.md](../../method-01-scope/assumptions-log.md) — hypothèses A10 et A11, toutes deux non testées.\n- *Event Storming — The Complete Guide* — niveau Software Design.\n\n#### Questions to Ask\n\n1. Comment les architectes identifient-ils un bounded context aujourd'hui, sans outil ?\n2. Combien de découpages candidats leur sont utiles ?\n3. Quelle forme de justification rend une proposition automatique recevable ?\n4. Que fait l'assistant quand le mur est trop pauvre pour fonder une frontière ?\n5. Le découpage est-il révisé au fil de plusieurs ateliers ou figé en une fois ?"
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 6.9
+    width: 8.6
+    height: 0.25
+    text: "Source: use-cases/deriver-aggregates-et-bounded-contexts.md"
+    font: "Segoe UI"
+    font_size: 9
+    font_color: "#77809A"
+
+  - type: textbox
+    left: 10.7
+    top: 6.9
+    width: 1.9
+    height: 0.25
+    text: "Last Updated: 2026-08-05"
+    font: "Segoe UI"
+    font_size: 9
+    font_color: "#77809A"

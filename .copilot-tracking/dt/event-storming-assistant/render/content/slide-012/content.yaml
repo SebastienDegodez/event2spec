@@ -1,0 +1,95 @@
+slide: 12
+title: "Use Case — Matérialiser les échanges de l'atelier en post-its validés"
+section: "Use Cases"
+layout: "blank"
+
+background:
+  fill: "#0F1117"
+
+elements:
+  - type: textbox
+    left: 0.6
+    top: 0.8
+    width: 12.0
+    height: 0.5
+    text: "USE CASE (Part 4 of 4)"
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#6FD2D9"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 1.3
+    width: 12.0
+    height: 0.8
+    text: "Use Case — Matérialiser les échanges de l'atelier en post-its validés"
+    font: "Segoe UI"
+    font_size: 22
+    font_color: "#FFFFFF"
+    font_bold: true
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 2.2
+    width: 12.0
+    height: 0.4
+    text: "Extensions"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 2.7
+    width: 12.0
+    height: 2.8
+    text: "- **Apport par texte** — un participant qui n'ose pas parler soumet un élément par écrit ; utile pour contrer le silence en visio.\n- **Transcription importée** — l'atelier a été enregistré ailleurs ; l'analyse s'effectue a posteriori, sans écoute live.\n- **Hotspot** — le groupe est en désaccord ; l'assistant marque le point sans trancher, conformément à la notation Event Storming.\n- **Mode dégradé sans enregistrement** — si la conformité l'interdit, seule la saisie texte reste disponible.\n- **Reprise de séance** — la modélisation se poursuit sur une séance ultérieure à partir du mur existant."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 5.6
+    width: 12.0
+    height: 0.4
+    text: "Evidence"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 6.1
+    width: 12.0
+    height: 0.7
+    text: "- Verbatim, session de cadrage du 2026-08-04 : « il y a 2 développeurs qui connaissent la méthode et qui l'ont déjà fait seulement ils vont avoir du mal à participer s'ils animent. »\n- Verbatim : « ce qui empêche de participer c'est : écrire et placer les post-its à la place des autres, tenir la chronologie et réorganiser le mur, corriger la notation. »\n- Verbatim : « l'IA ne fait pas de choix, elle pose les post-it seulement s'ils sont validés par le groupe. »\n- [scope-boundaries.md](../../method-01-scope/scope-boundaries.md) — arbitrages T1, T2, T3, T5, T7 et périmètre de notation du MVP.\n- [stakeholder-map.md](../../method-01-scope/stakeholder-map.md) — composition de l'atelier et parties prenantes cachées.\n- [assumptions-log.md](../../method-01-scope/assumptions-log.md) — hypothèses A1, A2, A3 et A5 non testées.\n- *Event Storming — The Complete Guide* (document de référence du programme) — niveaux Big Picture / Process Modeling / Software Design, notation et grammaire.\n\n#### Questions to Ask\n\n1. Quel mécanisme de validation permet à 23 personnes de trancher une proposition sans casser le rythme ?\n2. À quelle fréquence l'assistant propose-t-il — en continu, sur pause, ou à la demande du coach ?\n3. Quel est le comportement attendu quand la transcription est erronée sur du vocabulaire métier ?\n4. Que devient le modèle entre deux séances si l'exercice s'étale ?"
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 6.9
+    width: 8.6
+    height: 0.25
+    text: "Source: use-cases/materialiser-les-echanges-en-post-its.md"
+    font: "Segoe UI"
+    font_size: 9
+    font_color: "#77809A"
+
+  - type: textbox
+    left: 10.7
+    top: 6.9
+    width: 1.9
+    height: 0.25
+    text: "Last Updated: 2026-08-05"
+    font: "Segoe UI"
+    font_size: 9
+    font_color: "#77809A"

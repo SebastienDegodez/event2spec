@@ -1,0 +1,161 @@
+slide: 6
+title: "Use Case — Dériver aggregates et bounded contexts depuis le mur"
+section: "Use Cases"
+layout: "blank"
+
+background:
+  fill: "#0F1117"
+
+elements:
+  - type: textbox
+    left: 0.6
+    top: 0.8
+    width: 12.0
+    height: 0.5
+    text: "USE CASE (Part 2 of 4)"
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#6FD2D9"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 1.3
+    width: 12.0
+    height: 0.8
+    text: "Use Case — Dériver aggregates et bounded contexts depuis le mur"
+    font: "Segoe UI"
+    font_size: 22
+    font_color: "#FFFFFF"
+    font_bold: true
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 2.2
+    width: 5.8
+    height: 0.4
+    text: "Primary User"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 2.7
+    width: 5.8
+    height: 0.7
+    text: "L'architecte solution et l'architecte d'entreprise. Ils décident du découpage et en portent la responsabilité. Leur contrainte forte : ils rejetteront toute proposition qu'ils ne peuvent pas inspecter, contester ou amender."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 6.6
+    top: 2.2
+    width: 5.8
+    height: 0.4
+    text: "Secondary User"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 6.6
+    top: 2.7
+    width: 5.8
+    height: 0.7
+    text: "Les deux développeurs praticiens de l'Event Storming, qui apportent la connaissance du système existant et vérifient la cohérence des propositions avec le mur d'origine. Indirectement, les experts métier, dont la parole fonde les frontières sans qu'ils participent à cette séance."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 3.5
+    width: 12.0
+    height: 0.4
+    text: "Preconditions"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 4.0
+    width: 12.0
+    height: 0.6
+    text: "- Un mur d'Event Storming existe, issu de la séance A ou importé.\n- Les niveaux Big Picture et Process Modeling y sont suffisamment renseignés — événements, commandes, policies, systèmes, acteurs.\n- Le lien entre les éléments du mur et leurs extraits de conversation source est conservé.\n- Les architectes disposent d'un créneau dédié, distinct de l'atelier à 23."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 4.65
+    width: 12.0
+    height: 0.4
+    text: "Steps"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 5.1
+    width: 12.0
+    height: 0.9
+    text: "1. L'architecte ouvre le mur produit par l'atelier de domaine.\n2. Il déclenche l'analyse de découpage.\n3. L'assistant analyse la structure du mur : flux, dépendances, acteurs, vocabulaire.\n4. L'assistant propose un ou plusieurs découpages candidats en aggregates et bounded contexts.\n5. Pour chaque frontière proposée, l'assistant affiche les éléments du mur qui la justifient.\n6. L'architecte inspecte une frontière et remonte, s'il le souhaite, jusqu'à l'extrait de conversation d'origine.\n7. Le groupe accepte, fusionne, scinde ou écarte des frontières.\n8. L'assistant met à jour le découpage retenu et conserve la trace des alternatives écartées.\n9. Le découpage validé est enregistré comme une couche du modèle, sans altérer le mur d'origine."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 6.05
+    width: 12.0
+    height: 0.4
+    text: "Data Requirements"
+    font: "Segoe UI"
+    font_size: 12
+    font_color: "#4DA3FF"
+    font_bold: true
+
+  - type: textbox
+    left: 0.6
+    top: 6.45
+    width: 12.0
+    height: 0.35
+    text: "**Nécessaire en entrée** : le mur complet avec ses éléments typés et leurs liens, l'ordre chronologique fin, le rattachement de chaque élément à son extrait de transcription, les acteurs et les systèmes externes identifiés.\n\n**Créé ou modifié** : les frontières d'aggregates et de bounded contexts sous forme de couche additionnelle, la justification de chaque frontière, l'historique des découpages proposés et écartés, les décisions des architectes.\n\nLe découpage doit être une **couche superposée** au mur, jamais une transformation destructive. Un mauvais découpage doit pouvoir être annulé sans perdre le travail de l'atelier."
+    font: "Segoe UI"
+    font_size: 10
+    font_color: "#D7DDEA"
+    auto_size: "shrink"
+
+  - type: textbox
+    left: 0.6
+    top: 6.9
+    width: 8.6
+    height: 0.25
+    text: "Source: use-cases/deriver-aggregates-et-bounded-contexts.md"
+    font: "Segoe UI"
+    font_size: 9
+    font_color: "#77809A"
+
+  - type: textbox
+    left: 10.7
+    top: 6.9
+    width: 1.9
+    height: 0.25
+    text: "Last Updated: 2026-08-05"
+    font: "Segoe UI"
+    font_size: 9
+    font_color: "#77809A"
