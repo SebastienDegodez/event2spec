@@ -112,4 +112,4 @@ npm run build     # production build
 
 The application is automatically deployed to **GitHub Pages** on every push to `main` via [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
 
-The workflow builds the project with `npm run build` and publishes the `dist/` folder using native GitHub Pages deployment.
+The workflow builds the project with `npm run build`, includes `Assistant-EventStorming.html` in the published artifact, and deploys the `dist/` folder using native GitHub Pages deployment. The standalone HTML is available at `/Assistant-EventStorming.html`.
