@@ -1,0 +1,189 @@
+name: clean-architecture-react
+description: Does the agent keep business rules out of React components and HTTP out of the inner layers?
+version: "1.0"
+type: capability
+
+# Every stimulus starts from the same workspace: a React/TS project whose ESLint
+# config already extends the skill's layer rules, and an empty src/. The agent
+# chooses the structure — that choice is what we measure.
+environment:
+  files:
+    - src: fixtures/package.json
+      dest: package.json
+    - src: fixtures/tsconfig.json
+      dest: tsconfig.json
+    - src: fixtures/eslint.config.js
+      dest: eslint.config.js
+    - src: eslint/clean-architecture.js
+      dest: eslint/clean-architecture.js
+  commands:
+    - npm install --no-audit --no-fund
+  commandTimeout: 5m
+
+defaults:
+  runs: 3
+  timeout: 15m
+  model: claude-sonnet-4.5
+  executor: copilot-sdk
+  judge_model: claude-sonnet-4.5
+
+scoring:
+  threshold: 0.8
+
+stimuli:
+  # Guard against the skill making things worse: a pure read path needs no domain layer.
+  - name: read-slice-needs-no-domain
+    tags:
+      id: "read-slice-needs-no-domain"
+      smoke: "yes"
+    prompt: |
+      The project is already set up (React 19, TypeScript, ESLint) — extend it. Do not scaffold a
+      new project, do not modify package.json or eslint.config.js, and do not start a dev server.
+      Write your code under src/.
+
+      The backend exposes `GET /api/todos`, which returns:
+      [{ "id": "1", "title": "Buy milk", "done": false }]
+
+      Add a screen that lists the todos.
+    graders:
+      - type: run-command
+        name: architecture lint passes
+        config:
+          command: sh
+          args:
+            - "-c"
+            - "npm install --no-audit --no-fund >/dev/null 2>&1; npx eslint src --max-warnings 0"
+          expected_exit_code: 0
+          timeout: 5m
+      - type: file-exists
+        name: a screen exists
+        config:
+          path: "src/ui/**/*.tsx"
+      # A plain `interface Todo` in domain/ is harmless. What we reject is the ceremony:
+      # a class with a factory and guards for a path that only reads from the API.
+      - type: file-not-matches
+        name: no aggregate ceremony for a pure read path
+        config:
+          path: "src/domain/**/*.ts"
+          pattern: "class\\s+\\w+"
+
+  # The core case: a real client-side rule must live in a domain object.
+  - name: invariant-lives-in-domain
+    tags:
+      id: "invariant-lives-in-domain"
+    prompt: |
+      The project is already set up (React 19, TypeScript, ESLint) — extend it. Do not scaffold a
+      new project, do not modify package.json or eslint.config.js, and do not start a dev server.
+      Write your code under src/.
+
+      Todos are listed with `GET /api/todos` and completed through `PUT /api/todos/:id` with
+      `{ "done": true }`.
+
+      Business rule: a todo that is already completed must not be completed a second time — the
+      user must see an error message instead. Implement the feature end to end.
+    graders:
+      - type: run-command
+        name: architecture lint passes
+        config:
+          command: sh
+          args:
+            - "-c"
+            - "npm install --no-audit --no-fund >/dev/null 2>&1; npx eslint src --max-warnings 0"
+          expected_exit_code: 0
+          timeout: 5m
+      - type: file-exists
+        name: a domain layer exists
+        config:
+          path: "src/domain/**/*.ts"
+      - type: prompt
+        name: the guard sits in the domain, not in the view
+        config:
+          evidence: ["diff"]
+          prompt: |
+            Read the diff. The rule "an already-completed todo cannot be completed again" must be
+            enforced inside a plain TypeScript object under src/domain — a method that throws or
+            returns an error.
+
+            Score 1 only if the guard is in src/domain and neither the React component nor the hook
+            re-implements it. Score 0 if the check lives in a component, in a hook, or nowhere.
+          threshold: 1
+
+  # HTTP is an outer-layer concern.
+  - name: http-stays-in-infrastructure
+    tags:
+      id: "http-stays-in-infrastructure"
+    prompt: |
+      The project is already set up (React 19, TypeScript, ESLint) — extend it. Do not scaffold a
+      new project, do not modify package.json or eslint.config.js, and do not start a dev server.
+      Write your code under src/.
+
+      Add todo creation: `POST /api/todos` with `{ "title": "..." }` returns the created todo.
+      Wire it to a form in the UI.
+    graders:
+      - type: run-command
+        name: architecture lint passes
+        config:
+          command: sh
+          args:
+            - "-c"
+            - "npm install --no-audit --no-fund >/dev/null 2>&1; npx eslint src --max-warnings 0"
+          expected_exit_code: 0
+          timeout: 5m
+      - type: file-exists
+        name: an adapter exists
+        config:
+          path: "src/infrastructure/**/*.ts"
+      - type: file-not-matches
+        name: no network call in the application layer
+        config:
+          path: "src/application/**/*.ts"
+          pattern: "fetch\\(|from ['\"]axios['\"]"
+
+  # The UI talks to ports, never to adapters.
+  - name: ui-never-imports-infrastructure
+    tags:
+      id: "ui-never-imports-infrastructure"
+    prompt: |
+      The project is already set up (React 19, TypeScript, ESLint) — extend it. Do not scaffold a
+      new project, do not modify package.json or eslint.config.js, and do not start a dev server.
+      Write your code under src/.
+
+      Build a todo screen that lists todos (`GET /api/todos`) and completes one
+      (`PUT /api/todos/:id`).
+    graders:
+      - type: run-command
+        name: architecture lint passes
+        config:
+          command: sh
+          args:
+            - "-c"
+            - "npm install --no-audit --no-fund >/dev/null 2>&1; npx eslint src --max-warnings 0"
+          expected_exit_code: 0
+          timeout: 5m
+      - type: file-not-matches
+        name: no adapter import inside components
+        config:
+          path: "src/ui/**/*.tsx"
+          pattern: "from ['\"][^'\"]*infrastructure"
+
+  # Naming carries meaning: the API owns the data, so the port is a gateway.
+  - name: port-is-named-gateway
+    tags:
+      id: "port-is-named-gateway"
+    prompt: |
+      The project is already set up (React 19, TypeScript, ESLint) — extend it. Do not scaffold a
+      new project, do not modify package.json or eslint.config.js, and do not start a dev server.
+      Write your code under src/.
+
+      Create the port the application uses to reach the todos API (`GET /api/todos`,
+      `POST /api/todos`), plus its HTTP implementation. The API is the source of truth for todos.
+    graders:
+      - type: file-matches
+        name: the port is a Gateway
+        config:
+          path: "src/application/**/*.ts"
+          pattern: "(interface|type)\\s+\\w*Gateway"
+      - type: file-not-exists
+        name: not named Repository — the client does not own the collection
+        config:
+          path: "src/**/*Repository*"

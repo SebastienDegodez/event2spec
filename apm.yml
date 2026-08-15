@@ -6,5 +6,4 @@ dependencies:
   - anthropics/claude-code/plugins/frontend-design
   - SebastienDegodez/copilot-instructions/plugins/csharp-clean-architecture-development
   - SebastienDegodez/copilot-instructions/plugins/minimal-context-tools
-  - SebastienDegodez/copilot-instructions/plugins/superpowers-whetstone
   - microsoft/playwright-cli/skills/playwright-cli

@@ -1,0 +1,11 @@
+name: clean-architecture-react-skill-lift
+evals:
+  - ./eval.yaml
+matrix:
+  skills:
+    path: /environment/skills
+    values:
+      - without_skill: []
+      - with_skill: ["./"]
+baseline:
+  skills: without_skill
