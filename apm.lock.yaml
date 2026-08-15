@@ -1,52 +1,171 @@
 lockfile_version: '1'
-generated_at: '2026-03-27T00:27:10.079741+00:00'
-apm_version: 0.8.5
+generated_at: '2026-08-15T18:57:27.865080+00:00'
+apm_version: 0.21.0
 dependencies:
 - repo_url: SebastienDegodez/copilot-instructions
   host: github.com
-  resolved_commit: 4a43ac9775c62672c238bf4df833784b1cc5ed92
+  resolved_commit: 0f0dccf10029993f877672336c23ae73caa5548e
   virtual_path: plugins/csharp-clean-architecture-development
   is_virtual: true
-  package_type: apm_package
+  package_type: skill_bundle
   deployed_files:
-  - .github/skills/clean-architecture-dotnet
-  content_hash: sha256:c3daa00bb8b14d42ef18127391797d8cee9ac2ba94c4b21de7b288a5c234b229
+  - .agents/skills/clean-architecture-dotnet
+  - .agents/skills/clean-architecture-dotnet/SKILL.md
+  - .agents/skills/clean-architecture-dotnet/references/architecture-layers.md
+  - .agents/skills/clean-architecture-dotnet/references/convention-based-di.md
+  - .agents/skills/clean-architecture-dotnet/references/cqrs-patterns.md
+  - .agents/skills/clean-architecture-dotnet/references/ddd.md
+  - .agents/skills/clean-architecture-dotnet/references/interface-placement.md
+  - .agents/skills/clean-architecture-dotnet/references/layer-responsibilities.md
+  - .agents/skills/clean-architecture-dotnet/references/netarchtest-rules.md
+  - .agents/skills/clean-architecture-dotnet/references/project-structure.md
+  - .agents/skills/clean-architecture-dotnet/references/shared-kernel.md
+  - .agents/skills/clean-architecture-dotnet/scripts/init-project.ps1
+  - .agents/skills/clean-architecture-dotnet/scripts/init-project.sh
+  - .agents/skills/clean-architecture-dotnet/templates/Api/IApiMarker.cs
+  - .agents/skills/clean-architecture-dotnet/templates/Application/IApplicationMarker.cs
+  - .agents/skills/clean-architecture-dotnet/templates/Application/Shared/ICommandBus.cs
+  - .agents/skills/clean-architecture-dotnet/templates/Application/Shared/ICommandHandler.cs
+  - .agents/skills/clean-architecture-dotnet/templates/Application/Shared/IQueryBus.cs
+  - .agents/skills/clean-architecture-dotnet/templates/Application/Shared/IQueryHandler.cs
+  - .agents/skills/clean-architecture-dotnet/templates/Domain/IDomainMarker.cs
+  - .agents/skills/clean-architecture-dotnet/templates/Infrastructure/CQRS/CommandBus.cs
+  - .agents/skills/clean-architecture-dotnet/templates/Infrastructure/CQRS/QueryBus.cs
+  - .agents/skills/clean-architecture-dotnet/templates/Infrastructure/DependencyInjection.cs
+  - .agents/skills/clean-architecture-dotnet/templates/Infrastructure/IInfrastructureMarker.cs
+  - .agents/skills/clean-architecture-dotnet/templates/IntegrationTests/ArchitectureTests.cs
+  - .agents/skills/clean-architecture-dotnet/tests/README.md
+  - .agents/skills/clean-architecture-dotnet/tests/baseline-prompts.txt
+  - .agents/skills/clean-architecture-dotnet/tests/validation.md
+  deployed_file_hashes:
+    .agents/skills/clean-architecture-dotnet/SKILL.md: sha256:5ca6cb7bf77bcb7aff27da6fc5bccbec267991428e2ca19a75e20d4906ea7224
+    .agents/skills/clean-architecture-dotnet/references/architecture-layers.md: sha256:c547698c2b33f7ae00e4b6a567a15e8e37a714032d794ad528e82884929b0559
+    .agents/skills/clean-architecture-dotnet/references/convention-based-di.md: sha256:ea2ae98e95132e50d9c33152bc1812b403da8e61382ddf1a85d9a2734b9077bd
+    .agents/skills/clean-architecture-dotnet/references/cqrs-patterns.md: sha256:588bc5d7d21227014d1cebf1aac36ba706e591e401371a6f4d2b4d1d54638aa2
+    .agents/skills/clean-architecture-dotnet/references/ddd.md: sha256:49c2065858c9a177f446a45a1ffbe24d34140b96f9ee5292393725dd96f6048d
+    .agents/skills/clean-architecture-dotnet/references/interface-placement.md: sha256:cb1def89ec933e1abdd6041c396af35991e653b7af9b5564998a00ac78471bc5
+    .agents/skills/clean-architecture-dotnet/references/layer-responsibilities.md: sha256:5696f97fcf12ffaec7c05fe4c36edc0b96fc615929f253c870fd75064af63741
+    .agents/skills/clean-architecture-dotnet/references/netarchtest-rules.md: sha256:af4a9f298021c4c111b30b4b0e2dd4f567a7f4ce31bcce63c735c08917f32acb
+    .agents/skills/clean-architecture-dotnet/references/project-structure.md: sha256:603029e83759b636a029f0a55b664c800622de2818a4bd5469fb57e6b77b1739
+    .agents/skills/clean-architecture-dotnet/references/shared-kernel.md: sha256:a0d0d573e2a2eb6732825b21f4362ea756364c584cd481ab55e5a39345b6e09f
+    .agents/skills/clean-architecture-dotnet/scripts/init-project.ps1: sha256:7656110b510ee1351ec0eb22677be801e67eb14d22e90715e379265b68e8e02c
+    .agents/skills/clean-architecture-dotnet/scripts/init-project.sh: sha256:e7f2c79d02530d60dc4e34619b1338d7b0e3551bbc45e1b6827622afa2bf03b9
+    .agents/skills/clean-architecture-dotnet/templates/Api/IApiMarker.cs: sha256:79a31835fe206d693f008d60588516b2ea13e75ecb6154d6a4dc93b149274be1
+    .agents/skills/clean-architecture-dotnet/templates/Application/IApplicationMarker.cs: sha256:ba253d14d8206c85fc3e5436404b427415973bf3c11c3ad8e45dacc92dabe62f
+    .agents/skills/clean-architecture-dotnet/templates/Application/Shared/ICommandBus.cs: sha256:03d0f652bcea4fff473e1ab371d90139de6874d71be83ac8c747d85a7e90dbac
+    .agents/skills/clean-architecture-dotnet/templates/Application/Shared/ICommandHandler.cs: sha256:d35c2c3f5ea7b77a17b90b5cfc2780432a5a89df6257f63e22784e6b5d3765e6
+    .agents/skills/clean-architecture-dotnet/templates/Application/Shared/IQueryBus.cs: sha256:c7227b7e9480d8ce0a3ecf411dd2fef3fa0a444f71ecf93b6082d2e611e795ae
+    .agents/skills/clean-architecture-dotnet/templates/Application/Shared/IQueryHandler.cs: sha256:cbe46599718a806a041c571a0523ec7f5c23aafa133b48b0170d6afb17a633d3
+    .agents/skills/clean-architecture-dotnet/templates/Domain/IDomainMarker.cs: sha256:1720224ec9a6bd83986511c57cdbcf46d56ba59571aa347d7d78cd20c05e00e0
+    .agents/skills/clean-architecture-dotnet/templates/Infrastructure/CQRS/CommandBus.cs: sha256:509098c7baf61c0976fbc3474d11b70b18622645b045b69bb5a62031b1913990
+    .agents/skills/clean-architecture-dotnet/templates/Infrastructure/CQRS/QueryBus.cs: sha256:9e39c4800bb81213512928809d6bf4779b09b8269c6c3425d35fa5b1b67fe625
+    .agents/skills/clean-architecture-dotnet/templates/Infrastructure/DependencyInjection.cs: sha256:c5f29827baa508e90b5fe8694d97b9a62c25293ebc92132b548b3f092ced4284
+    .agents/skills/clean-architecture-dotnet/templates/Infrastructure/IInfrastructureMarker.cs: sha256:834bb032f93db310b53b99aca576aff0acbe0197eeab54bd354bfa9852d2afb1
+    .agents/skills/clean-architecture-dotnet/templates/IntegrationTests/ArchitectureTests.cs: sha256:f4abee99a1cc5923972bcb86d121e74c86302d6bf09b8842bcf878a30047fa3d
+    .agents/skills/clean-architecture-dotnet/tests/README.md: sha256:dffb0846531e0d98d659f22379c641c97ee198aa83e0d4d6de12d51a3f8e04d7
+    .agents/skills/clean-architecture-dotnet/tests/baseline-prompts.txt: sha256:d9a962c41427a08beee633394c95b1ffdf6bd259faeafb0bc122a33a716e2097
+    .agents/skills/clean-architecture-dotnet/tests/validation.md: sha256:2df89dc0fa3ef044bbcab0af219a7753d215f30bbbc6c640d9e8dcdeaa1ff82b
+  content_hash: sha256:20c211afa0018f384e6374666a79e7da43f7dc2f11f5250cefc01840e6c96ff3
 - repo_url: SebastienDegodez/copilot-instructions
   host: github.com
-  resolved_commit: 4a43ac9775c62672c238bf4df833784b1cc5ed92
+  resolved_commit: 0f0dccf10029993f877672336c23ae73caa5548e
   virtual_path: plugins/minimal-context-tools
   is_virtual: true
-  package_type: apm_package
+  package_type: skill_bundle
   deployed_files:
-  - .github/skills/analyzing-code
-  - .github/skills/analyzing-code-structure
-  - .github/skills/extracting-code-structure
-  - .github/skills/finding-files
-  - .github/skills/fuzzy-selecting
-  - .github/skills/querying-json
-  - .github/skills/querying-yaml
-  - .github/skills/replacing-text
-  - .github/skills/searching-text
-  - .github/skills/setup-snip-hooks
-  - .github/skills/viewing-files
-  content_hash: sha256:e9f28674807391f779ad65f4955401671cba43ae7b983ce80aba6d8dbda8ceed
-- repo_url: SebastienDegodez/copilot-instructions
-  host: github.com
-  resolved_commit: 4a43ac9775c62672c238bf4df833784b1cc5ed92
-  virtual_path: plugins/superpowers-whetstone
-  is_virtual: true
-  package_type: apm_package
-  deployed_files:
-  - .github/skills/gherkin-gate
-  - .github/skills/mutation-testing
-  - .github/skills/outside-in-tdd
-  content_hash: sha256:2c7fbe3dd6fe4764899aa9c73173591fbcd957bf05b0a7efd6ee27d3b5e39625
+  - .agents/skills/analyzing-code
+  - .agents/skills/analyzing-code-structure
+  - .agents/skills/analyzing-code-structure/SKILL.md
+  - .agents/skills/analyzing-code-structure/reference/ast-grep-guide.md
+  - .agents/skills/analyzing-code/SKILL.md
+  - .agents/skills/analyzing-code/reference/tokei-guide.md
+  - .agents/skills/extracting-code-structure
+  - .agents/skills/extracting-code-structure/SKILL.md
+  - .agents/skills/extracting-code-structure/reference/code-structure-guide.md
+  - .agents/skills/finding-files
+  - .agents/skills/finding-files/SKILL.md
+  - .agents/skills/finding-files/reference/fd-guide.md
+  - .agents/skills/fuzzy-selecting
+  - .agents/skills/fuzzy-selecting/SKILL.md
+  - .agents/skills/fuzzy-selecting/reference/fzf-guide.md
+  - .agents/skills/querying-json
+  - .agents/skills/querying-json/SKILL.md
+  - .agents/skills/querying-json/reference/jq-guide.md
+  - .agents/skills/querying-yaml
+  - .agents/skills/querying-yaml/SKILL.md
+  - .agents/skills/querying-yaml/reference/yq-guide.md
+  - .agents/skills/replacing-text
+  - .agents/skills/replacing-text/SKILL.md
+  - .agents/skills/replacing-text/reference/sd-guide.md
+  - .agents/skills/searching-text
+  - .agents/skills/searching-text/SKILL.md
+  - .agents/skills/searching-text/reference/ripgrep-guide.md
+  - .agents/skills/viewing-files
+  - .agents/skills/viewing-files/SKILL.md
+  - .agents/skills/viewing-files/reference/bat-guide.md
+  - .github/hooks/minimal-context-tools-snip.json
+  deployed_file_hashes:
+    .agents/skills/analyzing-code-structure/SKILL.md: sha256:d7b37c00c92759e6bb4333a3a510ee0f0b9ac587384d56d54ecac01ad2663830
+    .agents/skills/analyzing-code-structure/reference/ast-grep-guide.md: sha256:e6cf261cd9c15d0d7f5fb23919af0ee78bb4289d41acd2f851fbbed07e53f9fb
+    .agents/skills/analyzing-code/SKILL.md: sha256:af7a374a5670729456d375a7b7133e688cfdb3d92cdf420dae703be723fe8a65
+    .agents/skills/analyzing-code/reference/tokei-guide.md: sha256:143c35666474bb91bcd534f79ea1f02708eaa97946471458187177b7f48bd9b8
+    .agents/skills/extracting-code-structure/SKILL.md: sha256:447e1da3caa15d4174a11298f7f7c19a1822a72ae1c71baf851fb46c576eb7ab
+    .agents/skills/extracting-code-structure/reference/code-structure-guide.md: sha256:76f78d426329f32eb384cd105254842043ebc49ae273365eba9150a353d99d22
+    .agents/skills/finding-files/SKILL.md: sha256:c7b2d809a330086c10ce9bfeaed857a5c035485229a402a995561aea36e135fd
+    .agents/skills/finding-files/reference/fd-guide.md: sha256:0bfc015bb8e6145a37b66786f697ce1a11d6af31eabad27e4504bf7ee4cec2d3
+    .agents/skills/fuzzy-selecting/SKILL.md: sha256:a5d49acc2f483d74f01687b17d188853fa09e02258ff1768b7761d9486bc2a6b
+    .agents/skills/fuzzy-selecting/reference/fzf-guide.md: sha256:9f0e0d6fb4cbb1bd7c0f43ed3434bfbcfd75920f92110674090e4e4fd9f0bdef
+    .agents/skills/querying-json/SKILL.md: sha256:2898bacc02f35dadfbb084e6a0b79871e3839ff88fd63912afd2e1b2f40d77c2
+    .agents/skills/querying-json/reference/jq-guide.md: sha256:188a56334f65604c65ac68d7064b15552221f9428fd6a87bfc9f0cb8a0f15d75
+    .agents/skills/querying-yaml/SKILL.md: sha256:fed74ece4323ef3536e5cba397161f523cf5e2d3d0a1001dada482c8ce808654
+    .agents/skills/querying-yaml/reference/yq-guide.md: sha256:1d1e53fcadc5c2317d6d941ccdc18f8994a19b5c719507fe4ab94f7291dd74fb
+    .agents/skills/replacing-text/SKILL.md: sha256:f3c753f06199e21d6afc98e50037de10be2c0bddc976ec6c9b7387fbbf947d49
+    .agents/skills/replacing-text/reference/sd-guide.md: sha256:150d3aed94855acf8793e9f42a794d31d23761ce0e6b1b7f270fdff598484420
+    .agents/skills/searching-text/SKILL.md: sha256:937a85a65da1e97814df2b32bb44de631793fa0aab026efa3c92c7d4230cbfe4
+    .agents/skills/searching-text/reference/ripgrep-guide.md: sha256:2539363819a9064bfc7e3ca9477f1bacd7301774cdea251113b4af58c6e6c864
+    .agents/skills/viewing-files/SKILL.md: sha256:5c9bf6d21b57db7a4867937e51fb7b36ad43142962333c8cfd18857fbe45262f
+    .agents/skills/viewing-files/reference/bat-guide.md: sha256:3ce007a875afc613421c6f1f142343d9f75a80e7028ef94e4369a9f9bc238237
+    .github/hooks/minimal-context-tools-snip.json: sha256:ae0fee16112e754765fee42de7ad4f6625c6ebf8b49cbd489fb156837489c400
+  content_hash: sha256:cfec2a95aba6029cc84538cf772eef806becd017919a8c03e28ddc13655ce0cf
 - repo_url: anthropics/claude-code
   host: github.com
-  resolved_commit: 2923bc87d10da4fda57570313f2abbc5b457fed1
+  resolved_commit: 0fa8c19d50f70f9f383fb6ff5ce5209575267d21
   virtual_path: plugins/frontend-design
   is_virtual: true
-  package_type: apm_package
+  package_type: marketplace_plugin
   deployed_files:
-  - .github/skills/frontend-design
-  content_hash: sha256:880dd1dbc720f598083e2bc099fc66d8bd195c6b2bfc92381c73fed07ec6c0e4
+  - .agents/skills/frontend-design
+  - .agents/skills/frontend-design/SKILL.md
+  deployed_file_hashes:
+    .agents/skills/frontend-design/SKILL.md: sha256:1608ea77fbb6fc30d13a97d12cfa8ebf31358d40f0dd97beed24829d6b3f45dd
+  content_hash: sha256:18e95a968c2db70d419a921825993d8561fdc0ec44a6a199298730942559d301
+- repo_url: microsoft/playwright-cli
+  host: github.com
+  resolved_commit: 4f9d85a9472fc6d0c9a91ac62f3f3ecc24c16de2
+  virtual_path: skills/playwright-cli
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .agents/skills/playwright-cli
+  - .agents/skills/playwright-cli/SKILL.md
+  - .agents/skills/playwright-cli/references/element-attributes.md
+  - .agents/skills/playwright-cli/references/playwright-tests.md
+  - .agents/skills/playwright-cli/references/request-mocking.md
+  - .agents/skills/playwright-cli/references/running-code.md
+  - .agents/skills/playwright-cli/references/session-management.md
+  - .agents/skills/playwright-cli/references/storage-state.md
+  - .agents/skills/playwright-cli/references/test-generation.md
+  - .agents/skills/playwright-cli/references/tracing.md
+  - .agents/skills/playwright-cli/references/video-recording.md
+  deployed_file_hashes:
+    .agents/skills/playwright-cli/SKILL.md: sha256:29c0b669a524d42b51934d7db9144c1c07a566d0549ae6fb6ccd810e5a3cf61b
+    .agents/skills/playwright-cli/references/element-attributes.md: sha256:bf19aa4671e0a50a0fefa9c790f39124e803060eefe395042b723c29fcb7faa2
+    .agents/skills/playwright-cli/references/playwright-tests.md: sha256:c5b0719fef2cfdff50bd744051b2f9afc119775db4b48e9b2882c1cf3886797c
+    .agents/skills/playwright-cli/references/request-mocking.md: sha256:54e801c9663fc2b6d68ceb058cb1c360724c2499f42acc7852a68e83e5b5f37c
+    .agents/skills/playwright-cli/references/running-code.md: sha256:d95c539a5990b71d02d8bdf1d9414df16191eb6cff95b0063820518b7a13dcb2
+    .agents/skills/playwright-cli/references/session-management.md: sha256:cd3e261b8763bf952f1e371b876cb78d054379afec85482f9250633e1b7e6c44
+    .agents/skills/playwright-cli/references/storage-state.md: sha256:9ac47f9ae4a1aedcd2077f8ac9ab1ba6bee1962cb83ff51adcd36fb6d83b5ec6
+    .agents/skills/playwright-cli/references/test-generation.md: sha256:12f54cfa718d9e559bad918120a4ca4f11c933167713d1b9c5f99872eddaf749
+    .agents/skills/playwright-cli/references/tracing.md: sha256:792e0ac7705e56ac48df84c0f5400221ce86107897c671590a64a4ea6a82508e
+    .agents/skills/playwright-cli/references/video-recording.md: sha256:8555ab5400df0d90e66318aacc0a8a4418fbf872e7463824d55d5c41615abd83
+  content_hash: sha256:823f5cee8a67bf3be400529cf8bce84f7b48023e3c9b06807e4dfaad4091512b
