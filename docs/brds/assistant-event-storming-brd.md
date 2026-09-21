@@ -31,6 +31,8 @@ Le cadrage source fait autorité. Les points où il se contredit lui-même sont 
 
 Aucune exigence issue des versions 1 et 2 n'introduit de fonctionnalité absente du cadrage source. **Les exigences BR-037 à BR-040, créées le 2026-09-21, font exception** : elles proviennent de la maquette et du document d'exigences produit, et sont signalées comme telles.
 
+**Précision du 2026-09-21, sur la nature de l'outil.** L'outil qui servira cet atelier est un service proposé à plusieurs organisations, qui permet de conduire n'importe quelle séquence d'atelier. **Le présent document ne s'en trouve pas élargi** : il reste les exigences métier de ce programme, pour ce domaine et ces participants. Le parcours en neuf phases y devient le modèle de référence livré avec le service. Les capacités propres au service — organisations, modèles de séquence, packs de notation, abonnement — sont spécifiées dans le document d'exigences produit et n'ont pas à figurer ici : elles n'appartiennent pas à ce client.
+
 **Amendement du 2026-09-21.** Le document d'exigences produit, rédigé à partir de la maquette du 2026-08-15, a relevé douze écarts entre le comportement démontré et le présent document. Le Product Owner les a arbitrés le 2026-09-21. Quatre exigences sont amendées, une est durcie, quatorze capacités de la maquette sont reportées en quatre exigences nouvelles, et trois informations manquantes sont closes. Le détail figure en section 9.5.
 
 ## 1. Contexte métier

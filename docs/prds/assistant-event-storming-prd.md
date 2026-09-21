@@ -1,6 +1,6 @@
 ---
 title: "Assistant Event Storming - Document d'exigences produit"
-description: "Exigences produit de l'assistant d'atelier Event Storming : parcours, features, exigences fonctionnelles et non fonctionnelles, modèle de données, plan de livraison et traçabilité"
+description: "Exigences produit du service d'assistance aux ateliers de modélisation collaborative : modèles de séquence, notation, features, exigences fonctionnelles et non fonctionnelles, modèle de données, plan de livraison et traçabilité"
 author: "Product Manager"
 ms.date: 2026-09-21
 ms.topic: reference
@@ -39,6 +39,24 @@ Ce document traduit en exigences produit le document d'exigences métier, l'inte
 **Règle d'autorité, arrêtée le 2026-09-21.** La maquette est postérieure au document d'exigences métier et porte des décisions produit concrètes. Elle fait autorité. Chaque écart entre la maquette et une exigence métier ou une orientation UX est consigné en **annexe A**, avec une recommandation et la décision attendue du Product Owner. Aucun écart n'est résolu silencieusement.
 
 **Conséquence sur le document d'exigences métier.** Sa règle de gestion du périmètre impose qu'une extension suppose son réexamen. Les capacités introduites par la maquette et non couvertes par une exigence métier sont listées en annexe A, famille E-09 : elles doivent y être reportées pour devenir opposables.
+
+### Nature du produit
+
+**Précision du Product Owner du 2026-09-21.** Le produit est un service en ligne, proposé à plusieurs organisations, qui permet de conduire **n'importe quelle séquence d'atelier**. On ne sait pas d'avance ce que ses utilisateurs feront.
+
+Cette précision déplace la nature du document.
+
+| Avant                                                                  | Après                                                                       |
+|------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| Le produit sert l'atelier de cadrage du domaine dommage aux biens       | Ce programme est **une instance** de ce que le produit sert                  |
+| Le parcours en neuf phases est la structure du produit                  | Il devient **le modèle de référence**, livré avec le produit et dérivable    |
+| Les critères de sortie sont neuf règles écrites dans le produit         | Ils s'expriment dans un **vocabulaire de règles** que l'auteur d'un modèle compose |
+| Les huit types d'éléments sont la notation du produit                   | Ils deviennent le **pack de notation par défaut**, et d'autres sont définissables |
+| Une seule organisation, une seule population, un seul dépôt             | Des **organisations isolées**, chacune avec ses membres, ses modèles et son dépôt |
+
+**Ce que le document d'exigences métier devient.** Il reste la référence d'exigences de la première instance : un programme de transformation, un domaine assurantiel, vingt-trois participants, une méthode. Il ne décrit pas le produit. Les capacités propres au service — organisations, modèles de séquence, packs de notation — n'ont pas à y être reportées : elles n'appartiennent pas à ce client.
+
+**Ce que la maquette devient.** Elle démontre le modèle de référence appliqué à ce domaine. Son autorité vaut pour ce que le produit doit rendre possible, pas pour ce qu'il doit imposer.
 
 ### Conventions
 
@@ -88,9 +106,13 @@ Le document d'exigences métier situe l'atelier de cadrage aux 15 et 16 septembr
 
 ### 1.1 Énoncé
 
-> Un assistant d'atelier Event Storming qui prend en charge la mécanique — déroulé, notation, chronologie, mesures, restitution — pour qu'une connaissance de domaine détenue en parts par vingt-trois personnes devienne un modèle partagé dont chaque élément reste rattaché à la parole qui l'a produit.
+> Un service qui prend en charge la mécanique d'un atelier de modélisation collaborative — déroulé, notation, chronologie, mesures, restitution — pour qu'une connaissance détenue en parts par un groupe devienne un modèle partagé dont chaque élément reste rattaché à la parole qui l'a produit.
 
 Le produit n'anime pas, ne tranche pas et ne propose aucun découpage. Il rend possible, visible et traçable ce que le groupe produit.
+
+**Ce que le produit apporte de spécifique, et qu'un tableau blanc collaboratif n'apporte pas**, tient en une phrase : il connaît la séquence qu'on lui a décrite, il sait dire où en est le groupe par rapport à elle, et il conserve le lien entre ce qui a été dit et ce qui a été modélisé.
+
+**Le premier usage servi** est l'Event Storming, par le modèle de référence livré avec le produit. Ce n'est pas le seul que le produit doit admettre.
 
 ### 1.2 Problèmes adressés
 
@@ -157,14 +179,27 @@ Deux rôles de décision complètent la liste : le **Product Owner**, qui arbitr
 
 ### 2.2 Rôles applicatifs
 
-Le persona décrit une population, le rôle applicatif décrit un droit d'usage. La maquette en expose trois ; le quatrième est requis par la séance de conception.
+Le persona décrit une population, le rôle applicatif décrit un droit d'usage. **Deux niveaux coexistent depuis la décision du 2026-09-21** : l'organisation, qui possède les modèles, les membres et les séances, et la séance elle-même.
+
+#### Rôles d'organisation
+
+| Rôle                     | Ce qu'il peut faire                                                                                  |
+|--------------------------|-------------------------------------------------------------------------------------------------------|
+| **Administrateur**       | Inviter et retirer des membres, administrer la rétention, connecter un dépôt, gérer l'abonnement      |
+| **Méthodologue**         | Créer, dériver et publier des modèles de séquence et des packs de notation pour son organisation      |
+| **Membre**               | Créer une séance à partir d'un modèle publié, y tenir un rôle                                         |
+
+Un administrateur n'a aucun droit sur le contenu d'une séance à laquelle il ne participe pas. La possession de l'organisation ne donne pas autorité sur le modèle produit, conformément à PP-07.
+
+#### Rôles de séance
 
 | Rôle                 | Personas rattachés | Accès                                    | Ce qu'il peut faire de plus                                                   |
 |----------------------|--------------------|------------------------------------------|---------------------------------------------------------------------------------|
 | **Facilitateur**     | P2                 | Connexion GitHub ou OIDC                 | Démarrer, suspendre, prolonger, valider une étape, ouvrir un vote, imposer un focus, déclencher l'import de transcription |
 | **Participant**      | P1, P3, P5         | Code de session et prénom                | Contribuer, reformuler, ordonner, voter, questionner, exporter                 |
-| **Architecte**       | P4                 | Connexion GitHub ou OIDC                 | Créer une hypothèse de découpage, délimiter, déclarer un indice, lire les mesures |
-| **Équipe de conception** | P6, Product Owner | Connexion GitHub ou OIDC             | Ouvrir la séance de conception, formuler un invariant, proposer un agrégat, extraire la liste à valider |
+| **Observateur**      | —                  | Membre de l'organisation ou code         | Lire et exporter, sans contribuer                                              |
+
+**Révision du 2026-09-21.** Les rôles Architecte et Équipe de conception disparaissent. Ils décrivaient des activités — argumenter une frontière, formuler un invariant — et non des droits. Dans un produit qui admet n'importe quelle séquence, **ce n'est pas le rôle qui ouvre une capacité, c'est l'étape en cours** : une étape déclare les surfaces qu'elle active, et tout contributeur y accède. Cela reste conforme à la règle d'autorité du document d'exigences métier, qui interdisait déjà qu'un rôle décide seul d'une frontière.
 
 **DP-01.** Le facilitateur ne contribue pas au contenu. Son rôle ne donne accès à aucune saisie d'élément du modèle, ce qui rend le dénominateur des indicateurs de participation égal à 22. Source : décision du 2026-08-12 reprise en QU-05.
 
@@ -204,6 +239,8 @@ Le persona décrit une population, le rôle applicatif décrit un droit d'usage.
 | F-18    | Continuité et repli non logiciel                        | D10            | L1    |
 | F-19    | Lisibilité du mur : modes, filtres, vues et focus       | D1, transverse | L1    |
 | F-20    | Instrumentation des indicateurs                         | Transverse     | L1    |
+| F-21    | Modèles de séquence et packs de notation                | Création       | L1, complété en L3 |
+| F-22    | Organisations, membres et isolation                     | Création       | L1, complété en L3 |
 
 ### 3.2 Hors périmètre
 
@@ -215,7 +252,7 @@ Le persona décrit une population, le rôle applicatif décrit un droit d'usage.
 | Conduite de l'animation par un dispositif automatisé        | La distribution de la parole et la gestion du temps restent humaines        |
 | Captation autonome de la parole                             | La transcription est produite par l'outil de visioconférence en place       |
 | Production de documents d'exigences ou d'architecture        | Suppose un modèle complet et validé, non attendu à l'issue de l'atelier     |
-| Usage par plusieurs organisations                           | Hypothèse de généralisation sans preuve                                     |
+| ~~Usage par plusieurs organisations~~                       | **Exclusion levée le 2026-09-21.** Le produit est un service proposé à plusieurs organisations, voir F-22 |
 | Contribution au mur hors d'une phase ouverte                  | **Décision du 2026-09-21.** La consultation du modèle et l'amorçage du glossaire restent possibles hors séance ; aucune contribution au mur ne l'est. Un élément produit hors phase n'aurait ni étape de rattachement ni critère de sortie stable |
 | Restitution de l'historique des opérations                   | Décision du 2026-08-10, l'historique ne figure pas dans la restitution, voir RP-09 |
 
@@ -236,13 +273,24 @@ Le persona décrit une population, le rôle applicatif décrit un droit d'usage.
 
 ### 3.4 Règle d'extension du périmètre
 
-Toute capacité ajoutée à ce document et non couverte par une exigence métier est signalée comme création, listée en annexe A famille E-09, et reportée au document d'exigences métier pour devenir opposable. Aucune extension n'est introduite silencieusement.
+Toute capacité ajoutée à ce document et non couverte par une exigence métier est signalée comme création et listée en annexe A, famille E-09. Aucune extension n'est introduite silencieusement.
+
+**Révision du 2026-09-21.** La règle antérieure imposait de reporter toute création au document d'exigences métier. Elle ne vaut plus pour tout : deux familles doivent être distinguées.
+
+| Famille de création                                                    | Traitement                                                                 |
+|--------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| Capacité servant l'instance décrite par le document d'exigences métier   | Reportée, comme les quatorze capacités de E-09 reportées le 2026-09-21      |
+| Capacité propre au service — organisation, modèle de séquence, pack de notation, abonnement | **Non reportée.** Elle n'appartient pas à ce client et n'a rien à faire dans ses exigences. Elle vit dans le présent document |
+
+Sans cette distinction, le document d'exigences métier d'un programme de transformation se mettrait à spécifier un service commercial, ce qu'aucun de ses signataires n'a demandé.
 
 ## 4. Parcours produit
 
-### 4.1 Les neuf phases
+### 4.1 Le modèle de référence, en neuf phases
 
-Le parcours du produit est le déroulé d'atelier de Brandolini instancié pour le domaine dommage aux biens. Il compte neuf phases, dont huit se tiennent pendant les deux jours d'atelier et une en séance de conception.
+**Révisé le 2026-09-21.** Ce qui suit n'est plus le parcours du produit : c'est le **modèle de référence** livré avec lui, le déroulé d'atelier de Brandolini instancié pour un domaine assurantiel. Il compte neuf phases, dont huit se tiennent pendant deux jours d'atelier et une en séance de conception.
+
+Le produit admet n'importe quelle autre séquence, décrite dans le même format, voir la feature F-21. Ce modèle a valeur de démonstration et de point de départ : il montre ce qu'un modèle complet contient, et il est dérivable.
 
 | Phase | Journée | Intitulé | Durée | Question posée au groupe | Résultat attendu |
 |-------|---------|----------|-------|---------------------------|------------------|
@@ -279,9 +327,13 @@ Le document d'exigences métier décrit un parcours en dix étapes. La correspon
 
 ### 4.3 Mécanique des critères de sortie
 
-Chaque phase porte un critère de sortie calculé en continu à partir du contenu produit. Le critère est énoncé en termes observables, jamais en durée ni en volume seul.
+Chaque étape porte un critère de sortie calculé en continu à partir du contenu produit. Le critère est énoncé en termes observables, jamais en durée ni en volume seul.
 
-| Phase | Critère de sortie évalué par le produit                                                                    |
+**Révisé le 2026-09-21.** Une séquence quelconque ne peut pas porter des critères écrits dans le produit. Le critère s'exprime dans un **vocabulaire de règles déclaratives**, composé par l'auteur du modèle et évalué par le produit sur le modèle en construction. Le vocabulaire est défini en section 7.9.
+
+Les neuf critères ci-dessous sont ceux du modèle de référence. Ils sont donnés ici en langage courant ; leur expression en règles figure en section 7.9.
+
+| Étape du modèle de référence | Critère de sortie évalué par le produit                                                                    |
 |-------|--------------------------------------------------------------------------------------------------------------|
 | 1     | Au moins huit événements d'échauffement posés                                                                |
 | 2     | Au moins vingt événements posés, et doublons évidents regroupés                                              |
@@ -309,9 +361,11 @@ Le blocage n'est pas un réglage : il s'applique à toute séance. Ce qui est r�
 
 ### 4.4 Modes du mur
 
-Le mur est une surface unique dont les règles et les affordances changent selon la phase. Un mode ne met en avant que les types d'éléments de son étape et des étapes antérieures.
+Le mur est une surface unique dont les règles et les affordances changent selon l'étape en cours. Un mode ne met en avant que les types d'éléments de son étape et des étapes antérieures.
 
-| Mode              | Phases | Types mis en avant                                   | Ce que le mode interdit ou range                                  |
+**Révisé le 2026-09-21.** Un mode n'est pas une liste fermée écrite dans le produit. **Une étape déclare ce qu'elle attend** — ses types mis en avant, les surfaces qu'elle active, ce qu'elle range — et le mode en découle. Les huit modes ci-dessous sont ceux que produit le modèle de référence, et non le catalogue des modes possibles.
+
+| Mode du modèle de référence | Étapes | Types mis en avant                                   | Ce que le mode interdit ou range                                  |
 |-------------------|--------|-------------------------------------------------------|---------------------------------------------------------------------|
 | Échauffement      | 1      | Événement, sur un domaine trivial séparé              | Le domaine réel n'est pas encore ouvert                            |
 | Collecte          | 2      | Événement                                             | Aucun ordre, aucun lien, aucun signalement spontané. Le mur des autres est masqué jusqu'à révélation individuelle |
@@ -348,8 +402,11 @@ Le mur est une surface unique dont les règles et les affordances changent selon
 | **S-18** | Restitution et export                          | Action  | —       | Transverse  | F-17, F-18         |
 | **S-19** | Vote silencieux                                | Panneau | V5      | 2 à 8       | F-09               |
 | **S-20** | Participants et relance                        | Panneau | W2      | 1 à 8       | F-20               |
+| **S-21** | Éditeur de modèles de séquence                 | Écran   | —       | Hors séance | F-21               |
+| **S-22** | Éditeur de packs de notation                   | Écran   | —       | Hors séance | F-21               |
+| **S-23** | Administration de l'organisation               | Écran   | —       | Hors séance | F-22               |
 
-Les surfaces S-02, S-07, S-09, S-12 et S-20 n'ont pas d'équivalent dans le catalogue de vues UX : elles proviennent de la maquette et sont signalées à ce titre en annexe A.
+Les surfaces S-02, S-07, S-09, S-12 et S-20 n'ont pas d'équivalent dans le catalogue de vues UX : elles proviennent de la maquette et sont signalées à ce titre en annexe A. **S-21, S-22 et S-23, ajoutées le 2026-09-21**, ne proviennent ni de la maquette ni du document UX : elles servent le produit et non l'atelier, et ne concernent aucun des six personas pendant une séance.
 
 ## 5. Exigences produit
 
@@ -1899,6 +1956,210 @@ Le détail par indicateur figure en section 8.
 - [ ] Les cinq mesures d'usage de la section 8.4 figurent dans l'export
 - [ ] Aucune mesure individuelle n'est exportée sans le décompte global qui la contextualise
 
+### F-21 Modèles de séquence et packs de notation
+
+| Attribut      | Valeur                                                                         |
+|---------------|----------------------------------------------------------------------------------|
+| Intention     | Permettre de conduire une séquence que le produit ne connaît pas d'avance         |
+| Personas      | Méthodologue, P1, Product Owner                                                  |
+| Jalon         | L1 pour la dérivation, L3 pour la création complète                              |
+| Exigences métier | BR-003, BR-001, BR-038, reste en création                                     |
+| Statut maquette | Absent                                                                         |
+
+#### PR-121 Fournir un catalogue de modèles de séquence
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Indispensable | BR-038 | — | S-02, S-21 | Partiel |
+
+- [ ] Le modèle de référence « Big Picture 2 jours » est livré avec le produit
+- [ ] Chaque modèle porte son intention, sa durée totale, son nombre d'étapes et le pack de notation qu'il emploie
+- [ ] Un modèle livré avec le produit ne peut pas être modifié, seulement dérivé
+- [ ] Une organisation ne voit que les modèles livrés et les siens
+
+#### PR-122 Dériver un modèle existant
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Indispensable | BR-003 | — | S-21 | Absent |
+
+Dériver, plutôt que créer de zéro, est le geste attendu : personne ne compose un atelier de deux jours devant une page blanche.
+
+- [ ] Un modèle se duplique sous un nouveau nom, dans son organisation
+- [ ] Toute étape du modèle dérivé est modifiable, supprimable, et de nouvelles s'ajoutent
+- [ ] L'origine du modèle dérivé reste visible
+- [ ] Une séance en cours n'est jamais affectée par la modification du modèle dont elle est issue
+
+#### PR-123 Décrire une étape de modèle
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Indispensable | BR-001, BR-003 | UF-06 | S-21 | Absent |
+
+Une étape porte tout ce que le produit affichera pendant qu'elle est en cours.
+
+- [ ] Intitulé, question posée au groupe, résultat attendu, consigne visible des participants
+- [ ] Phrase de lancement et pièges, destinés au seul facilitateur
+- [ ] Durée prévue
+- [ ] Types d'éléments mis en avant, choisis dans le pack de notation du modèle
+- [ ] Surfaces activées par l'étape, parmi celles de la section 4.5
+- [ ] Critère de sortie, composé selon PR-124
+- [ ] Aucun de ces contenus n'est obligatoire, sauf l'intitulé : une étape minimale reste valide
+
+#### PR-124 Composer le critère de sortie d'une étape
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Indispensable | BR-036 | UF-06 | S-21 | Absent |
+
+Le critère se compose dans le vocabulaire de règles de la section 7.9, évalué par le produit sur le modèle en construction.
+
+- [ ] Les prédicats du vocabulaire sont proposés avec leurs paramètres
+- [ ] Plusieurs prédicats se combinent par « et »
+- [ ] L'auteur voit l'énoncé en langage courant que produira sa règle
+- [ ] Une étape sans critère reste valide : le passage y est alors libre
+- [ ] Une règle portant sur un type absent du pack du modèle est refusée à l'enregistrement
+
+#### PR-125 Publier et versionner un modèle
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Souhaitable | Création | — | S-21 | Absent |
+
+- [ ] Un modèle est publié dans son organisation avant de pouvoir servir une séance
+- [ ] Une modification postérieure produit une nouvelle version, sans altérer les séances déjà tenues
+- [ ] Une séance conserve la version du modèle dont elle est issue, et la restitution la nomme
+- [ ] Une version antérieure reste consultable
+
+#### PR-126 Définir un pack de notation
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Indispensable | Création | — | S-22 | Absent |
+
+Le pack Event Storming des huit types de la section 7.2 est livré comme pack par défaut, et reste la référence méthodologique du produit.
+
+- [ ] Le pack par défaut est livré, non modifiable, et dérivable comme un modèle
+- [ ] Un type porte un libellé, une couleur, une consigne de formulation et au moins un exemple
+- [ ] Un pack dérivé ajoute, retire et renomme des types
+- [ ] La distinction entre deux types ne peut jamais reposer sur la seule couleur, y compris dans un pack dérivé
+- [ ] Un pack employé par une séance tenue n'est plus modifiable, seulement versionné
+
+#### PR-127 Attacher une règle de formulation à un type
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Souhaitable | BR-008 | UF-02 | S-22 | Absent |
+
+Les règles déterministes de la section 7.2 sont attachées aux types du pack par défaut, et non écrites dans le produit.
+
+- [ ] Un type porte zéro, une ou plusieurs règles de formulation
+- [ ] Les règles disponibles sont celles de la section 7.2, paramétrables
+- [ ] Un type sans règle ne produit aucun signalement
+- [ ] Une règle ne bloque jamais une contribution, quel que soit le pack, conformément à PP-04
+
+#### PR-128 Éprouver un modèle avant de l'employer
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Souhaitable | Création | — | S-21 | Absent |
+
+Un modèle mal composé ne se découvre pas en séance, devant vingt-trois personnes.
+
+- [ ] Une séance d'essai s'ouvre sur un modèle non publié, sans compter dans les indicateurs
+- [ ] Les critères de sortie sont évaluables sur un contenu d'essai
+- [ ] Un modèle dont une étape référence un type absent du pack est signalé avant publication
+- [ ] Un modèle dont un critère ne peut jamais être atteint est signalé, sans être empêché
+
+### F-22 Organisations, membres et isolation
+
+| Attribut      | Valeur                                                                         |
+|---------------|----------------------------------------------------------------------------------|
+| Intention     | Servir plusieurs organisations sans qu'aucune ne voie ce que fait une autre       |
+| Personas      | Administrateur, Product Owner                                                    |
+| Jalon         | L1 pour l'isolation, L3 pour l'administration complète                           |
+| Exigences métier | Création, hors périmètre du document d'exigences métier                       |
+| Statut maquette | Absent                                                                         |
+
+#### PR-129 Créer une organisation et y inviter des membres
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Indispensable | Création | — | S-23 | Absent |
+
+- [ ] Une organisation se crée avec un nom et un premier administrateur
+- [ ] Un membre est invité par adresse électronique et rejoint en s'authentifiant
+- [ ] Un membre retiré perd tout accès, ses contributions passées demeurant attribuées
+- [ ] Une personne appartient à plusieurs organisations sans confusion entre elles
+
+#### PR-130 Isoler les données entre organisations
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Indispensable | Création | — | — | Absent |
+
+- [ ] Aucune séance, aucun modèle, aucun pack et aucune transcription n'est atteignable hors de son organisation
+- [ ] Un code de séance ne donne accès qu'à cette séance, jamais à l'organisation
+- [ ] L'isolation est vérifiée par des essais automatisés, et non par revue de code seule
+- [ ] Une erreur d'accès ne révèle pas l'existence de la ressource demandée
+
+#### PR-131 Administrer les rôles d'organisation
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Indispensable | Création | — | S-23 | Absent |
+
+- [ ] Les trois rôles de la section 2.2 sont attribuables et révocables
+- [ ] Une organisation compte au moins un administrateur à tout instant
+- [ ] Un administrateur n'accède pas au contenu d'une séance à laquelle il ne participe pas
+- [ ] Toute modification de rôle est journalisée
+
+#### PR-132 Paramétrer la rétention par organisation
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Indispensable | BR-011 | — | S-23 | Absent |
+
+La purge à la clôture décidée le 2026-09-21 est le comportement par défaut. Une organisation assurantielle et une équipe produit n'ont pas les mêmes contraintes.
+
+- [ ] La purge de la transcription à la clôture est la valeur par défaut
+- [ ] Une organisation prolonge cette durée, dans une limite maximale fixée par le service
+- [ ] La suppression d'une séance et de ses données est possible à la demande
+- [ ] Les extraits rattachés à un élément survivent à toute purge de transcription
+
+#### PR-133 Connecter un dépôt de versement
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Souhaitable | BR-013 | — | S-23 | Absent |
+
+**Révision du 2026-09-21.** Le versement dans `event2spec` décidé le même jour ne survit pas au passage en service : chaque organisation verse dans son propre dépôt.
+
+- [ ] Une organisation connecte un dépôt et désigne la branche de versement
+- [ ] Le téléchargement du fichier reste disponible sans aucun dépôt connecté, et demeure le comportement de base
+- [ ] Le versement est manuel, jamais automatique
+- [ ] La déconnexion du dépôt n'altère ni les séances ni les restitutions déjà produites
+
+#### PR-134 Administrer l'abonnement et les quotas
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Optionnelle | Création | — | S-23 | Absent |
+
+- [ ] Les limites applicables à l'organisation sont consultables : participants par séance, séances actives, volumétrie
+- [ ] L'atteinte d'une limite est signalée avant qu'elle ne soit bloquante
+- [ ] Aucune limite n'interrompt une séance en cours, voir PP-04
+
+#### PR-135 Journaliser les actions d'administration
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Souhaitable | Création | — | S-23 | Absent |
+
+- [ ] Invitation, retrait, changement de rôle, purge et connexion de dépôt sont journalisés avec leur auteur et leur date
+- [ ] Le journal est consultable par un administrateur de l'organisation
+- [ ] Le journal n'expose aucun contenu de séance
+
 ## 6. Exigences non fonctionnelles
 
 | ID         | Domaine                  | Exigence                                                                                                 | Priorité      | Vérification                                        |
@@ -1906,21 +2167,26 @@ Le détail par indicateur figure en section 8.
 | **NFR-01** | Collaboration            | 23 sessions simultanées contribuent sans perte d'élément, propagation d'une contribution visible en moins d'une seconde en conditions nominales | Indispensable | Essai de charge à 23 postes avant la séance         |
 | **NFR-02** | Volumétrie               | Le produit tient 800 éléments, 20 moments, 3 processus, 80 chaînes, 12 frontières et 24 agrégats sans dégradation perceptible | Indispensable | Jeu d'essai dimensionné à cette volumétrie, décidée le 2026-09-21 |
 | **NFR-03** | Continuité               | Une interruption du service ne détruit aucun contenu déjà produit, et le dernier export reste exploitable  | Indispensable | Essai de coupure pendant une phase de contribution  |
+| **NFR-17** | Disponibilité            | Le service est disponible aux heures ouvrées des organisations servies. Une indisponibilité pendant une séance est un incident, pas un aléa accepté | Indispensable | Engagement à formuler, voir QP-15                   |
 | **NFR-04** | Reprise                  | Un participant qui perd sa connexion retrouve la séance à l'état courant, sa saisie en cours préservée      | Indispensable | Essai de déconnexion et reconnexion                 |
 | **NFR-05** | Accessibilité            | WCAG 2.2 niveau AA, parcours de contribution intégralement utilisable au clavier, cibles d'au moins 24 pixels, fonctionnement préservé à 200 pour cent de zoom | Indispensable | Audit sur le parcours de contribution et d'ordonnancement |
 | **NFR-06** | Accessibilité            | Aucune information n'est portée par la seule couleur : type, statut de preuve et origine portent forme, libellé ou bordure | Indispensable | Revue de conception et essai en nuances de gris     |
 | **NFR-07** | Perception               | Étape courante, temps restant et signalements sont annoncés comme régions vivantes aux lecteurs d'écran    | Souhaitable   | Essai avec lecteur d'écran                          |
 | **NFR-08** | Performance d'interface  | Une saisie rend la main en moins de 100 millisecondes, la navigation sur le mur reste fluide à la volumétrie de NFR-02 | Indispensable | Mesure sur poste de référence bas de gamme          |
 | **NFR-09** | Sécurité                 | L'accès conduisant la séance passe par GitHub ou OIDC ; le code de séance est limité à la durée de la séance et révocable | Indispensable | Revue de conception                                 |
-| **NFR-10** | Confidentialité          | La transcription est purgée à la clôture de la séance, une fois la restitution produite. Les extraits déjà rattachés à un élément demeurent dans le modèle | Indispensable | Essai de purge, et vérification que la traçabilité survit |
+| **NFR-10** | Confidentialité          | La transcription est purgée à la clôture de la séance par défaut, une fois la restitution produite. Les extraits déjà rattachés à un élément demeurent. La durée est paramétrable par organisation, voir PR-132 | Indispensable | Essai de purge, et vérification que la traçabilité survit |
+| **NFR-18** | Isolation                | Aucune donnée d'une organisation n'est atteignable depuis une autre, quel que soit le chemin d'accès | Indispensable | Essais automatisés d'isolation, voir PR-130          |
+| **NFR-19** | Souveraineté             | La localisation d'hébergement des données est connue et opposable à une organisation assurantielle | Indispensable | À établir, voir QP-14                                |
 | **NFR-11** | Traitement automatisé    | Le traitement du contenu par un service tiers est limité à la transcription et à la production de propositions ; il ne produit jamais une décision, une frontière ni un agrégat | Indispensable | Revue de conception, PP-08                          |
 | **NFR-12** | Restitution              | Le fichier de restitution est lisible sans outil spécifique, déterministe et versionnable                  | Indispensable | Deux restitutions successives comparées             |
 | **NFR-13** | Portabilité              | Le modèle sort du produit sans perte sémantique et sans format propriétaire                                | Indispensable | Reprise manuelle du fichier sur un support tiers    |
 | **NFR-14** | Poste et navigateur      | Fonctionnement sur les navigateurs courants à jour, sans installation, sur des postes hétérogènes en distanciel | Indispensable | Matrice de compatibilité à établir                  |
-| **NFR-15** | Langue                   | L'interface est en français et emploie le vocabulaire du domaine assurance, jamais le seul vocabulaire de la méthode | Indispensable | Revue de contenu                                    |
+| **NFR-15** | Langue                   | L'interface est en français. Le vocabulaire métier affiché provient du contenu de l'organisation, jamais du produit : c'est le modèle et le pack de notation qui le portent | Indispensable | Revue de contenu, voir QP-13 pour les autres langues |
 | **NFR-16** | Observabilité            | Chaque opération est journalisée avec son auteur, sa phase et son horodatage, aux fins des indicateurs      | Indispensable | Export des mesures, PR-120                          |
 
-**Ce que ces exigences ne couvrent pas.** Aucune exigence de tenue à la charge au-delà de la séance, aucune exigence de disponibilité exprimée en pourcentage, et aucune exigence de reprise après sinistre. Le produit sert une séance conduite, protégée par le repli non logiciel de la feature F-18, et non un service continu. Ce choix est cohérent avec l'acceptation du risque de ressource unique au niveau programme.
+**Révision du 2026-09-21.** La version précédente écartait toute exigence de disponibilité au motif que le produit servait une séance et non un service continu. Le passage en service rend cette position intenable : une organisation qui paie pour conduire ses ateliers n'accepte pas que l'outil soit indisponible le jour où elle en a besoin.
+
+**Ce que ces exigences ne couvrent toujours pas.** Le niveau de service chiffré, le plan de reprise après sinistre et les engagements contractuels restent à établir, voir QP-15. Le repli non logiciel de la feature F-18 demeure, mais il protège la séance, pas le service.
 
 ## 7. Modèle de données et contrats
 
@@ -1930,8 +2196,15 @@ Cette section décrit ce que le produit manipule et ce qu'il produit. Elle ne d�
 
 | Entité                      | Attributs déterminants                                                                                  | Relations                                            |
 |-----------------------------|-----------------------------------------------------------------------------------------------------------|-------------------------------------------------------|
-| **Séance**                  | Nom, domaine, dates, effectif, code, état, modèle de déroulé, intention et périmètre du domaine          | Contient phases, participants, éléments              |
-| **Phase**                   | Rang, journée, titre, durée, question, résultat attendu, phrase de lancement, consigne, pièges, critère de sortie, état | Appartient à une séance                              |
+| **Organisation**            | Nom, membres et leurs rôles, paramètres de rétention, dépôt connecté, limites                            | Possède modèles, packs et séances                    |
+| **Membre**                  | Identité, rôle d'organisation, état de l'invitation                                                       | Appartient à une ou plusieurs organisations          |
+| **Modèle de séquence**      | Nom, intention, version, état publié, pack de notation employé, modèle d'origine si dérivé               | Contient des étapes de modèle                        |
+| **Étape de modèle**         | Rang, intitulé, question, résultat attendu, consigne, phrase de lancement, pièges, durée, types mis en avant, surfaces activées, critère de sortie | Appartient à un modèle de séquence |
+| **Pack de notation**        | Nom, version, état publié, pack d'origine si dérivé                                                       | Contient des types d'éléments                        |
+| **Type d'élément**          | Libellé, couleur, consigne de formulation, exemples, règles de formulation attachées                      | Appartient à un pack de notation                     |
+| **Règle de critère**        | Prédicat, paramètres, énoncé en langage courant                                                           | Compose le critère de sortie d'une étape             |
+| **Séance**                  | Nom, domaine, dates, effectif, code, état, version du modèle employé, intention et périmètre du domaine  | Appartient à une organisation, contient étapes, participants, éléments |
+| **Étape de séance**         | Instance d'une étape de modèle dans une séance, avec son état, son minuteur, et le dépassement éventuel de son critère | Appartient à une séance                              |
 | **Participant**             | Nom affiché, rôle applicatif, rôle métier, état de contribution                                          | Auteur d'éléments                                    |
 | **Élément**                 | Type, texte, auteur d'origine, dernier modificateur, horodatage, statut de preuve, origine, formulation d'origine, moment, frontière, doublon, état supprimé | Rattaché à un moment, à une frontière, à un extrait  |
 | **Moment**                  | Nom, rang, état de revue                                                                                  | Contient des éléments                                |
@@ -1956,7 +2229,9 @@ Cette section décrit ce que le produit manipule et ce qu'il produit. Elle ne d�
 
 Huit types d'éléments. Chaque type porte un libellé textuel, une couleur indicative et une consigne de formulation.
 
-**Décision du Product Owner du 2026-09-21.** Ces huit types constituent la notation de référence du produit. Cette décision clôt MQ-10, ouverte depuis le document d'exigences métier, et stabilise la feature F-05 dans son ensemble.
+**Décision du Product Owner du 2026-09-21.** Ces huit types constituent le **pack de notation par défaut**, livré avec le produit et employé par le modèle de référence. Cette décision clôt MQ-10, ouverte depuis le document d'exigences métier, et stabilise la feature F-05.
+
+**Précision du même jour.** Le produit admettant n'importe quelle séquence, il admet d'autres notations : un pack se dérive, ses types se renomment, s'ajoutent et se retirent, voir PR-126. Ce qui ne se dérive pas, ce sont les principes — un type porte toujours un libellé textuel, jamais une couleur seule, et aucune règle de formulation ne bloque jamais une contribution.
 
 | Type             | Consigne de formulation               | Règle déterministe appliquée à la saisie                                          |
 |------------------|----------------------------------------|-------------------------------------------------------------------------------------|
@@ -2065,7 +2340,48 @@ Deux versements successifs d'un modèle inchangé produisent deux fichiers ident
 | Un changement de statut conserve l'état antérieur                                            | PR-096                 |
 | Le raffinement d'un scénario n'altère pas la chronologie source                              | PR-055, PR-061         |
 
+### 7.9 Vocabulaire des règles de critère de sortie
+
+**Ajouté le 2026-09-21.** Une séquence que le produit ne connaît pas d'avance ne peut pas porter des critères écrits dans le produit. Ce vocabulaire est ce qui rend un critère à la fois composable par un auteur et évaluable par le produit.
+
+Il est délibérément pauvre. Un vocabulaire riche deviendrait un langage de programmation, que personne dans les six rôles n'a demandé à écrire.
+
+| Prédicat                        | Paramètres                                   | Énoncé produit en langage courant                                        |
+|---------------------------------|----------------------------------------------|----------------------------------------------------------------------------|
+| **au-moins**                    | type, nombre                                 | « Au moins 20 événements posés »                                          |
+| **au-plus**                     | type, nombre                                 | « Au plus 3 processus retenus »                                           |
+| **aucun-sans-position**         | type                                         | « Plus aucun événement hors de la chronologie »                           |
+| **au-moins-conteneurs**         | nature du conteneur, nombre                  | « Au moins 2 moments nommés »                                             |
+| **tous-liés**                   | type source, type cible                      | « Chaque commande porte un déclencheur »                                  |
+| **tous-revus**                  | nature du conteneur                          | « Chaque moment passé en revue, ou déclaré vide »                         |
+| **aucun-ouvert**                | nature du point ouvert                        | « Aucun écart de récit en attente »                                       |
+| **parcours-achevé**             | nature du parcours                            | « Le récit parcouru de bout en bout »                                     |
+| **artefact-produit**            | nature de l'artefact                          | « Le modèle est exporté »                                                 |
+| **marqueur-posé**               | marqueur                                      | « Les doublons évidents sont regroupés »                                  |
+
+Les prédicats se combinent par « et ». Aucune négation, aucune disjonction, aucun calcul : un critère qu'on ne peut pas lire à voix haute n'aide pas un facilitateur à décider.
+
+**Les neuf critères du modèle de référence, exprimés dans ce vocabulaire.**
+
+| Étape | Composition                                                                                              |
+|-------|-------------------------------------------------------------------------------------------------------------|
+| 1     | au-moins(événement d'échauffement, 8)                                                                       |
+| 2     | au-moins(événement, 20) et marqueur-posé(doublons regroupés)                                                |
+| 3     | aucun-sans-position(événement) et au-moins-conteneurs(moment, 2)                                            |
+| 4     | parcours-achevé(récit) et aucun-ouvert(écart de récit)                                                      |
+| 5     | tous-revus(moment)                                                                                          |
+| 6     | au-moins(processus, 2) et au-plus(processus, 3) et tous-liés(événement rattaché, commande)                  |
+| 7     | au-moins(politique, 3) et tous-liés(commande, déclencheur)                                                  |
+| 8     | au-moins(variante, 2)                                                                                       |
+| 9     | aucun-sans-position(événement dans une frontière) et au-moins-conteneurs(frontière, 2) et tous-liés(frontière, agrégat) et artefact-produit(restitution) |
+
+**Ce que le vocabulaire ne sait pas exprimer, et l'assume.** La qualité d'un fait métier, la justesse d'une règle, la pertinence d'une frontière. Aucun prédicat ne porte de jugement : ils comptent, ils vérifient des liens, ils constatent des états. Le jugement reste au groupe, PP-07.
+
 ## 8. Mesures de succès et instrumentation
+
+**Révisé le 2026-09-21.** Les seize indicateurs ci-dessous sont ceux du programme décrit par le document d'exigences métier. Ils ne sont pas les indicateurs du produit : une organisation qui conduit une rétrospective ou un atelier de cadrage produit n'a rien à faire du nombre de frontières argumentées.
+
+**Ce que le produit doit garantir** est plus étroit et plus durable : produire la donnée dont ces indicateurs se calculent, et laisser chaque organisation fixer ses cibles. La colonne « donnée à produire » est donc la partie opposable du tableau ; la colonne « cible » appartient au client.
 
 ### 8.1 Ce que le produit doit produire, indicateur par indicateur
 
@@ -2125,11 +2441,13 @@ Les indicateurs de qualité du résultat, famille C, sont au contraire affichés
 |--------|---------------------------------|---------------------------------------------------------------------------------------------|------------------|
 | **L1** | Atelier de domaine              | Conduire les huit phases d'un atelier de deux jours, jusqu'à 23 participants, et en sortir un modèle exporté | P1 à P5          |
 | **L2** | Séance de conception            | Poser des frontières argumentées, formuler des invariants, en déduire des agrégats et remonter jusqu'à la parole | P4, P6, Product Owner |
-| **L3** | Reprise et industrialisation    | Reprendre une séance suspendue, conserver l'historique au-delà de l'outil, administrer la rétention | À décider, voir QP-04 |
+| **L3** | Service ouvert                  | Composer ses propres séquences et notations, administrer son organisation, verser dans son dépôt, reprendre une séance suspendue | Toute organisation |
 
 Aucun jalon n'est rattaché à une date. L1 vise la prochaine session ouverte, quelle qu'elle soit, et L2 la séance de conception qui la suit.
 
-**L3 est conditionnel.** Il ne s'engage qu'après la décision sur le devenir de l'outil. Les exigences qui s'y rattachent ne sont pas spécifiées dans ce document. La décision du 2026-09-21, qui acte d'autres séquences et d'autres sessions, rend son hypothèse plus probable sans l'engager : la reprise d'une séance suspendue et la conservation de l'historique deviendront un besoin dès qu'une session en suivra une autre sur le même domaine.
+**Révision du 2026-09-21.** L3 s'appelait « reprise et industrialisation » et n'était pas spécifié, son engagement dépendant du devenir de l'outil. Le produit étant un service, il ne l'est plus : L3 est ce qui rend le produit vendable à une organisation qui n'est pas celle du premier programme. Il est spécifié dans ce document, features F-21 et F-22.
+
+**Ce qui bascule en L1 malgré tout.** L'isolation entre organisations n'est pas une capacité d'administration, c'est une propriété de sécurité : elle se construit dès la première ligne ou jamais. Et la dérivation d'un modèle est ce qui permet à la deuxième séance de ne pas être la copie de la première. Ces deux points figurent en L1.
 
 ### 9.2 Contenu par jalon
 
@@ -2155,6 +2473,8 @@ Aucun jalon n'est rattaché à une date. L1 vise la prochaine session ouverte, q
 | F-18    | Complet                                   | —                                         | —                |
 | F-19    | PR-111, PR-112, PR-113, PR-115            | PR-114, PR-116                            | —                |
 | F-20    | PR-117, PR-118, PR-119                    | PR-120                                    | —                |
+| F-21    | PR-121, PR-122, PR-123, PR-124            | PR-128                                    | PR-125, PR-126, PR-127 |
+| F-22    | PR-129, PR-130                            | PR-132                                    | PR-131, PR-133, PR-134, PR-135 |
 
 ### 9.3 Ordre de réalisation de L1
 
@@ -2162,7 +2482,7 @@ Aucun jalon n'est rattaché à une date. L1 vise la prochaine session ouverte, q
 
 | Rang | Feature            | Motif                                                                                 | Rang au document d'exigences |
 |------|--------------------|-----------------------------------------------------------------------------------------|------------------------------|
-| 1    | F-01               | Sans séance, sans rôle et sans identité, aucune contribution n'est attribuable          | Absent, création             |
+| 1    | F-22, puis F-01    | L'isolation entre organisations se construit avant tout le reste. Sans séance, sans rôle et sans identité, aucune contribution n'est attribuable | Absent, création |
 | 2    | F-02, F-03         | Le déroulé porte la structure de tout le reste                                          | 8                            |
 | 3    | F-04, F-05         | Sans faits métier, aucun autre domaine n'a d'objet                                      | 1                            |
 | 4    | F-17, F-18         | Protection du jalon. L'export doit exister avant tout incident                          | 2 et 7                       |
@@ -2176,12 +2496,16 @@ Aucun jalon n'est rattaché à une date. L1 vise la prochaine session ouverte, q
 | 12   | F-15               | L'enrichissement assisté ne conditionne aucune autre capacité                           | 9                            |
 | 13   | F-09               | Le vote est un confort de priorisation, aucune phase n'en dépend                        | 4                            |
 
+**Ajout du 2026-09-21.** La feature F-21 ne tient pas un rang : elle traverse la réalisation. Le modèle de référence doit exister comme **donnée** dès le rang 2, sans quoi le produit reprend des phases écrites en dur et le travail est à refaire. L'éditeur, lui, vient en L3. C'est l'inversion qui compte : construire le moteur qui lit un modèle, puis livrer le modèle de référence comme premier contenu.
+
 Cette révision est à confirmer par le Product Owner, elle modifie un ordre validé le 2026-08-10 puis révisé le 2026-08-11.
 
 ### 9.4 Chemin critique
 
 | Dépendance                                                        | Conséquence si elle n'est pas tenue                                  |
 |--------------------------------------------------------------------|------------------------------------------------------------------------|
+| F-22 avant toute donnée persistée                                  | L'isolation ne se greffe pas après coup sur un schéma qui l'ignore    |
+| F-21 comme format avant F-02                                       | Le déroulé doit être lu depuis un modèle, pas écrit dans le produit   |
 | F-02 avant toute feature de phase                                  | Aucune phase ne peut ouvrir ni fermer, le produit n'a pas de squelette |
 | F-04 avant F-06, F-07, F-08 et F-10                                | Aucun élément à ordonner, raconter, enrichir ni rattacher             |
 | F-06 avant F-10                                                     | Les chaînes se construisent sur des événements situés dans un moment  |
@@ -2236,6 +2560,10 @@ Si le contenu de L1 doit être réduit, les features tombent dans l'ordre invers
 | **RP-14**  | L'historique des opérations disparaît avec l'outil                                          | Faible   | PR-023 le conserve pendant la vie du produit, la restitution ne l'inclut pas | Assumé, décision du 2026-08-10                             |
 | **RP-15**  | Des contenus métier assurantiels sont traités sans durée de conservation décidée            | Moyenne  | PR-106, conservation paramétrable                                           | La durée n'est pas fixée, QP-03                             |
 | **RP-16**  | Le produit passe pour un outil de restitution plutôt que de découverte                      | Moyenne  | PP-01, PP-07, aucune proposition de découpage, aucune animation automatisée | Dépend de la conduite en séance                             |
+| **RP-17**  | La configurabilité vide la méthode de sa substance : un modèle mal composé produit un atelier raté, et le produit en porte la responsabilité perçue | Élevée   | PR-121, modèles livrés non modifiables et dérivables ; PR-128, essai avant emploi ; PR-124, énoncé en langage courant du critère composé | Entier. Le produit ne peut pas juger la qualité d'une séquence, et ne doit pas prétendre le faire |
+| **RP-18**  | Une donnée d'une organisation devient atteignable depuis une autre                          | Élevée   | PR-130, isolation vérifiée par essais automatisés, réalisée au premier rang | Un défaut d'isolation dans un service assurantiel n'est pas un incident produit, c'est une rupture de contrat |
+| **RP-19**  | Le vocabulaire de règles dérive vers un langage de programmation                            | Moyenne  | Section 7.9, dix prédicats, composition par « et » seulement, aucune négation ni calcul | La pression des cas particuliers poussera à l'étendre. Chaque ajout doit être refusé par défaut |
+| **RP-20**  | Le service devient indisponible pendant une séance payée                                    | Élevée   | F-18, repli non logiciel et export permanent ; NFR-17 | Le repli protège la séance, pas la relation commerciale. Le niveau de service reste à établir, QP-15 |
 
 ## 11. Hypothèses, décisions et questions
 
@@ -2271,10 +2599,15 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | **DP-06** | L'ordre de réalisation est révisé, la conduite passe du huitième au deuxième rang             | Le produit est construit autour du déroulé                                  | Confirmée le 2026-09-21 |
 | **DP-07** | La restitution de référence est un fichier Markdown déterministe, versé dans `event2spec` sous `docs/sessions/` | Lisible sans outil, comparable, reprenable manuellement en mode de repli    | Confirmée le 2026-09-21 |
 | **DP-08** | Le produit est spécifié comme multi-séances, avec liste, création et codes de séance          | La maquette le démontre, et d'autres séquences et sessions sont prévues     | Confirmée le 2026-09-21 |
+| **DP-09** | Le produit est un service proposé à plusieurs organisations, qui admet n'importe quelle séquence | Précision du Product Owner du 2026-09-21                                   | Prise le 2026-09-21 |
+| **DP-10** | Le déroulé est une donnée éditable, pas une structure du produit. Des modèles sont livrés, dérivables | On ne sait pas d'avance ce que les utilisateurs feront                     | Prise le 2026-09-21 |
+| **DP-11** | Les critères de sortie s'expriment dans un vocabulaire de dix prédicats, évalués sur le modèle | Seul moyen de garder BR-036 opposable sur une séquence inconnue             | Prise le 2026-09-21 |
+| **DP-12** | La notation est un pack dérivable, les huit types Event Storming étant le pack par défaut     | Le produit doit admettre d'autres méthodes sans renoncer à en porter une    | Prise le 2026-09-21 |
+| **DP-13** | Le versement de la restitution vise le dépôt connecté par l'organisation, le téléchargement restant la base | DP-07 versait dans `event2spec`, ce qui ne survit pas au passage en service | Prise le 2026-09-21, révise DP-07 et QP-09 |
 
 ### 11.3 Questions
 
-**Aucune question ouverte au 2026-09-21.** Les douze questions du document ont été tranchées, huit décisions produit sont confirmées, et les douze écarts de l'annexe A sont arbitrés. Ce qui reste à faire relève de l'exécution, section 13, et non de la décision.
+**Les douze premières questions sont closes**, treize décisions produit sont prises, et les treize écarts de l'annexe A sont arbitrés. **Quatre questions nouvelles sont ouvertes le même jour** par le passage en service : elles figurent après le tableau des réponses.
 
 | ID        | Question                                                                                   | Réponse                                                                     |
 |-----------|----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
@@ -2290,6 +2623,17 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | **QP-10** | La notation de référence est-elle celle des huit types de la section 7.2 ?                   | **Oui**, le 2026-09-21. Clôt MQ-10, ouverte depuis le document d'exigences métier |
 | **QP-11** | L'ordre de réalisation révisé est-il validé ?                                                | **Oui**, le 2026-09-21. Voir DP-06 et la section 9.3                        |
 | **QP-12** | Les objectifs BO-08 à BO-10 et les cibles de la famille C sont-ils confirmés ?               | **Confirmés tels quels**, le 2026-09-21. Clôt l'action AC-14 du document d'exigences métier |
+
+**Questions ouvertes par le passage en service, le 2026-09-21.**
+
+| ID        | Question                                                                                   | Interlocuteur              | Ce qu'elle bloque                                        |
+|-----------|----------------------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------|
+| **QP-13** | L'interface doit-elle exister dans d'autres langues que le français ?                        | Product Owner              | NFR-15, et le coût de toute chaîne de caractères écrite d'ici là |
+| **QP-14** | Où les données sont-elles hébergées, et cette localisation est-elle opposable ?              | Responsable de programme   | NFR-19, et la vente à toute organisation assurantielle    |
+| **QP-15** | Quel niveau de service est engagé, et avec quelles conséquences en cas de manquement ?       | Responsable de programme   | NFR-17 et le risque RP-20                                 |
+| **QP-16** | Une organisation peut-elle imposer son propre fournisseur d'identité ?                       | Product Owner              | PR-001 et l'entrée des grandes organisations              |
+
+Ces quatre questions ne bloquent ni L1 ni L2. Elles bloquent la mise en vente, et QP-13 devient coûteuse à répondre tard.
 
 **Le jalon des 15 et 16 septembre ne conditionne plus le document**, décision du 2026-09-21 : d'autres séquences et sessions suivront, et cette date n'est plus l'ancrage du produit.
 
@@ -2342,7 +2686,11 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | BR-039          | PR-047                                            | Complète, créée le 2026-09-21 |
 | BR-040          | PR-021, PR-112, PR-113, PR-114, PR-116            | Complète, créée le 2026-09-21, PR-114 en L2 |
 
-Les quarante exigences métier sont couvertes. Le document d'exigences métier ayant été amendé le 2026-09-21, il ne reste que deux exigences produit marquées Création : PR-063, rappel d'exhaustivité des variantes, Optionnelle, et PR-115, position stable sans animation, qui traduit une orientation UX et non un besoin métier.
+Les quarante exigences métier sont couvertes.
+
+**Ce qui n'y figure pas, et n'a pas à y figurer.** Les features F-21 et F-22, ajoutées le 2026-09-21, servent le service et non le programme décrit par le document d'exigences métier : modèles de séquence, packs de notation, organisations, isolation, abonnement. Quinze exigences produit, PR-121 à PR-135, n'ont donc aucun rattachement métier et ne doivent pas en recevoir, conformément à la règle révisée de la section 3.4. Trois d'entre elles servent malgré tout une exigence existante : PR-123 et PR-124 pour BR-001 et BR-036, PR-132 pour BR-011, PR-133 pour BR-013.
+
+Hors ces quinze, il ne reste que deux exigences produit marquées Création : PR-063, rappel d'exhaustivité des variantes, Optionnelle, et PR-115, position stable sans animation, qui traduit une orientation UX et non un besoin métier.
 
 ### 12.2 Objectifs métier vers features
 
@@ -2398,8 +2746,12 @@ Toutes les décisions sont rendues. Ce qui suit relève de l'exécution.
 | **AP-05**    | Chiffrer L1 sur la base de la section 9                                                    | Réalisation                | Une journée | Permettre l'arbitrage programme prévu par la règle de réalisation |
 | **AP-06**    | Faire confirmer la couverture des exigences par les six rôles                              | Product Owner              | 6 × 30 min  | Lever les hypothèses HP-01 à HP-05, seule preuve extérieure disponible |
 | **AP-07**    | Éprouver les huit tests de risque méthodologique sur un atelier réduit                     | Product Owner, P1          | Une demi-journée | Vérifier que le parcours produit la découverte attendue    |
+| **AP-09**    | Répondre aux quatre questions ouvertes par le passage en service, QP-13 à QP-16            | Product Owner, responsable de programme | Une demi-journée | Mettre le service en vente, et éviter que QP-13 ne devienne coûteuse |
+| **AP-10**    | Décrire le modèle de référence dans le format de la feature F-21, comme donnée et non comme code | Réalisation           | Deux jours  | Vérifier que le format tient la séquence la plus complète connue avant d'en dépendre |
 
 **Actions closes le 2026-09-21.** AP-02, arbitrage des douze écarts. AP-03, confirmation des décisions produit. AP-04, amendement du document d'exigences métier et report des quatorze capacités. AP-08, arrêt de la notation de référence.
+
+**AP-10 est la première à mener.** Elle éprouve, à coût faible, la décision la plus structurante du 2026-09-21 : si le modèle de référence ne s'exprime pas entièrement dans le format de F-21 — ses neuf critères compris — alors le vocabulaire de la section 7.9 est trop pauvre, et il vaut mieux le découvrir avant d'avoir écrit le moteur.
 
 **AP-06 est la seule action qui apporte une preuve extérieure.** Toutes les autres reposent sur la conviction du Product Owner et sur la maquette. Elle reste à mener depuis le document d'exigences métier du 2026-08-11.
 
@@ -2539,6 +2891,16 @@ Deux décisions de la même journée, prises hors annexe A, contredisent elles a
 | UX | Sept points bloquants recensés, dont la conception clavier comme mode nominal |
 | Conséquence | 18 des 23 participants ne sont pas techniques, et le parcours de contribution est d'abord une saisie au clavier |
 | **Décision du 2026-09-21** | NFR-05 à NFR-07 sont indispensables en L1 et vérifiés avant la mise en service, section 9.5 |
+
+### E-13 La maquette et les exigences métier décrivent une instance, pas un produit
+
+| | |
+|---|---|
+| Maquette | Neuf phases écrites dans le produit, huit types d'éléments, un domaine assurantiel, vingt-trois participants, une organisation implicite |
+| Document d'exigences métier | Un programme de transformation, un atelier, six rôles nommés, seize indicateurs rattachés à ce jalon |
+| Constat du 2026-09-21 | Le produit est un service qui admet n'importe quelle séquence, pour des organisations dont on ne connaît ni les méthodes ni les populations |
+| **Décision du 2026-09-21** | Les deux sources gardent leur autorité **sur l'instance qu'elles décrivent**, et le modèle de référence la porte dans le produit. Ce qui en était la structure devient de la donnée : séquence, notation, critères, population, cibles d'indicateurs. Features F-21 et F-22 |
+| Conséquence | Ce qui était écrit dans le produit doit être lu depuis un modèle. La réalisation doit construire le moteur avant le contenu, faute de quoi le modèle de référence sera codé en dur et le travail refait |
 
 ## Annexe B — Ce que la maquette démontre, phase par phase
 
