@@ -63,13 +63,16 @@ Chaque exigence produit est rattachée à au moins une exigence métier, ou sign
 
 Le document d'exigences métier situe l'atelier de cadrage aux 15 et 16 septembre 2026. Le présent document est rédigé le 2026-09-21, postérieurement à cette date.
 
+**Décision du Product Owner du 2026-09-21.** Ce jalon n'est plus l'ancrage du produit : d'autres séquences et d'autres sessions suivront. Le produit n'est pas spécifié pour un atelier, il l'est pour une pratique répétée.
+
 | Constat                                                                   | Traitement retenu                                                               |
 |---------------------------------------------------------------------------|----------------------------------------------------------------------------------|
-| La tenue effective de l'atelier n'est pas établie par les sources          | Le document ne la préjuge pas, voir QP-01                                       |
-| Le plan de livraison ne peut être ancré sur une date dépassée              | Les jalons L1, L2 et L3 sont définis par leur contenu, rattachés à la prochaine session d'atelier |
-| La maquette liste des sessions postérieures, dont une au 29 septembre 2026 | Le produit est spécifié comme multi-sessions, ce que confirme la feature F-01    |
+| L'échéance du 15 et 16 septembre n'est plus un critère d'arbitrage         | Aucune exigence n'est omise ni priorisée au motif de cette date                  |
+| Le plan de livraison n'est ancré sur aucune date                           | Les jalons L1, L2 et L3 sont définis par leur contenu, rattachés à la prochaine session ouverte |
+| D'autres séquences et sessions sont prévues                                | Le produit est spécifié comme multi-sessions, ce que porte la feature F-01 et confirme la décision DP-08 |
+| Les objectifs métier restent valides                                       | Ils portaient sur la découverte du domaine, et non sur la tenue d'une date       |
 
-Si l'atelier des 15 et 16 septembre s'est tenu, les objectifs métier restent valides pour les sessions suivantes et la séance de conception, et seul l'ordonnancement du plan de livraison est à réviser. QP-01 appelle cette confirmation.
+**Conséquence sur les indicateurs.** Les cibles des familles A et B étaient rattachées à l'atelier des 15 et 16 septembre et à ses vingt-trois participants. Elles restent formulables pour toute session, à condition de redéfinir leur population de référence à l'ouverture de chaque séance. Voir QP-01.
 
 ### Ce que ce document ne fait pas
 
@@ -2093,11 +2096,13 @@ Proposées par ce document, non validées, voir QP-05.
 
 | Jalon  | Intitulé                        | Ce qui doit être possible à son terme                                                     | Population       |
 |--------|---------------------------------|---------------------------------------------------------------------------------------------|------------------|
-| **L1** | Atelier de domaine              | Conduire les huit phases d'un atelier de deux jours, à 23 participants, et en sortir un modèle exporté | P1 à P5          |
+| **L1** | Atelier de domaine              | Conduire les huit phases d'un atelier de deux jours, jusqu'à 23 participants, et en sortir un modèle exporté | P1 à P5          |
 | **L2** | Séance de conception            | Poser des frontières argumentées, formuler des invariants, en déduire des agrégats et remonter jusqu'à la parole | P4, P6, Product Owner |
 | **L3** | Reprise et industrialisation    | Reprendre une séance suspendue, conserver l'historique au-delà de l'outil, administrer la rétention | À décider, voir QP-04 |
 
-**L3 est conditionnel.** Il ne s'engage qu'après la décision sur le devenir de l'outil. Les exigences qui s'y rattachent ne sont pas spécifiées dans ce document.
+Aucun jalon n'est rattaché à une date. L1 vise la prochaine session ouverte, quelle qu'elle soit, et L2 la séance de conception qui la suit.
+
+**L3 est conditionnel.** Il ne s'engage qu'après la décision sur le devenir de l'outil. Les exigences qui s'y rattachent ne sont pas spécifiées dans ce document. La décision du 2026-09-21, qui acte d'autres séquences et d'autres sessions, rend son hypothèse plus probable sans l'engager : la reprise d'une séance suspendue et la conservation de l'historique deviendront un besoin dès qu'une session en suivra une autre sur le même domaine.
 
 ### 9.2 Contenu par jalon
 
@@ -2238,13 +2243,13 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | **DP-05** | Le blocage du passage d'étape devient un réglage, non bloquant par défaut                     | Arbitrage entre la maquette et le principe PP-07                            | **À confirmer** |
 | **DP-06** | L'ordre de réalisation est révisé, la conduite passe du huitième au deuxième rang             | Le produit est construit autour du déroulé                                  | **À confirmer** |
 | **DP-07** | La restitution de référence est un fichier Markdown déterministe, versionné dans un dépôt Git | Lisible sans outil, comparable, reprenable manuellement en mode de repli    | **À confirmer** |
-| **DP-08** | Le produit est spécifié comme multi-séances, avec liste, création et codes de séance          | La maquette le démontre, et des séances postérieures sont déjà prévues      | **À confirmer** |
+| **DP-08** | Le produit est spécifié comme multi-séances, avec liste, création et codes de séance          | La maquette le démontre, et d'autres séquences et sessions sont prévues     | Confirmée le 2026-09-21 |
 
 ### 11.3 Questions ouvertes
 
 | ID        | Question                                                                                   | Interlocuteur              | Ce qu'elle bloque                                        |
 |-----------|----------------------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------|
-| **QP-01** | L'atelier des 15 et 16 septembre 2026 s'est-il tenu, et avec quel support ?                  | Responsable de programme   | L'ancrage calendaire du plan de livraison, section 9      |
+| **QP-01** | Les cibles des indicateurs sont-elles reconduites session par session, sur la population de chaque séance ? | Product Owner              | Le renseignement de KPI-03, KPI-04 et KPI-16, section 8   |
 | **QP-02** | Quelle volumétrie de modèle faut-il tenir ?                                                   | Product Owner, P1          | Le dimensionnement de NFR-02 et la stratégie de densité   |
 | **QP-03** | Quelle durée de conservation s'applique aux transcriptions et aux contenus métier ?          | Responsable de programme   | NFR-10 et PR-106                                          |
 | **QP-04** | À quelle échéance se tient la séance de conception ?                                          | Responsable de programme   | L'ordonnancement de L2, et le risque RP-09                |
@@ -2257,7 +2262,9 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | **QP-11** | L'ordre de réalisation révisé est-il validé ?                                                  | Product Owner              | DP-06 et la section 9.3                                   |
 | **QP-12** | Les objectifs BO-08 à BO-10 et les cibles de la famille C sont-ils confirmés ?                | Product Owner              | La section 8, reprise de l'action de confirmation du document d'exigences |
 
-**QP-01 est la seule question dont la réponse modifie la structure du document.** Les autres portent sur des valeurs, des réglages ou des confirmations.
+**Question close le 2026-09-21.** Le statut du jalon des 15 et 16 septembre ne conditionne plus le document : le Product Owner a acté que d'autres séquences et sessions suivraient, et que cette date n'était plus l'ancrage du produit. QP-01 porte désormais sur la reconduction des cibles d'indicateurs d'une session à l'autre.
+
+Aucune question ouverte ne modifie la structure du document. Toutes portent sur des valeurs, des réglages ou des confirmations.
 
 ## 12. Traçabilité
 
@@ -2352,9 +2359,9 @@ Les vingt flux sont couverts. Trois surfaces produit ne correspondent à aucun f
 
 | ID           | Action                                                                                  | Responsable                | Charge      | Ce que son absence empêche                                     |
 |--------------|-------------------------------------------------------------------------------------------|----------------------------|-------------|-----------------------------------------------------------------|
-| **AP-01**    | Répondre à QP-01, statut du jalon des 15 et 16 septembre                                  | Responsable de programme   | Une question| Ancrer le plan de livraison sur un calendrier réel              |
+| **AP-01**    | Désigner la prochaine session de référence, sa date et son domaine                        | Product Owner              | Une question| Ancrer le plan de livraison et la préparation de la section 9.5 |
 | **AP-02**    | Arbitrer les douze écarts de l'annexe A                                                    | Product Owner              | 45 minutes  | Engager la réalisation sur un comportement stable               |
-| **AP-03**    | Confirmer les décisions DP-05 à DP-08                                                      | Product Owner              | 20 minutes  | Figer le blocage d'étape, l'ordre de réalisation et le format de restitution |
+| **AP-03**    | Confirmer les décisions DP-05, DP-06 et DP-07                                              | Product Owner              | 20 minutes  | Figer le blocage d'étape, l'ordre de réalisation et le format de restitution |
 | **AP-04**    | Reporter au document d'exigences métier les capacités de la famille E-09                   | Product Owner              | 30 minutes  | Rendre opposables les capacités issues de la maquette           |
 | **AP-05**    | Chiffrer L1 sur la base de la section 9                                                    | Réalisation                | Une journée | Permettre l'arbitrage programme prévu par la règle de réalisation |
 | **AP-06**    | Faire confirmer la couverture des exigences par les six rôles                              | Product Owner              | 6 × 30 min  | Lever les hypothèses HP-01 à HP-05, seule preuve extérieure disponible |
