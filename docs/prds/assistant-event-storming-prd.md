@@ -30,7 +30,7 @@ Ce document traduit en exigences produit le document d'exigences métier, l'inte
 | Source                                                      | Date       | Rôle dans ce document                                                      |
 |-------------------------------------------------------------|------------|-----------------------------------------------------------------------------|
 | Maquette `Assistant-EventStorming.html`                     | 2026-08-15 | **Référence produit.** Fait autorité sur le parcours, les surfaces et les comportements |
-| Document d'exigences métier v2, `docs/brds/`                | 2026-08-11 | Exigences opposables BR-001 à BR-036, objectifs BO-01 à BO-10, indicateurs KPI-01 à KPI-16 |
+| Document d'exigences métier v3, `docs/brds/`                | 2026-09-21 | Exigences opposables BR-001 à BR-040, objectifs BO-01 à BO-10, indicateurs KPI-01 à KPI-16. Amendé le 2026-09-21 par les décisions du présent document |
 | Intention UX, `docs/ux/`                                    | 2026-08-11 | Personas P1 à P6, flux UF-01 à UF-20, vues V1 à V13, risques UX            |
 | Déroulé d'atelier 2 jours                                   | 2026-08-06 | Contenu méthodologique du déroulé guidé et support du repli non logiciel   |
 | Cadrage produit V0                                          | 2026-08-05 | Décisions produit initiales et exclusions de périmètre                      |
@@ -184,7 +184,7 @@ Le persona décrit une population, le rôle applicatif décrit un droit d'usage.
 
 | Feature | Intitulé                                                | Domaine métier | Jalon |
 |---------|---------------------------------------------------------|----------------|-------|
-| F-01    | Accès, sessions et rôles                                | Création       | L1    |
+| F-01    | Accès, sessions et rôles                                | D1             | L1    |
 | F-02    | Conduite guidée de la séance                            | D1             | L1    |
 | F-03    | Critères de sortie observables                          | D1             | L1    |
 | F-04    | Contribution simultanée et paternité                    | D2             | L1    |
@@ -202,7 +202,7 @@ Le persona décrit une population, le rôle applicatif décrit un droit d'usage.
 | F-16    | Statuts de preuve, décisions et traçabilité             | D9             | L2    |
 | F-17    | Restitution, export Markdown et versionnement           | D9             | L1    |
 | F-18    | Continuité et repli non logiciel                        | D10            | L1    |
-| F-19    | Lisibilité du mur : modes, filtres, vues et focus       | Transverse     | L1    |
+| F-19    | Lisibilité du mur : modes, filtres, vues et focus       | D1, transverse | L1    |
 | F-20    | Instrumentation des indicateurs                         | Transverse     | L1    |
 
 ### 3.2 Hors périmètre
@@ -373,7 +373,7 @@ Une exigence marquée **Création** n'est couverte par aucune exigence métier :
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Indispensable | Création | — | S-01 | Démontré |
+| Indispensable | BR-037 | — | S-01 | Démontré |
 
 Le facilitateur, l'architecte et l'équipe de conception se connectent par GitHub ou par le fournisseur d'identité de l'entreprise.
 
@@ -386,7 +386,7 @@ Le facilitateur, l'architecte et l'équipe de conception se connectent par GitHu
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Indispensable | Création | UF-11 | S-01 | Démontré |
+| Indispensable | BR-037 | UF-11 | S-01 | Démontré |
 
 Un participant rejoint avec le code diffusé en séance et son prénom, sans compte.
 
@@ -399,7 +399,7 @@ Un participant rejoint avec le code diffusé en séance et son prénom, sans com
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Indispensable | Création | — | S-02 | Démontré |
+| Indispensable | BR-038 | — | S-02 | Démontré |
 
 L'utilisateur connecté voit les séances où il a un rôle, avec leur état.
 
@@ -412,7 +412,7 @@ L'utilisateur connecté voit les séances où il a un rôle, avec leur état.
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Indispensable | BR-001 | UF-11 | S-02 | Démontré |
+| Indispensable | BR-001, BR-038 | UF-11 | S-02 | Démontré |
 
 Une séance se crée en nommant le domaine exploré, ses dates et le modèle de déroulé appliqué.
 
@@ -426,7 +426,7 @@ Une séance se crée en nommant le domaine exploré, ses dates et le modèle de 
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Indispensable | Création | — | S-02 | Partiel |
+| Indispensable | BR-037 | — | S-02 | Partiel |
 
 Chaque personne présente porte un rôle qui détermine ses capacités, sans lui donner d'autorité sur le contenu.
 
@@ -574,7 +574,7 @@ Le produit dénombre et permet de consulter les éléments qui empêchent le cri
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Indispensable | Création, voir DP-05 | UF-06 | S-05 | Démontré, sans le dépassement |
+| Indispensable | BR-036 amendée, voir DP-05 | UF-06 | S-05 | Démontré, sans le dépassement |
 
 La validation d'une phase est refusée tant que son critère n'est pas atteint. Le facilitateur passe outre par une action explicite, distincte de la validation ordinaire.
 
@@ -657,7 +657,7 @@ La double paternité est la règle : l'auteur d'origine est conservé, le dernie
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Indispensable | BR-007, BR-009 | UF-09 | S-03 | Partiel |
+| Indispensable | BR-007, BR-009, BR-040 | UF-09 | S-03 | Partiel |
 
 - [ ] La suppression demande une confirmation
 - [ ] L'élément supprimé reste visible en état barré, doublé d'une mention textuelle explicite
@@ -691,7 +691,7 @@ La double paternité est la règle : l'auteur d'origine est conservé, le dernie
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Indispensable | Création, voir E-03 | UF-01 | S-03 | Démontré |
+| Indispensable | BR-004 amendée, voir E-03 | UF-01 | S-03 | Démontré |
 
 **Décision du Product Owner du 2026-09-21 : le comportement de la maquette est retenu.** Pendant l'écriture silencieuse, un participant ne voit que ses propres éléments, jusqu'à ce qu'il révèle le mur.
 
@@ -878,7 +878,7 @@ La chronologie s'organise en moments nommés par le groupe, dans le langage du m
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Indispensable | Création, sert BR-027 | — | S-09 | Démontré |
+| Indispensable | BR-027 | — | S-09 | Démontré |
 
 - [ ] Un narrateur est désigné parmi les experts métier
 - [ ] Le parcours avance événement par événement, avec l'événement courant mis en évidence
@@ -985,7 +985,7 @@ Le point chaud porte un désaccord, une question ou un blocage.
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Souhaitable | Création | — | S-03 | Démontré |
+| Souhaitable | BR-039 | — | S-03 | Démontré |
 
 - [ ] L'opportunité est un type d'élément distinct du point chaud
 - [ ] Elle figure dans la restitution, séparée des faits
@@ -1695,7 +1695,7 @@ Le format et la structure de sections sont définis en section 7.7.
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Souhaitable | Création, sert BR-013 | — | S-18 | Démontré |
+| Souhaitable | BR-013 | — | S-18 | Démontré |
 
 **Décision du Product Owner du 2026-09-21 : le dépôt est `event2spec`**, un fichier par séance sous `docs/sessions/`, sur une branche dédiée.
 
@@ -1796,7 +1796,7 @@ Le format et la structure de sections sont définis en section 7.7.
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Souhaitable | Création | — | S-03 | Partiel |
+| Souhaitable | BR-040 | — | S-03 | Partiel |
 
 - [ ] Le mur est filtrable par moment, acteur, processus, frontière, statut et auteur
 - [ ] Un filtre individuel ne modifie ni le modèle ni l'affichage des autres participants
@@ -1805,7 +1805,7 @@ Le format et la structure de sections sont définis en section 7.7.
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Indispensable | Création, décision du 2026-08-12 | — | S-03 | Démontré |
+| Indispensable | BR-040 | — | S-03 | Démontré |
 
 - [ ] Chaque participant dispose de sa propre vue du mur
 - [ ] Aucune projection partagée n'est supposée
@@ -1815,7 +1815,7 @@ Le format et la structure de sections sont définis en section 7.7.
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Souhaitable | Création, décision du 2026-08-12 | — | S-05 | Absent |
+| Souhaitable | BR-040 | — | S-05 | Absent |
 
 - [ ] Le facilitateur repositionne les vues individuelles sur un point du mur
 - [ ] Le focus ne touche jamais à une saisie en cours
@@ -1836,7 +1836,7 @@ Le format et la structure de sections sont définis en section 7.7.
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Optionnelle | Création | — | S-03 | Démontré |
+| Optionnelle | BR-040 | — | S-03 | Démontré |
 
 - [ ] Trois échelles sont proposées, poste de travail, standard et mur projeté
 - [ ] Le réglage est individuel
@@ -1867,7 +1867,7 @@ Le format et la structure de sections sont définis en section 7.7.
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Souhaitable | Création | — | S-20 | Démontré |
+| Souhaitable | BR-007 | — | S-20 | Démontré |
 
 - [ ] La relance est individuelle et privée
 - [ ] Une relance déjà faite est signalée au facilitateur
@@ -2311,7 +2311,7 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | BR-008          | PR-025, PR-026, PR-027, PR-028, PR-029            | Complète   |
 | BR-009          | PR-018, PR-026                                    | Complète   |
 | BR-010          | PR-030, PR-046                                    | Complète   |
-| BR-011          | PR-089, PR-106                                    | Complète, **BR-011 à amender** : son critère « la transcription reste consultable après l'atelier » est contredit par la purge décidée le 2026-09-21 |
+| BR-011          | PR-089, PR-106                                    | Complète, BR-011 amendée le 2026-09-21 sur la purge |
 | BR-012          | PR-073, PR-083, PR-090, PR-093, PR-099, PR-100    | Complète   |
 | BR-013          | PR-064, PR-101, PR-102, PR-103, PR-104, PR-105    | Complète   |
 | BR-014          | PR-089, PR-090, PR-091                            | Complète   |
@@ -2336,9 +2336,13 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | BR-033          | PR-085, PR-086, PR-087                            | Complète, en L2 |
 | BR-034          | PR-081, PR-098                                    | Complète, en L2 |
 | BR-035          | PR-066, PR-081, PR-095, PR-096, PR-097, PR-103    | Complète   |
-| BR-036          | PR-010, PR-013, PR-014, PR-016, PR-048, PR-049    | Complète   |
+| BR-036          | PR-010, PR-013, PR-014, PR-015, PR-016, PR-048, PR-049 | Complète   |
+| BR-037          | PR-001, PR-002, PR-005                            | Complète, créée le 2026-09-21 |
+| BR-038          | PR-003, PR-004                                    | Complète, créée le 2026-09-21 |
+| BR-039          | PR-047                                            | Complète, créée le 2026-09-21 |
+| BR-040          | PR-021, PR-112, PR-113, PR-114, PR-116            | Complète, créée le 2026-09-21, PR-114 en L2 |
 
-Les trente-six exigences métier sont couvertes. Aucune exigence produit n'est orpheline : celles qui ne se rattachent à aucune exigence métier sont marquées Création et listées en annexe A, famille E-09.
+Les quarante exigences métier sont couvertes. Le document d'exigences métier ayant été amendé le 2026-09-21, il ne reste que deux exigences produit marquées Création : PR-063, rappel d'exhaustivité des variantes, Optionnelle, et PR-115, position stable sans animation, qui traduit une orientation UX et non un besoin métier.
 
 ### 12.2 Objectifs métier vers features
 
@@ -2391,16 +2395,17 @@ Toutes les décisions sont rendues. Ce qui suit relève de l'exécution.
 | ID           | Action                                                                                  | Responsable                | Charge      | Ce que son absence empêche                                     |
 |--------------|-------------------------------------------------------------------------------------------|----------------------------|-------------|-----------------------------------------------------------------|
 | **AP-01**    | Désigner la prochaine session de référence, sa date et son domaine                        | Product Owner              | Une question| Ancrer le plan de livraison et la préparation de la section 9.5 |
-| **AP-04**    | Amender BR-004, BR-006, BR-011, BR-033 et BR-036 selon les décisions du 2026-09-21, et reporter les quatorze capacités de la famille E-09 | Product Owner | Une demi-journée | Rendre opposables le blocage d'étape, le masquage en collecte, le secret du vote, le refus d'agrégat sans invariant, la purge de la transcription et les capacités issues de la maquette |
 | **AP-05**    | Chiffrer L1 sur la base de la section 9                                                    | Réalisation                | Une journée | Permettre l'arbitrage programme prévu par la règle de réalisation |
 | **AP-06**    | Faire confirmer la couverture des exigences par les six rôles                              | Product Owner              | 6 × 30 min  | Lever les hypothèses HP-01 à HP-05, seule preuve extérieure disponible |
 | **AP-07**    | Éprouver les huit tests de risque méthodologique sur un atelier réduit                     | Product Owner, P1          | Une demi-journée | Vérifier que le parcours produit la découverte attendue    |
 
-**Actions closes le 2026-09-21.** AP-02, arbitrage des douze écarts. AP-03, confirmation des décisions produit. AP-08, arrêt de la notation de référence.
+**Actions closes le 2026-09-21.** AP-02, arbitrage des douze écarts. AP-03, confirmation des décisions produit. AP-04, amendement du document d'exigences métier et report des quatorze capacités. AP-08, arrêt de la notation de référence.
 
 **AP-06 est la seule action qui apporte une preuve extérieure.** Toutes les autres reposent sur la conviction du Product Owner et sur la maquette. Elle reste à mener depuis le document d'exigences métier du 2026-08-11.
 
-**AP-04 conditionne la valeur opposable du PRD.** Cinq exigences métier sont désormais contredites par une décision produit — BR-004 sur la visibilité en collecte, BR-006 sur le vote, BR-011 sur la conservation de la transcription, BR-033 sur le marquage incomplet d'un agrégat, BR-036 sur le blocage d'étape. Tant qu'elles ne sont pas amendées, le document d'exigences et le PRD disent deux choses différentes sur le même comportement.
+**Le document d'exigences métier a été mis en concordance le 2026-09-21.** Quatre exigences sont amendées — BR-004 sur la visibilité en collecte, BR-011 sur la conservation de la transcription, BR-013 sur le versement, BR-036 sur le blocage d'étape. BR-033 est durcie, le marquage incomplet d'un agrégat n'étant plus admis. Quatre exigences sont créées, BR-037 à BR-040, et sept reçoivent des critères ajoutés. BR-006 n'appelait aucun amendement : elle exigeait déjà le vote secret, et c'est le comportement de la maquette qui est corrigé.
+
+Les deux documents disent désormais la même chose sur les mêmes comportements. **Il reste que quarante exigences reposent sur la conviction du Product Owner et sur une maquette que personne n'a essayée en séance.** Seule AP-06 peut lever cette réserve.
 
 ## Annexe A — Écarts entre la maquette, les exigences métier et l'intention UX
 
@@ -2489,24 +2494,24 @@ Deux décisions de la même journée, prises hors annexe A, contredisent elles a
 
 ### E-09 Capacités introduites par la maquette sans exigence métier
 
-**Décision du 2026-09-21 : les quatorze sont reportées au document d'exigences métier**, ce qui déclenche le réexamen prévu par sa règle de gestion du périmètre. Elles deviennent opposables et cessent d'être arbitrables sans réexamen.
+**Décision du 2026-09-21 : les quatorze sont reportées au document d'exigences métier**, ce qui déclenche le réexamen prévu par sa règle de gestion du périmètre. **Report effectué le 2026-09-21** : quatre exigences sont créées, BR-037 à BR-040, et les dix autres capacités deviennent des critères ajoutés à sept exigences existantes.
 
 | Capacité                                                     | Exigences produit | Rattachement au document d'exigences |
 |---------------------------------------------------------------|-------------------|-----------------------------------------------|
-| Connexion par GitHub ou OIDC                                  | PR-001            | Nouvelle exigence, domaine D1                 |
-| Accès participant par code de séance                          | PR-002            | BR-004 ou nouvelle exigence                   |
-| Liste et création de séances, modèles de déroulé               | PR-003, PR-004    | BR-001 étendu                                 |
-| Échauffement sur un domaine trivial                           | Phase 1           | BR-001 étendu                                 |
-| Phrase de lancement et pièges par étape                       | PR-007, PR-008    | BR-001 étendu                                 |
-| Récit conduit par un narrateur, en plusieurs passes           | PR-038, PR-043    | BR-027 étendu                                 |
-| Type d'élément « opportunité »                                | PR-047            | Nouvelle exigence, domaine D4                 |
-| Déclaration explicite d'absence d'acteur ou de système         | PR-048            | BR-036 étendu                                 |
-| Mesures de cohésion interne et de couverture du mur           | PR-072            | BR-018 étendu                                 |
-| Versement de la restitution dans un dépôt versionné           | PR-105            | BR-013 étendu                                 |
-| Vue personnelle, focus collectif, échelles d'affichage        | PR-113, PR-114, PR-116 | Nouvelle exigence, transverse           |
-| Relance privée d'un participant silencieux                    | PR-118            | BR-007 étendu                                 |
-| Filtre de masquage des éléments supprimés                     | PR-021            | Déjà signalé par l'UX comme non couvert       |
-| Alternative de positionnement sans glissement                 | PR-034            | Déjà signalé par l'UX comme non couvert       |
+| Connexion par GitHub ou OIDC                                  | PR-001            | **BR-037**, créée                             |
+| Accès participant par code de séance                          | PR-002            | **BR-037**, créée                             |
+| Liste et création de séances, modèles de déroulé               | PR-003, PR-004    | **BR-038**, créée                             |
+| Échauffement sur un domaine trivial                           | Phase 1           | BR-001, critère ajouté                        |
+| Phrase de lancement et pièges par étape                       | PR-007, PR-008    | BR-001, critères ajoutés                      |
+| Récit conduit par un narrateur, en plusieurs passes           | PR-038, PR-043    | BR-027, critères ajoutés                      |
+| Type d'élément « amélioration entrevue »                      | PR-047            | **BR-039**, créée                             |
+| Déclaration explicite d'absence d'acteur ou de système         | PR-048            | BR-036, critère ajouté                        |
+| Mesures de cohésion interne et de couverture du mur           | PR-072            | BR-018, critères ajoutés                      |
+| Versement de la restitution dans un dépôt versionné           | PR-105            | BR-013, critères ajoutés                      |
+| Vue personnelle, focus collectif, échelles d'affichage        | PR-113, PR-114, PR-116 | **BR-040**, créée                        |
+| Relance privée d'un participant silencieux                    | PR-118            | BR-007, critère ajouté                        |
+| Filtre de masquage des éléments supprimés                     | PR-021            | BR-040, critère ajouté                        |
+| Alternative de positionnement sans glissement                 | PR-034            | BR-024, critère ajouté                        |
 
 ### E-10 Branches, répétitions et événements pivots sont absents
 
