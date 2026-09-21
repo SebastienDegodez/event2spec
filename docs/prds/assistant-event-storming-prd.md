@@ -175,7 +175,7 @@ Le persona décrit une population, le rôle applicatif décrit un droit d'usage.
 | Usage                              | Quand                                   | Qui                          | Étapes couvertes            |
 |------------------------------------|-----------------------------------------|------------------------------|-----------------------------|
 | **Atelier de domaine**             | Deux jours, distanciel, 23 participants | P1 à P5                      | Phases 1 à 8                |
-| **Séance de conception**           | Postérieure, restreinte                 | P6, P4, Product Owner        | Phase 9, puis invariants et agrégats |
+| **Séance de conception**           | Dans les deux semaines suivant l'atelier | P6, P4, Product Owner        | Phase 9, puis invariants et agrégats |
 | **Restitution et traçabilité**     | Permanente, pendant et après            | Tous                         | Transverse                  |
 
 ## 3. Périmètre
@@ -216,7 +216,7 @@ Le persona décrit une population, le rôle applicatif décrit un droit d'usage.
 | Captation autonome de la parole                             | La transcription est produite par l'outil de visioconférence en place       |
 | Production de documents d'exigences ou d'architecture        | Suppose un modèle complet et validé, non attendu à l'issue de l'atelier     |
 | Usage par plusieurs organisations                           | Hypothèse de généralisation sans preuve                                     |
-| Édition hors séance par un participant isolé                 | **Création de ce document.** Le produit sert une séance conduite, pas un travail asynchrone. Voir QP-06 |
+| Contribution au mur hors d'une phase ouverte                  | **Décision du 2026-09-21.** La consultation du modèle et l'amorçage du glossaire restent possibles hors séance ; aucune contribution au mur ne l'est. Un élément produit hors phase n'aurait ni étape de rattachement ni critère de sortie stable |
 | Restitution de l'historique des opérations                   | Décision du 2026-08-10, l'historique ne figure pas dans la restitution, voir RP-09 |
 
 ### 3.3 Position sur le code existant
@@ -420,6 +420,7 @@ Une séance se crée en nommant le domaine exploré, ses dates et le modèle de 
 - [ ] Le modèle instancie les neuf phases, leurs durées et leurs contenus
 - [ ] Un code de séance est produit à la création
 - [ ] L'intention et le périmètre du domaine sont saisis à la création et restent affichés
+- [ ] Le nombre de contributeurs possibles est saisi à la création, et sert de dénominateur aux indicateurs de participation
 
 #### PR-005 Attribuer un rôle applicatif
 
@@ -1034,11 +1035,14 @@ Un moment sans acteur peut être un moment non revu, ou un moment sans acteur. L
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Souhaitable | BR-006 | UF-03 | S-19 | Absent, voir E-07 |
+| Indispensable dès lors que F-09 est livrée | BR-006 | UF-03 | S-19 | Absent, voir E-07 |
+
+**Décision du Product Owner du 2026-09-21 : le secret est retenu**, contre le comportement de la maquette.
 
 - [ ] Les votes d'un participant ne sont visibles que de lui avant la clôture
-- [ ] Aucun total n'est visible avant la clôture
+- [ ] Aucun total n'est visible avant la clôture, ni sur l'élément ni ailleurs
 - [ ] Le nombre de points restants est visible du votant
+- [ ] La clôture révèle les totaux à tous, simultanément
 
 #### PR-052 Présenter le résultat comme un indicateur
 
@@ -1210,6 +1214,8 @@ Les deux chaînes de la section 7.4 structurent la saisie.
 - [ ] La déclaration se fait sans quitter le mur ni l'activité en cours
 - [ ] Elle est possible à toute phase, dès la phase 2
 - [ ] Le terme est visible de tous dès sa déclaration
+- [ ] Le glossaire est amorçable hors séance, avant l'ouverture de l'atelier, par le Product Owner ou un porteur de la méthode
+- [ ] Un terme amorcé hors séance porte cette origine et reste soumis à la validation du métier, voir PR-066
 
 #### PR-066 Distinguer une définition retenue d'une définition proposée
 
@@ -1446,9 +1452,12 @@ Les huit indices recevables sont ceux du document d'exigences métier, rappelés
 |----------|-----------------|------|---------|------------------|
 | Indispensable | BR-033 | UF-18 | S-15 | Absent |
 
-- [ ] La création d'un agrégat sans invariant rattaché est refusée, ou l'agrégat est marqué incomplet
-- [ ] Aucun agrégat n'est accepté silencieusement sans invariant
+**Décision du Product Owner du 2026-09-21 : le refus est strict.** L'option du marquage incomplet, qu'admettait BR-033, n'est pas retenue.
+
+- [ ] La création d'un agrégat sans invariant rattaché est refusée
+- [ ] Le motif du refus nomme ce qui manque, et propose de formuler l'invariant
 - [ ] Le champ de nom de l'agrégat reste inactif tant qu'aucun invariant n'est formulé
+- [ ] Aucun agrégat existant ne subsiste sans invariant : le retrait du dernier invariant rattaché est refusé
 
 #### PR-086 Interdire la création d'un agrégat par regroupement visuel
 
@@ -1688,10 +1697,14 @@ Le format et la structure de sections sont définis en section 7.7.
 |----------|-----------------|------|---------|------------------|
 | Souhaitable | Création, sert BR-013 | — | S-18 | Démontré |
 
-- [ ] La restitution est versée dans un dépôt Git, sur une branche désignée
+**Décision du Product Owner du 2026-09-21 : le dépôt est `event2spec`**, un fichier par séance sous `docs/sessions/`, sur une branche dédiée.
+
+- [ ] La restitution est versée dans le dépôt du produit, sous `docs/sessions/`, un fichier par séance
+- [ ] Le versement se fait sur une branche dédiée à la séance, jamais directement sur la branche par défaut
 - [ ] L'horodatage du dernier versement est visible
 - [ ] Le versement est manuel, jamais automatique
 - [ ] L'échec du versement n'empêche pas le téléchargement du fichier
+- [ ] Deux versements successifs d'un modèle inchangé ne produisent aucun changement à valider
 
 #### PR-106 Conserver la transcription et l'associer à la séance
 
@@ -1699,9 +1712,14 @@ Le format et la structure de sections sont définis en section 7.7.
 |----------|-----------------|------|---------|------------------|
 | Indispensable | BR-011 | — | S-18 | Partiel |
 
-- [ ] La transcription est conservée à l'issue de la séance
-- [ ] Elle reste consultable après l'atelier
-- [ ] Sa durée de conservation est paramétrable, voir QP-03
+**Décision du Product Owner du 2026-09-21 : la transcription est purgée à la clôture de la séance**, une fois la restitution produite.
+
+- [ ] La transcription est conservée pendant la séance et associée à celle-ci
+- [ ] Elle reste consultable tant que la séance n'est pas close
+- [ ] La clôture purge la transcription, après production de la restitution
+- [ ] Les extraits déjà rattachés à un élément survivent à la purge, avec leur locuteur et leur horodatage
+- [ ] La purge est annoncée avant d'être exécutée, et son exécution est tracée
+- [ ] KPI-06 et la traçabilité vers la parole restent renseignables après la purge
 
 ### F-18 Continuité et repli non logiciel
 
@@ -1842,7 +1860,7 @@ Le format et la structure de sections sont définis en section 7.7.
 
 - [ ] Le facilitateur voit le nombre de contributeurs actifs et les participants sans contribution
 - [ ] Aucun classement par participant n'est visible, ni de lui ni des autres
-- [ ] Le dénominateur est de 22 contributeurs possibles, le facilitateur ne contribuant pas
+- [ ] Le dénominateur est le nombre de contributeurs possibles saisi à la création de la séance, facilitateur exclu — 22 pour un atelier à 23 personnes
 - [ ] Le panneau ne désigne jamais un silencieux sur une surface partagée
 
 #### PR-118 Permettre d'aller chercher un silencieux discrètement
@@ -1878,6 +1896,7 @@ Le détail par indicateur figure en section 8.
 
 - [ ] Les mesures de participation sont exportables après la séance
 - [ ] L'export porte les seize indicateurs renseignables et signale ceux qui ne le sont pas
+- [ ] Les cinq mesures d'usage de la section 8.4 figurent dans l'export
 - [ ] Aucune mesure individuelle n'est exportée sans le décompte global qui la contextualise
 
 ## 6. Exigences non fonctionnelles
@@ -1885,7 +1904,7 @@ Le détail par indicateur figure en section 8.
 | ID         | Domaine                  | Exigence                                                                                                 | Priorité      | Vérification                                        |
 |------------|--------------------------|------------------------------------------------------------------------------------------------------------|---------------|-----------------------------------------------------|
 | **NFR-01** | Collaboration            | 23 sessions simultanées contribuent sans perte d'élément, propagation d'une contribution visible en moins d'une seconde en conditions nominales | Indispensable | Essai de charge à 23 postes avant la séance         |
-| **NFR-02** | Volumétrie               | Le produit tient 400 éléments, 12 moments, 3 processus, 60 chaînes, 10 frontières et 20 agrégats sans dégradation perceptible | Indispensable | Jeu d'essai dimensionné, voir QP-02                 |
+| **NFR-02** | Volumétrie               | Le produit tient 800 éléments, 20 moments, 3 processus, 80 chaînes, 12 frontières et 24 agrégats sans dégradation perceptible | Indispensable | Jeu d'essai dimensionné à cette volumétrie, décidée le 2026-09-21 |
 | **NFR-03** | Continuité               | Une interruption du service ne détruit aucun contenu déjà produit, et le dernier export reste exploitable  | Indispensable | Essai de coupure pendant une phase de contribution  |
 | **NFR-04** | Reprise                  | Un participant qui perd sa connexion retrouve la séance à l'état courant, sa saisie en cours préservée      | Indispensable | Essai de déconnexion et reconnexion                 |
 | **NFR-05** | Accessibilité            | WCAG 2.2 niveau AA, parcours de contribution intégralement utilisable au clavier, cibles d'au moins 24 pixels, fonctionnement préservé à 200 pour cent de zoom | Indispensable | Audit sur le parcours de contribution et d'ordonnancement |
@@ -1893,7 +1912,7 @@ Le détail par indicateur figure en section 8.
 | **NFR-07** | Perception               | Étape courante, temps restant et signalements sont annoncés comme régions vivantes aux lecteurs d'écran    | Souhaitable   | Essai avec lecteur d'écran                          |
 | **NFR-08** | Performance d'interface  | Une saisie rend la main en moins de 100 millisecondes, la navigation sur le mur reste fluide à la volumétrie de NFR-02 | Indispensable | Mesure sur poste de référence bas de gamme          |
 | **NFR-09** | Sécurité                 | L'accès conduisant la séance passe par GitHub ou OIDC ; le code de séance est limité à la durée de la séance et révocable | Indispensable | Revue de conception                                 |
-| **NFR-10** | Confidentialité          | Transcriptions et contenus métier sont conservés pour la durée décidée par le programme, et supprimables à la demande | Indispensable | Décision de rétention, QP-03                        |
+| **NFR-10** | Confidentialité          | La transcription est purgée à la clôture de la séance, une fois la restitution produite. Les extraits déjà rattachés à un élément demeurent dans le modèle | Indispensable | Essai de purge, et vérification que la traçabilité survit |
 | **NFR-11** | Traitement automatisé    | Le traitement du contenu par un service tiers est limité à la transcription et à la production de propositions ; il ne produit jamais une décision, une frontière ni un agrégat | Indispensable | Revue de conception, PP-08                          |
 | **NFR-12** | Restitution              | Le fichier de restitution est lisible sans outil spécifique, déterministe et versionnable                  | Indispensable | Deux restitutions successives comparées             |
 | **NFR-13** | Portabilité              | Le modèle sort du produit sans perte sémantique et sans format propriétaire                                | Indispensable | Reprise manuelle du fichier sur un support tiers    |
@@ -1928,7 +1947,7 @@ Cette section décrit ce que le produit manipule et ce qu'il produit. Elle ne d�
 | **Invariant**               | Énoncé métier, statut de validation, auteur, date                                                        | Relié à des commandes et des événements              |
 | **Agrégat candidat**        | Nom, intention, commandes acceptées, invariants protégés, événements émis, informations consultées       | Rattaché à un contexte candidat                      |
 | **Proposition**             | Type, texte, extrait, locuteur, horodatage, niveau de confiance, échéance de péremption                  | Devient un élément si adoptée                        |
-| **Extrait de transcription**| Locuteur, horodatage, citation                                                                            | Origine d'un élément ou d'une proposition            |
+| **Extrait de transcription**| Locuteur, horodatage, citation. Survit à la purge de la transcription dont il provient                    | Origine d'un élément ou d'une proposition            |
 | **Vote**                    | Sujet, votant, points, état ouvert ou clos                                                                | Rattaché à une session de vote                       |
 | **Décision**                | Objet, sens, motif, date, composition de la séance                                                        | Rattachée à une hypothèse, un contexte, un invariant |
 | **Opération**               | Nature, auteur, horodatage, état antérieur                                                                | Rattachée à un élément                               |
@@ -1936,6 +1955,8 @@ Cette section décrit ce que le produit manipule et ce qu'il produit. Elle ne d�
 ### 7.2 Types d'éléments et grammaire
 
 Huit types d'éléments. Chaque type porte un libellé textuel, une couleur indicative et une consigne de formulation.
+
+**Décision du Product Owner du 2026-09-21.** Ces huit types constituent la notation de référence du produit. Cette décision clôt MQ-10, ouverte depuis le document d'exigences métier, et stabilise la feature F-05 dans son ensemble.
 
 | Type             | Consigne de formulation               | Règle déterministe appliquée à la saisie                                          |
 |------------------|----------------------------------------|-------------------------------------------------------------------------------------|
@@ -2071,6 +2092,8 @@ Deux versements successifs d'un modèle inchangé produisent deux fichiers ident
 
 **Aucun classement de contributeurs n'est visible pendant la séance.** KPI-03 et KPI-04 sont calculés après. Le panneau du facilitateur montre l'activité et les silences, jamais un rang. Cette règle découle de la décision du 2026-08-11 et est portée par PR-117.
 
+**Population de référence, décidée le 2026-09-21.** Les cibles restent exprimées en pourcentage et s'appliquent à toute séance. Le nombre de contributeurs possibles est saisi à la création de la séance, facilitateur exclu : 22 pour un atelier à 23 personnes, ce qui porte la cible de KPI-04 à 18 sur 22, soit 82 pour cent.
+
 Les indicateurs de qualité du résultat, famille C, sont au contraire affichés pendant la séance lorsqu'ils portent sur le modèle et non sur les personnes : un compteur d'indices ou un décompte de points chauds ouverts sert la conduite.
 
 ### 8.3 Ce qui n'est pas mesuré, et pourquoi
@@ -2084,7 +2107,7 @@ Les indicateurs de qualité du résultat, famille C, sont au contraire affichés
 
 ### 8.4 Mesures d'usage propres au produit
 
-Proposées par ce document, non validées, voir QP-05.
+**Retenues par le Product Owner le 2026-09-21.** Elles éprouvent quatre des cinq hypothèses fondatrices, que rien d'autre ne mesure.
 
 | Mesure                                                        | Ce qu'elle renseigne                                              |
 |---------------------------------------------------------------|---------------------------------------------------------------------|
@@ -2199,13 +2222,13 @@ Si le contenu de L1 doit être réduit, les features tombent dans l'ordre invers
 |------------|---------------------------------------------------------------------------------------------|----------|-----------------------------------------------------------------------------|-------------------------------------------------------------|
 | **RP-01**  | Une seule personne réalise le produit, et la base de code repart de zéro                    | Élevée   | Aucune. Le repli non logiciel, F-18, protège le jalon et non le produit     | Entier, accepté au niveau programme                         |
 | **RP-02**  | Le produit n'est pas prêt le jour de la séance                                              | Élevée   | F-18, décision de bascule rendue à J-5                                      | La séance se tient sans outil, les objectifs BO-04 et BO-09 sont manqués |
-| **RP-03**  | Le mur devient illisible à plusieurs centaines d'éléments en distanciel                     | Élevée   | F-19, divulgation progressive, filtres, vues personnelles                   | La volumétrie réelle n'est pas connue, voir QP-02           |
+| **RP-03**  | Le mur devient illisible à plusieurs centaines d'éléments en distanciel                     | Élevée   | F-19, divulgation progressive, filtres, vues personnelles, zoom sémantique  | La volumétrie retenue le 2026-09-21, 800 éléments, double la cible initiale et renforce l'exigence sur F-19 |
 | **RP-04**  | La collecte se détourne vers les commandes et les solutions                                 | Élevée   | PR-018, PR-025, mode collecte restreint aux événements                      | Dépend de la tenue du facilitateur autant que du produit    |
 | **RP-05**  | Un signalement de notation fait taire un expert métier pour la journée                      | Élevée   | PR-026, PR-027, signalement privé, muet en collecte, formulé en question    | Non éprouvé auprès d'un expert réel, hypothèse HY-03        |
 | **RP-06**  | Le blocage du passage d'étape dépossède le facilitateur de son arbitrage                    | Moyenne  | PR-015, dépassement explicite, distinct de la validation et toujours disponible | Un facilitateur qui ignore le dépassement subit le blocage. La formulation de l'action est déterminante |
 | **RP-07**  | Une zone tracée sur le mur passe pour une frontière décidée                                 | Élevée   | PR-076, marquage non étayée, indices avant mesures, statut hypothèse par défaut | Absent de la maquette, à construire en L2                |
-| **RP-08**  | Un agrégat est déduit d'un regroupement visuel plutôt que d'une règle                       | Élevée   | PR-085, PR-086, création refusée sans invariant, nom verrouillé             | La maquette démontre le comportement inverse, E-04          |
-| **RP-09**  | La chaîne de traçabilité se rompt entre l'atelier et la séance de conception                | Élevée   | PR-099, PR-100, navigation bidirectionnelle et ruptures signalées           | Le délai entre les deux séances n'est pas fixé, QP-04       |
+| **RP-08**  | Un agrégat est déduit d'un regroupement visuel plutôt que d'une règle                       | Élevée   | PR-085, PR-086, création strictement refusée sans invariant, nom verrouillé | Le refus déplace le risque sur la qualité de l'invariant formulé pour débloquer la création |
+| **RP-09**  | La chaîne de traçabilité se rompt entre l'atelier et la séance de conception                | Élevée   | PR-099, PR-100, navigation bidirectionnelle et ruptures signalées           | Délai borné à deux semaines le 2026-09-21, ce qui réduit le risque sans l'annuler |
 | **RP-10**  | Une équipe technique valide seule des règles métier                                         | Élevée   | PR-084, statut à vérifier par défaut, PR-088, liste transmissible au métier | Suppose la présence effective d'un représentant métier      |
 | **RP-11**  | Les hypothèses de découpage prolifèrent, sans limite de création                            | Élevée   | PR-079, une seule tracée à la fois, deux au plus en comparaison             | À construire en L2                                          |
 | **RP-12**  | Chacun ayant sa propre vue, le groupe cesse de regarder la même chose                       | Moyenne  | PR-114, focus collectif et repère de ce que le groupe regarde               | Le focus ne peut jamais interrompre une saisie, ce qui limite son effet |
@@ -2240,40 +2263,37 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 
 | ID        | Décision                                                                                   | Motif                                                                      | Statut          |
 |-----------|----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|-----------------|
-| **DP-01** | Le facilitateur ne contribue pas au contenu, le dénominateur de participation est 22         | Décision du 2026-08-12                                                      | Reprise, à confirmer |
+| **DP-01** | Le facilitateur ne contribue pas au contenu, le dénominateur de participation est 22         | Décision du 2026-08-12                                                      | Confirmée le 2026-09-21 |
 | **DP-02** | Aucun rôle n'emporte de droit de décision sur le modèle                                      | Règle d'autorité du document d'exigences métier                             | Reprise         |
 | **DP-03** | Le code existant n'est pas retenu comme socle de réalisation                                  | Décision du Product Owner du 2026-09-21                                     | Prise           |
 | **DP-04** | Un critère de sortie s'affiche toujours avec son état chiffré                                 | Un critère binaire ne dit pas ce qu'il reste à faire                        | Prise           |
 | **DP-05** | Le passage d'étape est bloqué tant que le critère n'est pas atteint, avec dépassement explicite et tracé | Protège la méthode sans retirer la décision au facilitateur                 | Prise le 2026-09-21 |
-| **DP-06** | L'ordre de réalisation est révisé, la conduite passe du huitième au deuxième rang             | Le produit est construit autour du déroulé                                  | **À confirmer** |
-| **DP-07** | La restitution de référence est un fichier Markdown déterministe, versionné dans un dépôt Git | Lisible sans outil, comparable, reprenable manuellement en mode de repli    | **À confirmer** |
+| **DP-06** | L'ordre de réalisation est révisé, la conduite passe du huitième au deuxième rang             | Le produit est construit autour du déroulé                                  | Confirmée le 2026-09-21 |
+| **DP-07** | La restitution de référence est un fichier Markdown déterministe, versé dans `event2spec` sous `docs/sessions/` | Lisible sans outil, comparable, reprenable manuellement en mode de repli    | Confirmée le 2026-09-21 |
 | **DP-08** | Le produit est spécifié comme multi-séances, avec liste, création et codes de séance          | La maquette le démontre, et d'autres séquences et sessions sont prévues     | Confirmée le 2026-09-21 |
 
-### 11.3 Questions ouvertes
+### 11.3 Questions
 
-| ID        | Question                                                                                   | Interlocuteur              | Ce qu'elle bloque                                        |
-|-----------|----------------------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------|
-| **QP-01** | Les cibles des indicateurs sont-elles reconduites session par session, sur la population de chaque séance ? | Product Owner              | Le renseignement de KPI-03, KPI-04 et KPI-16, section 8   |
-| **QP-02** | Quelle volumétrie de modèle faut-il tenir ?                                                   | Product Owner, P1          | Le dimensionnement de NFR-02 et la stratégie de densité   |
-| **QP-03** | Quelle durée de conservation s'applique aux transcriptions et aux contenus métier ?          | Responsable de programme   | NFR-10 et PR-106                                          |
-| **QP-04** | À quelle échéance se tient la séance de conception ?                                          | Responsable de programme   | L'ordonnancement de L2, et le risque RP-09                |
-| **QP-05** | Les mesures d'usage de la section 8.4 sont-elles retenues ?                                   | Product Owner              | PR-120                                                    |
-| **QP-06** | Le produit doit-il servir un travail hors séance conduite ?                                   | Product Owner              | L'exclusion de périmètre de la section 3.2                |
-| **QP-09** | Quel dépôt accueille les restitutions, et selon quelle convention de versement ?              | Product Owner, P1          | PR-105                                                    |
-| **QP-10** | La notation de référence est-elle celle des huit types de la section 7.2 ?                    | Product Owner, P1          | F-05 dans son ensemble, correspond à MQ-10                |
-| **QP-11** | L'ordre de réalisation révisé est-il validé ?                                                  | Product Owner              | DP-06 et la section 9.3                                   |
-| **QP-12** | Les objectifs BO-08 à BO-10 et les cibles de la famille C sont-ils confirmés ?                | Product Owner              | La section 8, reprise de l'action de confirmation du document d'exigences |
-
-**Questions closes, conservées pour mémoire.**
+**Aucune question ouverte au 2026-09-21.** Les douze questions du document ont été tranchées, huit décisions produit sont confirmées, et les douze écarts de l'annexe A sont arbitrés. Ce qui reste à faire relève de l'exécution, section 13, et non de la décision.
 
 | ID        | Question                                                                                   | Réponse                                                                     |
 |-----------|----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
-| **QP-07** | Le blocage du passage d'étape est-il retenu ?                                                | **Oui**, le 2026-09-21. Blocage maintenu jusqu'à ce que quelqu'un décide d'aller plus loin, par une action explicite et tracée. Voir DP-05 et PR-015 |
-| **QP-08** | Le masquage des contributions des autres en exploration chaotique est-il retenu ?            | **Oui**, le 2026-09-21. Comportement de la maquette retenu, BR-004 à amender. Voir PR-024 |
+| **QP-01** | Comment les cibles d'indicateurs se reconduisent-elles d'une session à l'autre ?             | **Population saisie à chaque séance**, le 2026-09-21. Les cibles restent en pourcentage, le dénominateur est renseigné à la création. Voir PR-004 et PR-117 |
+| **QP-02** | Quelle volumétrie de modèle faut-il tenir ?                                                  | **800 éléments et 20 moments**, le 2026-09-21. Clôt MQ-03. Voir NFR-02       |
+| **QP-03** | Quelle durée de conservation pour les transcriptions ?                                       | **Purge à la clôture de chaque séance**, le 2026-09-21, les extraits rattachés demeurant. Clôt MQ-04 et Q-04. Voir NFR-10 et PR-106 |
+| **QP-04** | À quelle échéance se tient la séance de conception ?                                         | **Dans les deux semaines suivant l'atelier**, le 2026-09-21. Clôt QU-17      |
+| **QP-05** | Les mesures d'usage de la section 8.4 sont-elles retenues ?                                  | **Les cinq**, le 2026-09-21. Voir PR-120                                    |
+| **QP-06** | Le produit sert-il hors d'une séance conduite ?                                              | **Consultation et préparation seulement**, le 2026-09-21. Aucune contribution au mur hors phase ouverte. Voir section 3.2 et PR-065 |
+| **QP-07** | Le blocage du passage d'étape est-il retenu ?                                                | **Oui**, le 2026-09-21, jusqu'à ce que quelqu'un décide d'aller plus loin par une action explicite et tracée. Voir DP-05 et PR-015 |
+| **QP-08** | Le masquage des contributions des autres en exploration chaotique est-il retenu ?            | **Oui**, le 2026-09-21, comportement de la maquette retenu. Voir PR-024      |
+| **QP-09** | Quel dépôt accueille les restitutions ?                                                      | **`event2spec`, sous `docs/sessions/`**, une branche par séance, le 2026-09-21. Voir PR-105 |
+| **QP-10** | La notation de référence est-elle celle des huit types de la section 7.2 ?                   | **Oui**, le 2026-09-21. Clôt MQ-10, ouverte depuis le document d'exigences métier |
+| **QP-11** | L'ordre de réalisation révisé est-il validé ?                                                | **Oui**, le 2026-09-21. Voir DP-06 et la section 9.3                        |
+| **QP-12** | Les objectifs BO-08 à BO-10 et les cibles de la famille C sont-ils confirmés ?               | **Confirmés tels quels**, le 2026-09-21. Clôt l'action AC-14 du document d'exigences métier |
 
-**Question close le 2026-09-21.** Le statut du jalon des 15 et 16 septembre ne conditionne plus le document : le Product Owner a acté que d'autres séquences et sessions suivraient, et que cette date n'était plus l'ancrage du produit. QP-01 porte désormais sur la reconduction des cibles d'indicateurs d'une session à l'autre.
+**Le jalon des 15 et 16 septembre ne conditionne plus le document**, décision du 2026-09-21 : d'autres séquences et sessions suivront, et cette date n'est plus l'ancrage du produit.
 
-Aucune question ouverte ne modifie la structure du document. Toutes portent sur des valeurs, des réglages ou des confirmations.
+**Ce qui reste incertain n'est plus une question mais une hypothèse.** Les treize hypothèses de la section 11.1 ne se lèvent par aucune décision : seules les personnes concernées peuvent les confirmer, ce que porte l'action AP-06.
 
 ## 12. Traçabilité
 
@@ -2291,7 +2311,7 @@ Aucune question ouverte ne modifie la structure du document. Toutes portent sur 
 | BR-008          | PR-025, PR-026, PR-027, PR-028, PR-029            | Complète   |
 | BR-009          | PR-018, PR-026                                    | Complète   |
 | BR-010          | PR-030, PR-046                                    | Complète   |
-| BR-011          | PR-089, PR-106                                    | Complète   |
+| BR-011          | PR-089, PR-106                                    | Complète, **BR-011 à amender** : son critère « la transcription reste consultable après l'atelier » est contredit par la purge décidée le 2026-09-21 |
 | BR-012          | PR-073, PR-083, PR-090, PR-093, PR-099, PR-100    | Complète   |
 | BR-013          | PR-064, PR-101, PR-102, PR-103, PR-104, PR-105    | Complète   |
 | BR-014          | PR-089, PR-090, PR-091                            | Complète   |
@@ -2366,22 +2386,34 @@ Les vingt flux sont couverts. Trois surfaces produit ne correspondent à aucun f
 
 ## 13. Suites
 
+Toutes les décisions sont rendues. Ce qui suit relève de l'exécution.
+
 | ID           | Action                                                                                  | Responsable                | Charge      | Ce que son absence empêche                                     |
 |--------------|-------------------------------------------------------------------------------------------|----------------------------|-------------|-----------------------------------------------------------------|
 | **AP-01**    | Désigner la prochaine session de référence, sa date et son domaine                        | Product Owner              | Une question| Ancrer le plan de livraison et la préparation de la section 9.5 |
-| **AP-02**    | Arbitrer les dix écarts encore ouverts de l'annexe A, dont E-04 et E-07                    | Product Owner              | 40 minutes  | Engager la réalisation sur un comportement stable               |
-| **AP-03**    | Confirmer les décisions DP-01, DP-06 et DP-07                                              | Product Owner              | 20 minutes  | Figer le dénominateur de participation, l'ordre de réalisation et le format de restitution |
-| **AP-04**    | Amender BR-004 et BR-036 selon les décisions du 2026-09-21, et reporter les capacités de la famille E-09 | Product Owner              | 40 minutes  | Rendre opposables le blocage d'étape, le masquage en collecte et les capacités issues de la maquette |
+| **AP-04**    | Amender BR-004, BR-006, BR-011, BR-033 et BR-036 selon les décisions du 2026-09-21, et reporter les quatorze capacités de la famille E-09 | Product Owner | Une demi-journée | Rendre opposables le blocage d'étape, le masquage en collecte, le secret du vote, le refus d'agrégat sans invariant, la purge de la transcription et les capacités issues de la maquette |
 | **AP-05**    | Chiffrer L1 sur la base de la section 9                                                    | Réalisation                | Une journée | Permettre l'arbitrage programme prévu par la règle de réalisation |
 | **AP-06**    | Faire confirmer la couverture des exigences par les six rôles                              | Product Owner              | 6 × 30 min  | Lever les hypothèses HP-01 à HP-05, seule preuve extérieure disponible |
 | **AP-07**    | Éprouver les huit tests de risque méthodologique sur un atelier réduit                     | Product Owner, P1          | Une demi-journée | Vérifier que le parcours produit la découverte attendue    |
-| **AP-08**    | Arrêter le contenu de la notation de référence, QP-10                                      | Product Owner, P1          | 30 minutes  | Stabiliser F-05 et la légende permanente                        |
+
+**Actions closes le 2026-09-21.** AP-02, arbitrage des douze écarts. AP-03, confirmation des décisions produit. AP-08, arrêt de la notation de référence.
 
 **AP-06 est la seule action qui apporte une preuve extérieure.** Toutes les autres reposent sur la conviction du Product Owner et sur la maquette. Elle reste à mener depuis le document d'exigences métier du 2026-08-11.
 
+**AP-04 conditionne la valeur opposable du PRD.** Cinq exigences métier sont désormais contredites par une décision produit — BR-004 sur la visibilité en collecte, BR-006 sur le vote, BR-011 sur la conservation de la transcription, BR-033 sur le marquage incomplet d'un agrégat, BR-036 sur le blocage d'étape. Tant qu'elles ne sont pas amendées, le document d'exigences et le PRD disent deux choses différentes sur le même comportement.
+
 ## Annexe A — Écarts entre la maquette, les exigences métier et l'intention UX
 
-Douze écarts. **E-02 et E-03 ont été tranchés par le Product Owner le 2026-09-21** et sont clos ; les deux décisions imposent d'amender BR-036 et BR-004. Les dix autres appellent une décision.
+**Les douze écarts ont été arbitrés par le Product Owner le 2026-09-21.** Aucun n'est ouvert.
+
+| Sens de l'arbitrage                                    | Écarts                                              | Conséquence                                                    |
+|---------------------------------------------------------|------------------------------------------------------|-----------------------------------------------------------------|
+| La maquette l'emporte                                   | E-01, E-02, E-03                                     | BR-004 et BR-036 sont à amender, ainsi que le parcours de la section 5.2 du document d'exigences métier |
+| Le document d'exigences métier l'emporte                | E-04, E-07, E-08                                     | Le comportement démontré est corrigé. BR-033 est durci : le refus est strict, le marquage incomplet n'est pas retenu |
+| L'écart est un manque, comblé à un jalon                | E-05, E-06, E-10, E-11, E-12                         | Construit en L2, sauf l'accessibilité, indispensable dès L1     |
+| Report au document d'exigences métier                   | E-09                                                 | Les quatorze capacités deviennent opposables, ce qui déclenche le réexamen prévu par la règle §6.3 |
+
+Deux décisions de la même journée, prises hors annexe A, contredisent elles aussi une exigence métier : la purge de la transcription à la clôture, contre le critère de BR-011, et le secret du vote, contre le comportement démontré. L'action AP-04 les traite avec les autres.
 
 ### E-01 Le parcours compte neuf phases et non dix étapes
 
@@ -2390,7 +2422,7 @@ Douze écarts. **E-02 et E-03 ont été tranchés par le Product Owner le 2026-0
 | Maquette | Neuf phases issues du déroulé de Brandolini instancié, dont huit en atelier |
 | Document d'exigences | Dix étapes de découverte, du cadrage à la restitution |
 | Conséquence | La clarification n'est pas une phase, elle est portée par le récit, les points chauds et le langage pivot. Frontières et collaboration fusionnent en phase 9. Le Process Modelling est anticipé dans l'atelier |
-| Recommandation | Retenir les neuf phases, et amender la section 5.2 du document d'exigences métier pour refléter la correspondance de la section 4.2 |
+| **Décision du 2026-09-21** | Les neuf phases sont retenues. La section 5.2 du document d'exigences métier est amendée pour refléter la correspondance de la section 4.2 |
 
 ### E-02 Le passage d'étape est bloqué tant que le critère n'est pas atteint
 
@@ -2417,7 +2449,7 @@ Douze écarts. **E-02 et E-03 ont été tranchés par le Product Owner le 2026-0
 | Maquette | La phase 9 crée un agrégat par frontière, sans formulation préalable d'invariant, et le nom est saisi immédiatement |
 | Document d'exigences et UX | BR-032 impose la formulation de l'invariant avant l'agrégat, BR-033 refuse un agrégat sans invariant, UX-20 proscrit le regroupement visuel |
 | Conséquence | Le comportement démontré est exactement celui que l'exigence interdit. C'est le seul écart où la maquette ne peut pas faire autorité |
-| Recommandation | Le document d'exigences prévaut sur ce point. PR-085 à PR-087 construisent le comportement attendu en L2 |
+| **Décision du 2026-09-21** | Le document d'exigences prévaut, et le refus est **strict** : l'option du marquage incomplet qu'admettait BR-033 n'est pas retenue. La création est refusée, le nom reste verrouillé, et le retrait du dernier invariant l'est aussi. PR-085 à PR-087, en L2 |
 
 ### E-05 Les hypothèses de découpage concurrentes sont absentes
 
@@ -2426,7 +2458,7 @@ Douze écarts. **E-02 et E-03 ont été tranchés par le Product Owner le 2026-0
 | Maquette | Une seule couche de frontières existe, sans notion d'hypothèse nommée, ni auteur, ni comparaison |
 | Document d'exigences et UX | BR-028 impose la coexistence d'hypothèses concurrentes, UF-15 leur comparaison côte à côte |
 | Conséquence | Le découpage démontré est unique, ce qui réintroduit le risque UX-19, une zone tracée valant frontière |
-| Recommandation | Construire PR-079 à PR-081 en L2, avec la règle d'affichage d'une seule hypothèse tracée à la fois |
+| **Décision du 2026-09-21** | Construire PR-079 à PR-081 en L2, avec la règle d'affichage d'une seule hypothèse tracée à la fois |
 
 ### E-06 Les statuts de preuve sont partiels
 
@@ -2435,7 +2467,7 @@ Douze écarts. **E-02 et E-03 ont été tranchés par le Product Owner le 2026-0
 | Maquette | Des états existent pour les écarts de récit, pour les définitions du langage pivot et pour l'origine fantôme, mais aucun statut uniforme ne porte sur tous les éléments |
 | Document d'exigences | BR-035 impose sept statuts sur chaque élément, modifiables et tracés |
 | Conséquence | Un fait observé et une hypothèse se présentent de la même manière sur le mur |
-| Recommandation | Généraliser le statut en L2 avec PR-095 à PR-097, en amorçant dès L1 sur les éléments produits |
+| **Décision du 2026-09-21** | Généraliser le statut en L2 avec PR-095 à PR-097, en amorçant dès L1 sur les éléments produits |
 
 ### E-07 Le vote est visible avant la clôture
 
@@ -2444,7 +2476,7 @@ Douze écarts. **E-02 et E-03 ont été tranchés par le Product Owner le 2026-0
 | Maquette | Le nombre de voix est affiché sur chaque élément pendant le vote, et le vote se fait élément par élément sur le mur |
 | Document d'exigences et UX | BR-006 exige que chacun vote sans connaître les votes des autres avant la clôture, et interdit tout effet visuel lié au nombre de voix |
 | Conséquence | Un compteur visible produit un effet de conformité, et désavantage les cas rares connus d'une seule personne |
-| Recommandation | Le document d'exigences prévaut. PR-051 et PR-053 corrigent le comportement |
+| **Décision du 2026-09-21** | Le document d'exigences prévaut : vote secret jusqu'à la clôture, aucun total visible avant, aucun effet visuel lié aux voix. PR-051 passe en Indispensable dès lors que F-09 est livrée |
 
 ### E-08 La composition de la séance de découpage diffère
 
@@ -2453,11 +2485,13 @@ Douze écarts. **E-02 et E-03 ont été tranchés par le Product Owner le 2026-0
 | Maquette | La phase 9 est décrite comme une séance d'architectes, tenue dans la semaine, de deux heures |
 | Document d'exigences | La séance Design Level est confiée à l'équipe de développement produit, rôle P6, avec un représentant métier, à une échéance non fixée |
 | Conséquence | Sans représentant métier, un invariant est formulé sans contradicteur, ce que la garantie métier du document d'exigences interdit |
-| Recommandation | Retenir la composition du document d'exigences. Le rôle applicatif Équipe de conception de la section 2.2 porte cette correction |
+| **Décision du 2026-09-21** | Retenir la composition du document d'exigences. Le rôle applicatif Équipe de conception de la section 2.2 porte cette correction, et la séance se tient dans les deux semaines suivant l'atelier |
 
 ### E-09 Capacités introduites par la maquette sans exigence métier
 
-| Capacité                                                     | Exigences produit | Rattachement proposé au document d'exigences |
+**Décision du 2026-09-21 : les quatorze sont reportées au document d'exigences métier**, ce qui déclenche le réexamen prévu par sa règle de gestion du périmètre. Elles deviennent opposables et cessent d'être arbitrables sans réexamen.
+
+| Capacité                                                     | Exigences produit | Rattachement au document d'exigences |
 |---------------------------------------------------------------|-------------------|-----------------------------------------------|
 | Connexion par GitHub ou OIDC                                  | PR-001            | Nouvelle exigence, domaine D1                 |
 | Accès participant par code de séance                          | PR-002            | BR-004 ou nouvelle exigence                   |
@@ -2481,7 +2515,7 @@ Douze écarts. **E-02 et E-03 ont été tranchés par le Product Owner le 2026-0
 | Maquette | La chronologie s'organise en moments nommés et en zone d'attente, sans branche ni répétition ni pivot |
 | Document d'exigences | BR-024 impose les quatre représentations, y compris la position incertaine |
 | Conséquence | Un domaine composé de processus multiples est représenté comme une séquence unique |
-| Recommandation | La zone d'attente couvre la position incertaine dès L1. Les branches, répétitions et pivots relèvent de PR-036, en L2 |
+| **Décision du 2026-09-21** | La zone d'attente couvre la position incertaine dès L1. Les branches, répétitions et pivots relèvent de PR-036, en L2 |
 
 ### E-11 Les dépendances entre frontières sont mesurées, jamais nommées
 
@@ -2490,7 +2524,7 @@ Douze écarts. **E-02 et E-03 ont été tranchés par le Product Owner le 2026-0
 | Maquette | Les liens traversants sont comptés et détaillés, sans nom, sans sens, sans responsable |
 | Document d'exigences | BR-030 impose un nom, un sens et un contexte responsable pour chaque dépendance |
 | Conséquence | KPI-13 n'est pas renseignable, et une ambiguïté de responsabilité est reportée sur la construction |
-| Recommandation | PR-078 en L2, avec conversion d'un lien traversant mesuré en dépendance nommée |
+| **Décision du 2026-09-21** | PR-078 en L2, avec conversion d'un lien traversant mesuré en dépendance nommée |
 
 ### E-12 L'accessibilité n'est pas démontrée
 
@@ -2499,7 +2533,7 @@ Douze écarts. **E-02 et E-03 ont été tranchés par le Product Owner le 2026-0
 | Maquette | Les types portent un libellé en plus de la couleur, ce qui est conforme. Le parcours clavier, l'annonce aux lecteurs d'écran et le contraste ne sont pas démontrés |
 | UX | Sept points bloquants recensés, dont la conception clavier comme mode nominal |
 | Conséquence | 18 des 23 participants ne sont pas techniques, et le parcours de contribution est d'abord une saisie au clavier |
-| Recommandation | NFR-05 à NFR-07 sont indispensables en L1 et doivent être vérifiés avant la mise en service, section 9.5 |
+| **Décision du 2026-09-21** | NFR-05 à NFR-07 sont indispensables en L1 et vérifiés avant la mise en service, section 9.5 |
 
 ## Annexe B — Ce que la maquette démontre, phase par phase
 
