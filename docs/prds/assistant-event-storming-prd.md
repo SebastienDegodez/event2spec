@@ -295,16 +295,17 @@ Chaque phase porte un critère de sortie calculé en continu à partir du conten
 
 **DP-04.** Le critère est toujours accompagné de son état chiffré, par exemple « 17 événements · doublons non traités ». Un critère qui dit seulement oui ou non ne dit pas ce qu'il reste à faire.
 
-**DP-05, blocage du passage d'étape.** La maquette bloque la validation d'une phase tant que son critère n'est pas atteint, et n'ouvre une phase que lorsque la précédente est validée. Le document d'exigences métier et l'intention UX posent un critère descriptif, jamais prescriptif.
+**DP-05, blocage du passage d'étape. Décision du Product Owner du 2026-09-21.** Le passage est **bloqué tant que le critère n'est pas atteint**, jusqu'à ce que quelqu'un décide d'aller plus loin. Le comportement de la maquette est retenu, complété d'un dépassement explicite.
 
 | Décision retenue                                                                                   | Motif                                                                        |
 |-----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
 | Le calcul du critère et son affichage sont conservés tels que la maquette les démontre               | Ils couvrent BR-036, qui fonde la conduite par un facilitateur non initié     |
-| Le blocage devient un paramètre de séance, activable par le facilitateur avant l'ouverture           | Il protège la méthode dans une séance conduite par un facilitateur non initié |
-| La valeur par défaut est **non bloquante**                                                           | PP-07, l'humain garde la décision. Un critère prescriptif retirerait au facilitateur l'arbitrage qui lui revient |
-| La fin du temps imparti ne déclenche jamais un passage d'étape                                       | BR-036, quel que soit le réglage                                             |
+| Une phase ne s'ouvre que lorsque la précédente est validée, et la validation est refusée tant que le critère n'est pas atteint | Un facilitateur qui ne maîtrise pas la méthode ne doit pas pouvoir sauter une étape par inadvertance |
+| Le blocage se dépasse par une **action explicite** du facilitateur, distincte de la validation ordinaire | PP-07, l'humain garde la décision. Le blocage impose de la prendre, il ne la remplace pas |
+| Le dépassement est tracé : critère non atteint, auteur, horodatage, et figure dans la restitution     | Une étape passée sans son critère est une information dont la séance de conception a besoin |
+| La fin du temps imparti ne déclenche jamais un passage d'étape                                       | BR-036, en toute circonstance                                                |
 
-Cette décision est l'écart E-02 de l'annexe A, et appelle confirmation du Product Owner.
+Le blocage n'est pas un réglage : il s'applique à toute séance. Ce qui est réglable, c'est la décision humaine de passer outre. Écart E-02 de l'annexe A, clos.
 
 ### 4.4 Modes du mur
 
@@ -313,7 +314,7 @@ Le mur est une surface unique dont les règles et les affordances changent selon
 | Mode              | Phases | Types mis en avant                                   | Ce que le mode interdit ou range                                  |
 |-------------------|--------|-------------------------------------------------------|---------------------------------------------------------------------|
 | Échauffement      | 1      | Événement, sur un domaine trivial séparé              | Le domaine réel n'est pas encore ouvert                            |
-| Collecte          | 2      | Événement                                             | Aucun ordre, aucun lien, aucun signalement spontané                |
+| Collecte          | 2      | Événement                                             | Aucun ordre, aucun lien, aucun signalement spontané. Le mur des autres est masqué jusqu'à révélation individuelle |
 | Chronologie       | 3      | Événement, moment, zone d'attente                      | Aucune saisie de commande ni de règle mise en avant                |
 | Récit             | 4      | Événement en focus, écart de récit                     | Le mur ne se réordonne pas pendant le récit                        |
 | Enrichissement    | 5      | Acteur, système, point chaud, opportunité              | Les commandes ne sont pas encore attendues                         |
@@ -505,7 +506,7 @@ Le passage d'étape résulte d'une action explicite du facilitateur.
 
 - [ ] L'étape validée est marquée comme telle et reste consultable
 - [ ] L'étape suivante devient courante et le mur change de mode
-- [ ] Aucune validation automatique n'existe, quel que soit le réglage de PR-015
+- [ ] Aucune validation automatique n'existe, ni par le temps, ni par l'atteinte du critère
 
 #### PR-011 Revenir à une étape antérieure sans perte
 
@@ -568,18 +569,20 @@ Le produit dénombre et permet de consulter les éléments qui empêchent le cri
 - [ ] Ils sont consultables en un geste depuis le panneau de conduite
 - [ ] La sélection d'un élément manquant le localise sur le mur
 
-#### PR-015 Paramétrer le blocage du passage d'étape
+#### PR-015 Bloquer le passage d'étape, et permettre de passer outre explicitement
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Souhaitable | Création, voir DP-05 | — | S-02 | Démontré, valeur par défaut inverse |
+| Indispensable | Création, voir DP-05 | UF-06 | S-05 | Démontré, sans le dépassement |
 
-Le blocage de la validation tant que le critère n'est pas atteint est un réglage de séance.
+La validation d'une phase est refusée tant que son critère n'est pas atteint. Le facilitateur passe outre par une action explicite, distincte de la validation ordinaire.
 
-- [ ] Le réglage est modifiable avant l'ouverture de la séance
-- [ ] La valeur par défaut est non bloquante
-- [ ] Lorsque le blocage est actif, le motif du refus est affiché au facilitateur
-- [ ] Le réglage n'affecte jamais la saisie des participants
+- [ ] La validation est refusée tant que le critère n'est pas atteint, et le motif du refus est affiché au facilitateur
+- [ ] Une phase ne s'ouvre que lorsque la précédente est validée ou explicitement dépassée
+- [ ] L'action de passer outre est distincte de la validation, et n'est jamais le geste par défaut
+- [ ] Le dépassement enregistre le critère non atteint, son état chiffré, son auteur et son horodatage
+- [ ] Les étapes passées sans leur critère figurent dans la restitution
+- [ ] Le blocage n'affecte jamais la saisie des participants ni le retour à une étape antérieure
 
 #### PR-016 Ne jamais faire passer une étape sur la fin du temps
 
@@ -687,14 +690,15 @@ La double paternité est la règle : l'auteur d'origine est conservé, le dernie
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Souhaitable | Création, voir E-03 | UF-01 | S-03 | Démontré |
+| Indispensable | Création, voir E-03 | UF-01 | S-03 | Démontré |
 
-Pendant l'écriture silencieuse, un participant ne voit que ses propres éléments, jusqu'à la révélation du mur.
+**Décision du Product Owner du 2026-09-21 : le comportement de la maquette est retenu.** Pendant l'écriture silencieuse, un participant ne voit que ses propres éléments, jusqu'à ce qu'il révèle le mur.
 
-- [ ] Le masquage ne s'applique qu'à la phase 2 et au rôle Participant
+- [ ] Le masquage s'applique par défaut, à la phase 2 et au rôle Participant
 - [ ] Le nombre d'éléments produits par les autres reste visible, sans leur contenu
-- [ ] Le participant révèle le mur de sa propre initiative
-- [ ] Le masquage est un réglage de séance, désactivable
+- [ ] Le participant révèle le mur de sa propre initiative, à tout moment
+- [ ] La révélation est individuelle et n'affecte aucune autre vue
+- [ ] Le masquage cesse à la fermeture de la phase 2
 
 ### F-05 Grammaire Event Storming et signalement de notation
 
@@ -2198,7 +2202,7 @@ Si le contenu de L1 doit être réduit, les features tombent dans l'ordre invers
 | **RP-03**  | Le mur devient illisible à plusieurs centaines d'éléments en distanciel                     | Élevée   | F-19, divulgation progressive, filtres, vues personnelles                   | La volumétrie réelle n'est pas connue, voir QP-02           |
 | **RP-04**  | La collecte se détourne vers les commandes et les solutions                                 | Élevée   | PR-018, PR-025, mode collecte restreint aux événements                      | Dépend de la tenue du facilitateur autant que du produit    |
 | **RP-05**  | Un signalement de notation fait taire un expert métier pour la journée                      | Élevée   | PR-026, PR-027, signalement privé, muet en collecte, formulé en question    | Non éprouvé auprès d'un expert réel, hypothèse HY-03        |
-| **RP-06**  | Le blocage du passage d'étape dépossède le facilitateur de son arbitrage                    | Moyenne  | DP-05, blocage désactivable, défaut non bloquant                            | Décision du Product Owner attendue, E-02                    |
+| **RP-06**  | Le blocage du passage d'étape dépossède le facilitateur de son arbitrage                    | Moyenne  | PR-015, dépassement explicite, distinct de la validation et toujours disponible | Un facilitateur qui ignore le dépassement subit le blocage. La formulation de l'action est déterminante |
 | **RP-07**  | Une zone tracée sur le mur passe pour une frontière décidée                                 | Élevée   | PR-076, marquage non étayée, indices avant mesures, statut hypothèse par défaut | Absent de la maquette, à construire en L2                |
 | **RP-08**  | Un agrégat est déduit d'un regroupement visuel plutôt que d'une règle                       | Élevée   | PR-085, PR-086, création refusée sans invariant, nom verrouillé             | La maquette démontre le comportement inverse, E-04          |
 | **RP-09**  | La chaîne de traçabilité se rompt entre l'atelier et la séance de conception                | Élevée   | PR-099, PR-100, navigation bidirectionnelle et ruptures signalées           | Le délai entre les deux séances n'est pas fixé, QP-04       |
@@ -2229,7 +2233,7 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | **HP-09** | Déclarer un indice de frontière en un geste est plus fiable que le reconstituer après coup    | HU-09   | PR-075                        |
 | **HP-10** | Un marquage « non étayée » incite à argumenter plutôt qu'à renoncer                           | HU-10   | PR-076                        |
 | **HP-11** | Refuser un agrégat sans invariant est perçu comme une aide et non comme un blocage            | HU-12   | PR-085                        |
-| **HP-12** | Un critère de sortie chiffré suffit à décider d'avancer, sans blocage du produit              | Création | PR-013, PR-015               |
+| **HP-12** | Un blocage assorti d'un dépassement explicite protège la méthode sans déposséder le facilitateur | Création | PR-013, PR-015               |
 | **HP-13** | Masquer les contributions des autres pendant l'écriture silencieuse augmente la diversité des faits produits | Création | PR-024            |
 
 ### 11.2 Décisions produit prises dans ce document
@@ -2240,7 +2244,7 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | **DP-02** | Aucun rôle n'emporte de droit de décision sur le modèle                                      | Règle d'autorité du document d'exigences métier                             | Reprise         |
 | **DP-03** | Le code existant n'est pas retenu comme socle de réalisation                                  | Décision du Product Owner du 2026-09-21                                     | Prise           |
 | **DP-04** | Un critère de sortie s'affiche toujours avec son état chiffré                                 | Un critère binaire ne dit pas ce qu'il reste à faire                        | Prise           |
-| **DP-05** | Le blocage du passage d'étape devient un réglage, non bloquant par défaut                     | Arbitrage entre la maquette et le principe PP-07                            | **À confirmer** |
+| **DP-05** | Le passage d'étape est bloqué tant que le critère n'est pas atteint, avec dépassement explicite et tracé | Protège la méthode sans retirer la décision au facilitateur                 | Prise le 2026-09-21 |
 | **DP-06** | L'ordre de réalisation est révisé, la conduite passe du huitième au deuxième rang             | Le produit est construit autour du déroulé                                  | **À confirmer** |
 | **DP-07** | La restitution de référence est un fichier Markdown déterministe, versionné dans un dépôt Git | Lisible sans outil, comparable, reprenable manuellement en mode de repli    | **À confirmer** |
 | **DP-08** | Le produit est spécifié comme multi-séances, avec liste, création et codes de séance          | La maquette le démontre, et d'autres séquences et sessions sont prévues     | Confirmée le 2026-09-21 |
@@ -2255,12 +2259,17 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | **QP-04** | À quelle échéance se tient la séance de conception ?                                          | Responsable de programme   | L'ordonnancement de L2, et le risque RP-09                |
 | **QP-05** | Les mesures d'usage de la section 8.4 sont-elles retenues ?                                   | Product Owner              | PR-120                                                    |
 | **QP-06** | Le produit doit-il servir un travail hors séance conduite ?                                   | Product Owner              | L'exclusion de périmètre de la section 3.2                |
-| **QP-07** | Le blocage du passage d'étape est-il retenu, et avec quelle valeur par défaut ?               | Product Owner              | DP-05, PR-015, écart E-02                                 |
-| **QP-08** | Le masquage des contributions des autres pendant l'exploration chaotique est-il retenu ?      | Product Owner, P1          | PR-024, écart E-03                                        |
 | **QP-09** | Quel dépôt accueille les restitutions, et selon quelle convention de versement ?              | Product Owner, P1          | PR-105                                                    |
 | **QP-10** | La notation de référence est-elle celle des huit types de la section 7.2 ?                    | Product Owner, P1          | F-05 dans son ensemble, correspond à MQ-10                |
 | **QP-11** | L'ordre de réalisation révisé est-il validé ?                                                  | Product Owner              | DP-06 et la section 9.3                                   |
 | **QP-12** | Les objectifs BO-08 à BO-10 et les cibles de la famille C sont-ils confirmés ?                | Product Owner              | La section 8, reprise de l'action de confirmation du document d'exigences |
+
+**Questions closes, conservées pour mémoire.**
+
+| ID        | Question                                                                                   | Réponse                                                                     |
+|-----------|----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| **QP-07** | Le blocage du passage d'étape est-il retenu ?                                                | **Oui**, le 2026-09-21. Blocage maintenu jusqu'à ce que quelqu'un décide d'aller plus loin, par une action explicite et tracée. Voir DP-05 et PR-015 |
+| **QP-08** | Le masquage des contributions des autres en exploration chaotique est-il retenu ?            | **Oui**, le 2026-09-21. Comportement de la maquette retenu, BR-004 à amender. Voir PR-024 |
 
 **Question close le 2026-09-21.** Le statut du jalon des 15 et 16 septembre ne conditionne plus le document : le Product Owner a acté que d'autres séquences et sessions suivraient, et que cette date n'était plus l'ancrage du produit. QP-01 porte désormais sur la reconduction des cibles d'indicateurs d'une session à l'autre.
 
@@ -2360,9 +2369,9 @@ Les vingt flux sont couverts. Trois surfaces produit ne correspondent à aucun f
 | ID           | Action                                                                                  | Responsable                | Charge      | Ce que son absence empêche                                     |
 |--------------|-------------------------------------------------------------------------------------------|----------------------------|-------------|-----------------------------------------------------------------|
 | **AP-01**    | Désigner la prochaine session de référence, sa date et son domaine                        | Product Owner              | Une question| Ancrer le plan de livraison et la préparation de la section 9.5 |
-| **AP-02**    | Arbitrer les douze écarts de l'annexe A                                                    | Product Owner              | 45 minutes  | Engager la réalisation sur un comportement stable               |
-| **AP-03**    | Confirmer les décisions DP-05, DP-06 et DP-07                                              | Product Owner              | 20 minutes  | Figer le blocage d'étape, l'ordre de réalisation et le format de restitution |
-| **AP-04**    | Reporter au document d'exigences métier les capacités de la famille E-09                   | Product Owner              | 30 minutes  | Rendre opposables les capacités issues de la maquette           |
+| **AP-02**    | Arbitrer les dix écarts encore ouverts de l'annexe A, dont E-04 et E-07                    | Product Owner              | 40 minutes  | Engager la réalisation sur un comportement stable               |
+| **AP-03**    | Confirmer les décisions DP-01, DP-06 et DP-07                                              | Product Owner              | 20 minutes  | Figer le dénominateur de participation, l'ordre de réalisation et le format de restitution |
+| **AP-04**    | Amender BR-004 et BR-036 selon les décisions du 2026-09-21, et reporter les capacités de la famille E-09 | Product Owner              | 40 minutes  | Rendre opposables le blocage d'étape, le masquage en collecte et les capacités issues de la maquette |
 | **AP-05**    | Chiffrer L1 sur la base de la section 9                                                    | Réalisation                | Une journée | Permettre l'arbitrage programme prévu par la règle de réalisation |
 | **AP-06**    | Faire confirmer la couverture des exigences par les six rôles                              | Product Owner              | 6 × 30 min  | Lever les hypothèses HP-01 à HP-05, seule preuve extérieure disponible |
 | **AP-07**    | Éprouver les huit tests de risque méthodologique sur un atelier réduit                     | Product Owner, P1          | Une demi-journée | Vérifier que le parcours produit la découverte attendue    |
@@ -2372,7 +2381,7 @@ Les vingt flux sont couverts. Trois surfaces produit ne correspondent à aucun f
 
 ## Annexe A — Écarts entre la maquette, les exigences métier et l'intention UX
 
-Douze écarts. Chacun appelle une décision. Aucun n'est résolu par ce document, à l'exception de ceux qui portent une recommandation explicitement retenue en section 11.2.
+Douze écarts. **E-02 et E-03 ont été tranchés par le Product Owner le 2026-09-21** et sont clos ; les deux décisions imposent d'amender BR-036 et BR-004. Les dix autres appellent une décision.
 
 ### E-01 Le parcours compte neuf phases et non dix étapes
 
@@ -2390,7 +2399,7 @@ Douze écarts. Chacun appelle une décision. Aucun n'est résolu par ce document
 | Maquette | La validation est refusée si le critère n'est pas satisfait, et une phase ne s'ouvre que lorsque la précédente est validée |
 | Document d'exigences et UX | Le critère est observable et descriptif, la décision appartient au facilitateur. Le pattern UX énonce « descriptif, jamais prescriptif » |
 | Conséquence | Un facilitateur qui juge une étape terminée ne peut pas avancer, ce qui contredit PP-07 |
-| Recommandation retenue | DP-05, faire du blocage un réglage de séance, non bloquant par défaut. Décision attendue en QP-07 |
+| **Décision du 2026-09-21** | Le blocage est retenu. Il se lève par une action explicite du facilitateur, distincte de la validation, enregistrée avec le critère non atteint et restituée. Écart clos, BR-036 à amender pour admettre le blocage assorti du dépassement |
 
 ### E-03 Le mur est masqué aux participants pendant l'exploration chaotique
 
@@ -2399,7 +2408,7 @@ Douze écarts. Chacun appelle une décision. Aucun n'est résolu par ce document
 | Maquette | En vue Participant, seuls les éléments de l'intéressé sont visibles jusqu'à la révélation du mur |
 | Document d'exigences | BR-004 pose que les éléments produits sont visibles de tous |
 | Conséquence | Le masquage sert l'indépendance des contributions et limite l'ancrage, mais contredit une exigence opposable |
-| Recommandation | Conserver le masquage, limité à la phase 2 et au rôle Participant, comme réglage de séance. Amender BR-004 en conséquence. Décision attendue en QP-08 |
+| **Décision du 2026-09-21** | Le comportement de la maquette est retenu : masquage actif par défaut en phase 2 pour le rôle Participant, révélation à l'initiative de chacun. Écart clos, BR-004 à amender en conséquence |
 
 ### E-04 Les agrégats sont créés sans invariant
 
