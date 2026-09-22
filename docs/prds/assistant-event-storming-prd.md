@@ -432,10 +432,17 @@ Une exigence marquée **Création** n'est couverte par aucune exigence métier :
 |----------|-----------------|------|---------|------------------|
 | Indispensable | BR-037 | — | S-01 | Démontré |
 
-Le facilitateur, l'architecte et l'équipe de conception se connectent par GitHub ou par le fournisseur d'identité de l'entreprise.
+Les membres d'une organisation se connectent par l'un des trois fournisseurs retenus le 2026-09-22.
 
-- [ ] Deux fournisseurs sont proposés, GitHub et OIDC
-- [ ] Le fournisseur recommandé est configurable par séance
+| Fournisseur                  | Usage attendu                                                            |
+|------------------------------|-----------------------------------------------------------------------------|
+| **GitHub**                   | Équipes produit et praticiens, déjà authentifiés là                        |
+| **GitHub Enterprise Server** | Organisations disposant d'une instance interne, avec son adresse propre    |
+| **OIDC**                     | Toute entreprise disposant de son propre fournisseur d'identité            |
+
+- [ ] Les trois fournisseurs sont proposés
+- [ ] Le fournisseur retenu et sa configuration relèvent de l'organisation, voir PR-136
+- [ ] Une instance GitHub Enterprise porte son adresse propre, distincte de github.com
 - [ ] L'identité obtenue porte le nom affiché et sert d'auteur des contributions
 - [ ] Un échec d'authentification n'empêche pas de rejoindre par code, voir PR-002
 
@@ -1972,8 +1979,9 @@ Le détail par indicateur figure en section 8.
 |----------|-----------------|------|---------|------------------|
 | Indispensable | BR-038 | — | S-02, S-21 | Partiel |
 
-- [ ] Le modèle de référence « Big Picture 2 jours » est livré avec le produit
+- [ ] Le modèle de référence « Big Picture 2 jours » est livré avec le produit, en français et en anglais
 - [ ] Chaque modèle porte son intention, sa durée totale, son nombre d'étapes et le pack de notation qu'il emploie
+- [ ] Un modèle porte la ou les langues dans lesquelles son contenu est rédigé
 - [ ] Un modèle livré avec le produit ne peut pas être modifié, seulement dérivé
 - [ ] Une organisation ne voit que les modèles livrés et les siens
 
@@ -2054,8 +2062,9 @@ Le pack Event Storming des huit types de la section 7.2 est livré comme pack pa
 Les règles déterministes de la section 7.2 sont attachées aux types du pack par défaut, et non écrites dans le produit.
 
 - [ ] Un type porte zéro, une ou plusieurs règles de formulation
+- [ ] Une règle appartient à un couple type et langue, voir la section 7.2
 - [ ] Les règles disponibles sont celles de la section 7.2, paramétrables
-- [ ] Un type sans règle ne produit aucun signalement
+- [ ] Un type sans règle dans la langue de la séance ne produit aucun signalement
 - [ ] Une règle ne bloque jamais une contribution, quel que soit le pack, conformément à PP-04
 
 #### PR-128 Éprouver un modèle avant de l'employer
@@ -2150,6 +2159,35 @@ La purge à la clôture décidée le 2026-09-21 est le comportement par défaut.
 - [ ] L'atteinte d'une limite est signalée avant qu'elle ne soit bloquante
 - [ ] Aucune limite n'interrompt une séance en cours, voir PP-04
 
+#### PR-136 Configurer le fournisseur d'identité de l'organisation
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Indispensable | Création | — | S-23 | Partiel |
+
+**Décision du 2026-09-22.** Trois fournisseurs sont admis : GitHub, GitHub Enterprise Server et OIDC.
+
+- [ ] L'administrateur choisit le fournisseur de son organisation parmi les trois
+- [ ] Une instance GitHub Enterprise se configure par son adresse
+- [ ] Un fournisseur OIDC se configure par ses points d'accès et son identifiant client
+- [ ] La configuration est éprouvée avant d'être appliquée, sans enfermer dehors l'administrateur qui la pose
+- [ ] Le changement de fournisseur n'altère ni les séances tenues ni l'attribution des contributions
+- [ ] L'accès participant par code de séance reste disponible quel que soit le fournisseur
+
+#### PR-137 Choisir la langue de l'interface
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Indispensable | NFR-15 | — | S-01, S-23 | Absent |
+
+**Décision du 2026-09-22.** L'interface existe en français et en anglais.
+
+- [ ] Chaque utilisateur choisit sa langue, et son choix le suit d'une séance à l'autre
+- [ ] La langue par défaut est celle du navigateur, à défaut le français
+- [ ] Un participant rejoignant par code choisit sa langue sans compte
+- [ ] Deux participants d'une même séance lisent l'interface dans deux langues différentes sans effet sur le modèle
+- [ ] Le contenu produit, les modèles et les packs de notation ne sont jamais traduits par le produit
+
 #### PR-135 Journaliser les actions d'administration
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
@@ -2181,7 +2219,7 @@ La purge à la clôture décidée le 2026-09-21 est le comportement par défaut.
 | **NFR-12** | Restitution              | Le fichier de restitution est lisible sans outil spécifique, déterministe et versionnable                  | Indispensable | Deux restitutions successives comparées             |
 | **NFR-13** | Portabilité              | Le modèle sort du produit sans perte sémantique et sans format propriétaire                                | Indispensable | Reprise manuelle du fichier sur un support tiers    |
 | **NFR-14** | Poste et navigateur      | Fonctionnement sur les navigateurs courants à jour, sans installation, sur des postes hétérogènes en distanciel | Indispensable | Matrice de compatibilité à établir                  |
-| **NFR-15** | Langue                   | L'interface est en français. Le vocabulaire métier affiché provient du contenu de l'organisation, jamais du produit : c'est le modèle et le pack de notation qui le portent | Indispensable | Revue de contenu, voir QP-13 pour les autres langues |
+| **NFR-15** | Langue                   | L'interface existe en français et en anglais, au choix de chaque utilisateur. Le contenu — modèles, packs de notation, éléments produits — reste dans la langue de ceux qui l'écrivent, et n'est jamais traduit par le produit | Indispensable | Revue des deux langues, et essai de séance en anglais |
 | **NFR-16** | Observabilité            | Chaque opération est journalisée avec son auteur, sa phase et son horodatage, aux fins des indicateurs      | Indispensable | Export des mesures, PR-120                          |
 
 **Révision du 2026-09-21.** La version précédente écartait toute exigence de disponibilité au motif que le produit servait une séance et non un service continu. Le passage en service rend cette position intenable : une organisation qui paie pour conduire ses ateliers n'accepte pas que l'outil soit indisponible le jour où elle en a besoin.
@@ -2247,6 +2285,8 @@ Huit types d'éléments. Chaque type porte un libellé textuel, une couleur indi
 **Aucune de ces règles n'empêche une saisie.** Elles produisent un signalement privé adressé au seul auteur, selon les exigences PR-025 à PR-029.
 
 **Les règles sont déterministes**, elles n'appellent aucun traitement automatisé du contenu. C'est ce qui les rend utilisables pendant la séance, sans latence et sans dépendance externe.
+
+**Conséquence de la décision du 2026-09-22 sur les langues.** Ces règles sont écrites pour le français : la forme passée composée, l'infinitif en *-er*, *-ir*, *-oir*, *-re*, le motif « dès que … alors … ». Elles ne se traduisent pas, elles se réécrivent. Une règle de formulation appartient donc à un couple **type et langue** : un pack employé par un atelier anglophone porte ses propres règles — participe passé anglais, verbe à l'infinitif sans *to*, motif « whenever … then … ». Un type sans règle dans la langue de la séance ne produit aucun signalement, ce qui reste conforme à PP-04.
 
 ### 7.3 Statuts de preuve
 
@@ -2453,7 +2493,7 @@ Aucun jalon n'est rattaché à une date. L1 vise la prochaine session ouverte, q
 
 | Feature | L1                                        | L2                                        | L3               |
 |---------|-------------------------------------------|-------------------------------------------|------------------|
-| F-01    | Complet, hors gestion fine des rôles      | Rôle équipe de conception                 | Administration   |
+| F-01    | Complet, PR-137 comprise                  | —                                         | Administration   |
 | F-02    | Complet sauf PR-012                       | PR-012                                    | —                |
 | F-03    | Complet                                   | —                                         | —                |
 | F-04    | Complet sauf PR-023                       | PR-023                                    | —                |
@@ -2474,7 +2514,7 @@ Aucun jalon n'est rattaché à une date. L1 vise la prochaine session ouverte, q
 | F-19    | PR-111, PR-112, PR-113, PR-115            | PR-114, PR-116                            | —                |
 | F-20    | PR-117, PR-118, PR-119                    | PR-120                                    | —                |
 | F-21    | PR-121, PR-122, PR-123, PR-124            | PR-128                                    | PR-125, PR-126, PR-127 |
-| F-22    | PR-129, PR-130                            | PR-132                                    | PR-131, PR-133, PR-134, PR-135 |
+| F-22    | PR-129, PR-130, PR-136                    | PR-132                                    | PR-131, PR-133, PR-134, PR-135 |
 
 ### 9.3 Ordre de réalisation de L1
 
@@ -2604,6 +2644,8 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | **DP-11** | Les critères de sortie s'expriment dans un vocabulaire de dix prédicats, évalués sur le modèle | Seul moyen de garder BR-036 opposable sur une séquence inconnue             | Prise le 2026-09-21 |
 | **DP-12** | La notation est un pack dérivable, les huit types Event Storming étant le pack par défaut     | Le produit doit admettre d'autres méthodes sans renoncer à en porter une    | Prise le 2026-09-21 |
 | **DP-13** | Le versement de la restitution vise le dépôt connecté par l'organisation, le téléchargement restant la base | DP-07 versait dans `event2spec`, ce qui ne survit pas au passage en service | Prise le 2026-09-21, révise DP-07 et QP-09 |
+| **DP-14** | L'interface existe en français et en anglais, au choix de l'utilisateur. Le contenu n'est jamais traduit | Un service vendu hors de France ne peut pas n'exister qu'en français, et traduire le contenu d'un atelier reviendrait à réécrire la parole métier | Prise le 2026-09-22 |
+| **DP-15** | Trois fournisseurs d'identité sont admis : GitHub, GitHub Enterprise Server et OIDC             | Les praticiens sont sur GitHub, les grandes organisations sur leur propre fournisseur, et certaines sur une instance interne | Prise le 2026-09-22 |
 
 ### 11.3 Questions
 
@@ -2628,12 +2670,19 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 
 | ID        | Question                                                                                   | Interlocuteur              | Ce qu'elle bloque                                        |
 |-----------|----------------------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------|
-| **QP-13** | L'interface doit-elle exister dans d'autres langues que le français ?                        | Product Owner              | NFR-15, et le coût de toute chaîne de caractères écrite d'ici là |
 | **QP-14** | Où les données sont-elles hébergées, et cette localisation est-elle opposable ?              | Responsable de programme   | NFR-19, et la vente à toute organisation assurantielle    |
 | **QP-15** | Quel niveau de service est engagé, et avec quelles conséquences en cas de manquement ?       | Responsable de programme   | NFR-17 et le risque RP-20                                 |
-| **QP-16** | Une organisation peut-elle imposer son propre fournisseur d'identité ?                       | Product Owner              | PR-001 et l'entrée des grandes organisations              |
 
-Ces quatre questions ne bloquent ni L1 ni L2. Elles bloquent la mise en vente, et QP-13 devient coûteuse à répondre tard.
+**QP-13 et QP-16 ont été tranchées le 2026-09-22.**
+
+| ID        | Question                                                                                   | Réponse                                                                     |
+|-----------|----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| **QP-13** | L'interface doit-elle exister dans d'autres langues que le français ?                        | **Français et anglais**, le 2026-09-22. Le contenu n'est jamais traduit. Voir DP-14, NFR-15 et PR-137 |
+| **QP-16** | Une organisation peut-elle imposer son propre fournisseur d'identité ?                       | **Oui**, le 2026-09-22. GitHub, GitHub Enterprise Server ou OIDC, au choix de l'organisation. Voir DP-15, PR-001 et PR-136 |
+
+Les deux questions restantes, QP-14 et QP-15, ne bloquent ni L1 ni L2. Elles bloquent la mise en vente.
+
+**Ce que la décision sur les langues emporte, et qui n'est pas qu'une traduction.** Les règles de formulation de la section 7.2 sont écrites pour le français et ne se traduisent pas : elles se réécrivent par langue, et appartiennent désormais à un couple type et langue. Le modèle de référence est livré dans les deux langues. C'est du contenu à produire, pas seulement des chaînes à extraire, et c'est pourquoi la réponse valait mieux maintenant que plus tard.
 
 **Le jalon des 15 et 16 septembre ne conditionne plus le document**, décision du 2026-09-21 : d'autres séquences et sessions suivront, et cette date n'est plus l'ancrage du produit.
 
@@ -2746,7 +2795,7 @@ Toutes les décisions sont rendues. Ce qui suit relève de l'exécution.
 | **AP-05**    | Chiffrer L1 sur la base de la section 9                                                    | Réalisation                | Une journée | Permettre l'arbitrage programme prévu par la règle de réalisation |
 | **AP-06**    | Faire confirmer la couverture des exigences par les six rôles                              | Product Owner              | 6 × 30 min  | Lever les hypothèses HP-01 à HP-05, seule preuve extérieure disponible |
 | **AP-07**    | Éprouver les huit tests de risque méthodologique sur un atelier réduit                     | Product Owner, P1          | Une demi-journée | Vérifier que le parcours produit la découverte attendue    |
-| **AP-09**    | Répondre aux quatre questions ouvertes par le passage en service, QP-13 à QP-16            | Product Owner, responsable de programme | Une demi-journée | Mettre le service en vente, et éviter que QP-13 ne devienne coûteuse |
+| **AP-09**    | Répondre à QP-14, hébergement et souveraineté, et à QP-15, niveau de service engagé        | Responsable de programme   | Une demi-journée | Mettre le service en vente auprès d'une organisation assurantielle |
 | **AP-10**    | Décrire le modèle de référence dans le format de la feature F-21, comme donnée et non comme code | Réalisation           | Deux jours  | Vérifier que le format tient la séquence la plus complète connue avant d'en dépendre |
 
 **Actions closes le 2026-09-21.** AP-02, arbitrage des douze écarts. AP-03, confirmation des décisions produit. AP-04, amendement du document d'exigences métier et report des quatorze capacités. AP-08, arrêt de la notation de référence.
