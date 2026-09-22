@@ -2211,6 +2211,20 @@ Une organisation qui ne peut pas partir avec ses données n'a jamais vraiment eu
 - [ ] La suppression complète des données d'une organisation est possible à la demande
 - [ ] Ce qui est exporté se relit sans le produit
 
+#### PR-141 Déclarer un créneau de séance et le protéger
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Indispensable | BR-007, création | — | S-02, S-23 | Absent |
+
+**Décision du 2026-09-22.** Le service n'engage aucun taux de disponibilité. Il engage une règle : il ne s'interrompt pas de lui-même pendant qu'un atelier se tient.
+
+- [ ] Une séance porte ses dates et ses horaires dès sa création, ce qui la déclare
+- [ ] Aucune mise en production ni opération de maintenance ne peut viser un créneau déclaré
+- [ ] Les fenêtres de maintenance sont annoncées aux organisations avant d'être ouvertes
+- [ ] Une organisation consulte les fenêtres à venir avant de programmer ses séances
+- [ ] Un créneau déclaré qui se prolonge reste protégé jusqu'à la clôture de la séance
+
 #### PR-136 Configurer le fournisseur d'identité de l'organisation
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
@@ -2257,7 +2271,7 @@ Une organisation qui ne peut pas partir avec ses données n'a jamais vraiment eu
 | **NFR-01** | Collaboration            | 23 sessions simultanées contribuent sans perte d'élément, propagation d'une contribution visible en moins d'une seconde en conditions nominales | Indispensable | Essai de charge à 23 postes avant la séance         |
 | **NFR-02** | Volumétrie               | Le produit tient 800 éléments, 20 moments, 3 processus, 80 chaînes, 12 frontières et 24 agrégats sans dégradation perceptible | Indispensable | Jeu d'essai dimensionné à cette volumétrie, décidée le 2026-09-21 |
 | **NFR-03** | Continuité               | Une interruption du service ne détruit aucun contenu déjà produit, et le dernier export reste exploitable  | Indispensable | Essai de coupure pendant une phase de contribution  |
-| **NFR-17** | Disponibilité            | Le service est disponible aux heures ouvrées des organisations servies. Une indisponibilité pendant une séance est un incident, pas un aléa accepté. Ce qu'une organisation héberge elle-même sort de cet engagement | Indispensable | Engagement à formuler, voir QP-15                   |
+| **NFR-17** | Disponibilité            | Aucun taux de disponibilité n'est engagé. Une seule règle est opposable : **aucune interruption volontaire pendant une séance déclarée**. Les fenêtres de maintenance sont annoncées à l'avance. Ce qu'une organisation héberge elle-même sort de cet engagement | Indispensable | Vérification qu'aucune mise en production ne peut viser un créneau déclaré |
 | **NFR-04** | Reprise                  | Un participant qui perd sa connexion retrouve la séance à l'état courant, sa saisie en cours préservée      | Indispensable | Essai de déconnexion et reconnexion                 |
 | **NFR-05** | Accessibilité            | WCAG 2.2 niveau AA, parcours de contribution intégralement utilisable au clavier, cibles d'au moins 24 pixels, fonctionnement préservé à 200 pour cent de zoom | Indispensable | Audit sur le parcours de contribution et d'ordonnancement |
 | **NFR-06** | Accessibilité            | Aucune information n'est portée par la seule couleur : type, statut de preuve et origine portent forme, libellé ou bordure | Indispensable | Revue de conception et essai en nuances de gris     |
@@ -2566,7 +2580,7 @@ Aucun jalon n'est rattaché à une date. L1 vise la prochaine session ouverte, q
 | F-19    | PR-111, PR-112, PR-113, PR-115            | PR-114, PR-116                            | —                |
 | F-20    | PR-117, PR-118, PR-119                    | PR-120                                    | —                |
 | F-21    | PR-121, PR-122, PR-123, PR-124            | PR-128                                    | PR-125, PR-126, PR-127 |
-| F-22    | PR-129, PR-130, PR-136, PR-138, PR-140    | PR-132, PR-133                            | PR-131, PR-134, PR-135, PR-139 |
+| F-22    | PR-129, PR-130, PR-136, PR-138, PR-140, PR-141 | PR-132, PR-133                       | PR-131, PR-134, PR-135, PR-139 |
 
 ### 9.3 Ordre de réalisation de L1
 
@@ -2657,7 +2671,7 @@ Si le contenu de L1 doit être réduit, les features tombent dans l'ordre invers
 | **RP-19**  | Le vocabulaire de règles dérive vers un langage de programmation                            | Moyenne  | Section 7.9, dix prédicats, composition par « et » seulement, aucune négation ni calcul | La pression des cas particuliers poussera à l'étendre. Chaque ajout doit être refusé par défaut |
 | **RP-21**  | Une base fournie par l'organisation brouille la responsabilité en incident : le produit est accusé d'une panne qu'il ne peut ni voir ni corriger | Moyenne  | PR-139, schéma et migrations fournis et versionnés, refus de démarrer sur un schéma inconnu, engagement de disponibilité explicitement exclu | Le diagnostic à distance reste impossible sans accès. Une séance perdue sera imputée au produit quoi qu'il arrive |
 | **RP-22**  | Le dépôt Git est pris pour un magasin de données concurrent et sert l'état vivant d'une séance | Élevée   | DP-16 et PR-138, la frontière est posée : fichiers pour ce qui dure, base pour ce qui vit | Vingt-trois contributeurs simultanés produiraient des conflits que personne ne sait résoudre en séance |
-| **RP-20**  | Le service devient indisponible pendant une séance payée                                    | Élevée   | F-18, repli non logiciel et export permanent ; NFR-17 | Le repli protège la séance, pas la relation commerciale. Le niveau de service reste à établir, QP-15 |
+| **RP-20**  | Le service devient indisponible pendant une séance payée                                    | Élevée   | F-18, repli non logiciel et export permanent ; PR-141, aucune interruption volontaire pendant une séance déclarée | Une panne subie reste possible et sans contrepartie contractuelle. Un engagement chiffré deviendra exigible à la première vente hors du programme d'origine, et suppose une équipe d'exploitation que le projet n'a pas |
 
 ## 11. Hypothèses, décisions et questions
 
@@ -2701,6 +2715,7 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | **DP-14** | L'interface existe en français et en anglais, au choix de l'utilisateur. Le contenu n'est jamais traduit | Un service vendu hors de France ne peut pas n'exister qu'en français, et traduire le contenu d'un atelier reviendrait à réécrire la parole métier | Prise le 2026-09-22 |
 | **DP-15** | Trois fournisseurs d'identité sont admis : GitHub, GitHub Enterprise Server et OIDC             | Les praticiens sont sur GitHub, les grandes organisations sur leur propre fournisseur, et certaines sur une instance interne | Prise le 2026-09-22 |
 | **DP-16** | Ce qui dure réside en fichiers versionnés dans le dépôt de l'organisation ; ce qui ne le peut pas réside dans une base, celle du service ou celle que l'organisation installe | Un modèle, un pack et une restitution se relisent, se comparent et se révisent comme du code. L'état vivant d'une séance à vingt-trois contributeurs ne le peut pas | Prise le 2026-09-22 |
+| **DP-17** | Aucun taux de disponibilité n'est engagé. Une seule règle l'est : aucune interruption volontaire pendant une séance déclarée | Une moyenne mensuelle ne dit rien à qui mobilise vingt-trois personnes un mardi à 9 h. Et rien de chiffré ne se tient sans équipe d'exploitation | Prise le 2026-09-22 |
 
 ### 11.3 Questions
 
@@ -2725,7 +2740,6 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 
 | ID        | Question                                                                                   | Interlocuteur              | Ce qu'elle bloque                                        |
 |-----------|----------------------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------|
-| **QP-15** | Quel niveau de service est engagé, et avec quelles conséquences en cas de manquement ?       | Responsable de programme   | NFR-17 et le risque RP-20                                 |
 
 **QP-13 et QP-16 ont été tranchées le 2026-09-22.**
 
@@ -2735,7 +2749,11 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | **QP-16** | Une organisation peut-elle imposer son propre fournisseur d'identité ?                       | **Oui**, le 2026-09-22. GitHub, GitHub Enterprise Server ou OIDC, au choix de l'organisation. Voir DP-15, PR-001 et PR-136 |
 | **QP-14** | Où les données sont-elles hébergées, et cette localisation est-elle opposable ?              | **En fichiers dans le dépôt de l'organisation pour ce qui dure**, le 2026-09-22 ; en base pour l'état vivant, celle du service ou celle que l'organisation installe. Voir DP-16, PR-138, PR-139 et PR-140 |
 
-Les deux questions restantes, QP-14 et QP-15, ne bloquent ni L1 ni L2. Elles bloquent la mise en vente.
+| **QP-15** | Quel niveau de service est engagé, et avec quelles conséquences en cas de manquement ?       | **Aucun taux engagé**, le 2026-09-22. Une règle ferme : aucune interruption volontaire pendant une séance déclarée, et des fenêtres de maintenance annoncées. Voir DP-17, NFR-17 et PR-141 |
+
+**Aucune question n'est ouverte au 2026-09-22.** Les seize questions du document sont tranchées, et dix-sept décisions produit sont prises.
+
+**Ce que la réponse à QP-15 laisse ouvert, et qui n'est pas une question mais une échéance.** Un engagement chiffré — disponibilité, délai de réaction, perte de données maximale — deviendra exigible le jour où une organisation achètera le service sans être le programme d'origine. Il suppose une équipe d'exploitation, ce que le projet n'a pas. Cette dette est inscrite en RP-20.
 
 **Ce que la décision sur les langues emporte, et qui n'est pas qu'une traduction.** Les règles de formulation de la section 7.2 sont écrites pour le français et ne se traduisent pas : elles se réécrivent par langue, et appartiennent désormais à un couple type et langue. Le modèle de référence est livré dans les deux langues. C'est du contenu à produire, pas seulement des chaînes à extraire, et c'est pourquoi la réponse valait mieux maintenant que plus tard.
 
@@ -2850,10 +2868,9 @@ Toutes les décisions sont rendues. Ce qui suit relève de l'exécution.
 | **AP-05**    | Chiffrer L1 sur la base de la section 9                                                    | Réalisation                | Une journée | Permettre l'arbitrage programme prévu par la règle de réalisation |
 | **AP-06**    | Faire confirmer la couverture des exigences par les six rôles                              | Product Owner              | 6 × 30 min  | Lever les hypothèses HP-01 à HP-05, seule preuve extérieure disponible |
 | **AP-07**    | Éprouver les huit tests de risque méthodologique sur un atelier réduit                     | Product Owner, P1          | Une demi-journée | Vérifier que le parcours produit la découverte attendue    |
-| **AP-09**    | Répondre à QP-14, hébergement et souveraineté, et à QP-15, niveau de service engagé        | Responsable de programme   | Une demi-journée | Mettre le service en vente auprès d'une organisation assurantielle |
 | **AP-10**    | Décrire le modèle de référence dans le format de la feature F-21, comme donnée et non comme code | Réalisation           | Deux jours  | Vérifier que le format tient la séquence la plus complète connue avant d'en dépendre |
 
-**Actions closes le 2026-09-21.** AP-02, arbitrage des douze écarts. AP-03, confirmation des décisions produit. AP-04, amendement du document d'exigences métier et report des quatorze capacités. AP-08, arrêt de la notation de référence.
+**Actions closes le 2026-09-21.** AP-02, arbitrage des douze écarts. AP-03, confirmation des décisions produit. AP-04, amendement du document d'exigences métier et report des quatorze capacités. AP-08, arrêt de la notation de référence. **Close le 2026-09-22 :** AP-09, questions ouvertes par le passage en service.
 
 **AP-10 est la première à mener.** Elle éprouve, à coût faible, la décision la plus structurante du 2026-09-21 : si le modèle de référence ne s'exprime pas entièrement dans le format de F-21 — ses neuf critères compris — alors le vocabulaire de la section 7.9 est trop pauvre, et il vaut mieux le découvrir avant d'avoir écrit le moteur.
 
