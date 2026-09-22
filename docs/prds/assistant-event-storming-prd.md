@@ -2144,10 +2144,13 @@ La purge à la clôture décidée le 2026-09-21 est le comportement par défaut.
 
 **Révision du 2026-09-21.** Le versement dans `event2spec` décidé le même jour ne survit pas au passage en service : chaque organisation verse dans son propre dépôt.
 
+**Révision du 2026-09-22.** Le dépôt connecté n'est plus seulement la cible d'un export : il devient le lieu de résidence de ce qui dure, voir DP-16 et PR-138.
+
 - [ ] Une organisation connecte un dépôt et désigne la branche de versement
 - [ ] Le téléchargement du fichier reste disponible sans aucun dépôt connecté, et demeure le comportement de base
-- [ ] Le versement est manuel, jamais automatique
+- [ ] Le versement d'une restitution est manuel, jamais automatique
 - [ ] La déconnexion du dépôt n'altère ni les séances ni les restitutions déjà produites
+- [ ] Une organisation sans dépôt connecté conserve ses données dans le stockage du service, sans perte de capacité
 
 #### PR-134 Administrer l'abonnement et les quotas
 
@@ -2158,6 +2161,55 @@ La purge à la clôture décidée le 2026-09-21 est le comportement par défaut.
 - [ ] Les limites applicables à l'organisation sont consultables : participants par séance, séances actives, volumétrie
 - [ ] L'atteinte d'une limite est signalée avant qu'elle ne soit bloquante
 - [ ] Aucune limite n'interrompt une séance en cours, voir PP-04
+
+#### PR-138 Conserver comme fichiers ce qui doit durer
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Indispensable | BR-013, création | UF-20 | S-18, S-23 | Partiel |
+
+**Décision du 2026-09-22.** Ce qui dure vit en fichiers versionnés, dans le dépôt de l'organisation quand elle en connecte un. Ce qui ne peut pas vivre en fichiers vit dans une base, voir PR-139.
+
+| Donnée                                                      | Résidence                                                   |
+|--------------------------------------------------------------|---------------------------------------------------------------|
+| Restitution du modèle, journal des décisions, invariants à valider | Fichiers versionnés                                    |
+| Modèles de séquence et packs de notation                     | Fichiers versionnés                                          |
+| État vivant d'une séance : éléments, positions, minuteur, présences, votes | Base de données, voir PR-139                   |
+| Transcription et extraits                                    | Base de données, purgée selon PR-132                         |
+
+- [ ] Les modèles de séquence et les packs de notation sont lisibles et modifiables comme fichiers
+- [ ] Une modification apportée dans le dépôt est reprise par le produit, l'éditeur de la surface S-21 n'étant pas le seul chemin
+- [ ] Un fichier invalide est signalé sans empêcher l'usage des modèles déjà valides
+- [ ] Une organisation sans dépôt connecté dispose des mêmes capacités, ses fichiers résidant dans le stockage du service
+- [ ] Aucun format propriétaire : ces fichiers se lisent et se modifient sans le produit
+
+#### PR-139 Employer la base de données du service ou celle de l'organisation
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Souhaitable | Création | — | S-23 | Absent |
+
+**Décision du 2026-09-22.** Une organisation qui ne veut pas que l'état de ses séances réside chez le service installe et configure la sienne.
+
+- [ ] Le service fournit une base par défaut, sans configuration
+- [ ] Une organisation configure la sienne par son adresse et ses identifiants de connexion
+- [ ] La configuration est éprouvée avant d'être appliquée, et son échec n'interrompt aucune séance en cours
+- [ ] Le schéma attendu et sa migration sont fournis et versionnés
+- [ ] Le produit annonce les versions de schéma qu'il sait servir, et refuse de démarrer sur une version qu'il ne sait pas servir
+- [ ] Les engagements de disponibilité du service ne couvrent pas une base fournie par l'organisation, voir NFR-17
+
+#### PR-140 Reprendre ses données et s'en aller
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Indispensable | BR-013, BR-020 | UF-07 | S-23 | Absent |
+
+Une organisation qui ne peut pas partir avec ses données n'a jamais vraiment eu le choix de l'hébergement.
+
+- [ ] L'ensemble des données d'une organisation est exportable, quelle que soit leur résidence
+- [ ] L'export comprend les modèles, les packs, les séances et leurs restitutions
+- [ ] La suppression complète des données d'une organisation est possible à la demande
+- [ ] Ce qui est exporté se relit sans le produit
 
 #### PR-136 Configurer le fournisseur d'identité de l'organisation
 
@@ -2205,7 +2257,7 @@ La purge à la clôture décidée le 2026-09-21 est le comportement par défaut.
 | **NFR-01** | Collaboration            | 23 sessions simultanées contribuent sans perte d'élément, propagation d'une contribution visible en moins d'une seconde en conditions nominales | Indispensable | Essai de charge à 23 postes avant la séance         |
 | **NFR-02** | Volumétrie               | Le produit tient 800 éléments, 20 moments, 3 processus, 80 chaînes, 12 frontières et 24 agrégats sans dégradation perceptible | Indispensable | Jeu d'essai dimensionné à cette volumétrie, décidée le 2026-09-21 |
 | **NFR-03** | Continuité               | Une interruption du service ne détruit aucun contenu déjà produit, et le dernier export reste exploitable  | Indispensable | Essai de coupure pendant une phase de contribution  |
-| **NFR-17** | Disponibilité            | Le service est disponible aux heures ouvrées des organisations servies. Une indisponibilité pendant une séance est un incident, pas un aléa accepté | Indispensable | Engagement à formuler, voir QP-15                   |
+| **NFR-17** | Disponibilité            | Le service est disponible aux heures ouvrées des organisations servies. Une indisponibilité pendant une séance est un incident, pas un aléa accepté. Ce qu'une organisation héberge elle-même sort de cet engagement | Indispensable | Engagement à formuler, voir QP-15                   |
 | **NFR-04** | Reprise                  | Un participant qui perd sa connexion retrouve la séance à l'état courant, sa saisie en cours préservée      | Indispensable | Essai de déconnexion et reconnexion                 |
 | **NFR-05** | Accessibilité            | WCAG 2.2 niveau AA, parcours de contribution intégralement utilisable au clavier, cibles d'au moins 24 pixels, fonctionnement préservé à 200 pour cent de zoom | Indispensable | Audit sur le parcours de contribution et d'ordonnancement |
 | **NFR-06** | Accessibilité            | Aucune information n'est portée par la seule couleur : type, statut de preuve et origine portent forme, libellé ou bordure | Indispensable | Revue de conception et essai en nuances de gris     |
@@ -2213,8 +2265,8 @@ La purge à la clôture décidée le 2026-09-21 est le comportement par défaut.
 | **NFR-08** | Performance d'interface  | Une saisie rend la main en moins de 100 millisecondes, la navigation sur le mur reste fluide à la volumétrie de NFR-02 | Indispensable | Mesure sur poste de référence bas de gamme          |
 | **NFR-09** | Sécurité                 | L'accès conduisant la séance passe par GitHub ou OIDC ; le code de séance est limité à la durée de la séance et révocable | Indispensable | Revue de conception                                 |
 | **NFR-10** | Confidentialité          | La transcription est purgée à la clôture de la séance par défaut, une fois la restitution produite. Les extraits déjà rattachés à un élément demeurent. La durée est paramétrable par organisation, voir PR-132 | Indispensable | Essai de purge, et vérification que la traçabilité survit |
-| **NFR-18** | Isolation                | Aucune donnée d'une organisation n'est atteignable depuis une autre, quel que soit le chemin d'accès | Indispensable | Essais automatisés d'isolation, voir PR-130          |
-| **NFR-19** | Souveraineté             | La localisation d'hébergement des données est connue et opposable à une organisation assurantielle | Indispensable | À établir, voir QP-14                                |
+| **NFR-18** | Isolation                | Aucune donnée d'une organisation n'est atteignable depuis une autre, quel que soit le chemin d'accès. Une base fournie par l'organisation rend l'isolation structurelle ; la base du service la rend logique, et c'est là qu'elle doit être éprouvée | Indispensable | Essais automatisés d'isolation, voir PR-130          |
+| **NFR-19** | Souveraineté             | Ce qui dure réside en fichiers versionnés dans le dépôt de l'organisation quand elle en connecte un ; l'état vivant réside dans la base du service ou dans celle qu'elle fournit. La résidence est connue et opposable | Indispensable | Essai avec dépôt connecté et base fournie, voir PR-138 et PR-139 |
 | **NFR-11** | Traitement automatisé    | Le traitement du contenu par un service tiers est limité à la transcription et à la production de propositions ; il ne produit jamais une décision, une frontière ni un agrégat | Indispensable | Revue de conception, PP-08                          |
 | **NFR-12** | Restitution              | Le fichier de restitution est lisible sans outil spécifique, déterministe et versionnable                  | Indispensable | Deux restitutions successives comparées             |
 | **NFR-13** | Portabilité              | Le modèle sort du produit sans perte sémantique et sans format propriétaire                                | Indispensable | Reprise manuelle du fichier sur un support tiers    |
@@ -2514,7 +2566,7 @@ Aucun jalon n'est rattaché à une date. L1 vise la prochaine session ouverte, q
 | F-19    | PR-111, PR-112, PR-113, PR-115            | PR-114, PR-116                            | —                |
 | F-20    | PR-117, PR-118, PR-119                    | PR-120                                    | —                |
 | F-21    | PR-121, PR-122, PR-123, PR-124            | PR-128                                    | PR-125, PR-126, PR-127 |
-| F-22    | PR-129, PR-130, PR-136                    | PR-132                                    | PR-131, PR-133, PR-134, PR-135 |
+| F-22    | PR-129, PR-130, PR-136, PR-138, PR-140    | PR-132, PR-133                            | PR-131, PR-134, PR-135, PR-139 |
 
 ### 9.3 Ordre de réalisation de L1
 
@@ -2603,6 +2655,8 @@ Si le contenu de L1 doit être réduit, les features tombent dans l'ordre invers
 | **RP-17**  | La configurabilité vide la méthode de sa substance : un modèle mal composé produit un atelier raté, et le produit en porte la responsabilité perçue | Élevée   | PR-121, modèles livrés non modifiables et dérivables ; PR-128, essai avant emploi ; PR-124, énoncé en langage courant du critère composé | Entier. Le produit ne peut pas juger la qualité d'une séquence, et ne doit pas prétendre le faire |
 | **RP-18**  | Une donnée d'une organisation devient atteignable depuis une autre                          | Élevée   | PR-130, isolation vérifiée par essais automatisés, réalisée au premier rang | Un défaut d'isolation dans un service assurantiel n'est pas un incident produit, c'est une rupture de contrat |
 | **RP-19**  | Le vocabulaire de règles dérive vers un langage de programmation                            | Moyenne  | Section 7.9, dix prédicats, composition par « et » seulement, aucune négation ni calcul | La pression des cas particuliers poussera à l'étendre. Chaque ajout doit être refusé par défaut |
+| **RP-21**  | Une base fournie par l'organisation brouille la responsabilité en incident : le produit est accusé d'une panne qu'il ne peut ni voir ni corriger | Moyenne  | PR-139, schéma et migrations fournis et versionnés, refus de démarrer sur un schéma inconnu, engagement de disponibilité explicitement exclu | Le diagnostic à distance reste impossible sans accès. Une séance perdue sera imputée au produit quoi qu'il arrive |
+| **RP-22**  | Le dépôt Git est pris pour un magasin de données concurrent et sert l'état vivant d'une séance | Élevée   | DP-16 et PR-138, la frontière est posée : fichiers pour ce qui dure, base pour ce qui vit | Vingt-trois contributeurs simultanés produiraient des conflits que personne ne sait résoudre en séance |
 | **RP-20**  | Le service devient indisponible pendant une séance payée                                    | Élevée   | F-18, repli non logiciel et export permanent ; NFR-17 | Le repli protège la séance, pas la relation commerciale. Le niveau de service reste à établir, QP-15 |
 
 ## 11. Hypothèses, décisions et questions
@@ -2646,6 +2700,7 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | **DP-13** | Le versement de la restitution vise le dépôt connecté par l'organisation, le téléchargement restant la base | DP-07 versait dans `event2spec`, ce qui ne survit pas au passage en service | Prise le 2026-09-21, révise DP-07 et QP-09 |
 | **DP-14** | L'interface existe en français et en anglais, au choix de l'utilisateur. Le contenu n'est jamais traduit | Un service vendu hors de France ne peut pas n'exister qu'en français, et traduire le contenu d'un atelier reviendrait à réécrire la parole métier | Prise le 2026-09-22 |
 | **DP-15** | Trois fournisseurs d'identité sont admis : GitHub, GitHub Enterprise Server et OIDC             | Les praticiens sont sur GitHub, les grandes organisations sur leur propre fournisseur, et certaines sur une instance interne | Prise le 2026-09-22 |
+| **DP-16** | Ce qui dure réside en fichiers versionnés dans le dépôt de l'organisation ; ce qui ne le peut pas réside dans une base, celle du service ou celle que l'organisation installe | Un modèle, un pack et une restitution se relisent, se comparent et se révisent comme du code. L'état vivant d'une séance à vingt-trois contributeurs ne le peut pas | Prise le 2026-09-22 |
 
 ### 11.3 Questions
 
@@ -2670,7 +2725,6 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 
 | ID        | Question                                                                                   | Interlocuteur              | Ce qu'elle bloque                                        |
 |-----------|----------------------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------|
-| **QP-14** | Où les données sont-elles hébergées, et cette localisation est-elle opposable ?              | Responsable de programme   | NFR-19, et la vente à toute organisation assurantielle    |
 | **QP-15** | Quel niveau de service est engagé, et avec quelles conséquences en cas de manquement ?       | Responsable de programme   | NFR-17 et le risque RP-20                                 |
 
 **QP-13 et QP-16 ont été tranchées le 2026-09-22.**
@@ -2679,6 +2733,7 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 |-----------|----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
 | **QP-13** | L'interface doit-elle exister dans d'autres langues que le français ?                        | **Français et anglais**, le 2026-09-22. Le contenu n'est jamais traduit. Voir DP-14, NFR-15 et PR-137 |
 | **QP-16** | Une organisation peut-elle imposer son propre fournisseur d'identité ?                       | **Oui**, le 2026-09-22. GitHub, GitHub Enterprise Server ou OIDC, au choix de l'organisation. Voir DP-15, PR-001 et PR-136 |
+| **QP-14** | Où les données sont-elles hébergées, et cette localisation est-elle opposable ?              | **En fichiers dans le dépôt de l'organisation pour ce qui dure**, le 2026-09-22 ; en base pour l'état vivant, celle du service ou celle que l'organisation installe. Voir DP-16, PR-138, PR-139 et PR-140 |
 
 Les deux questions restantes, QP-14 et QP-15, ne bloquent ni L1 ni L2. Elles bloquent la mise en vente.
 
