@@ -1795,11 +1795,15 @@ Le format et la structure de sections sont définis en section 7.7.
 
 | Attribut      | Valeur                                                                         |
 |---------------|----------------------------------------------------------------------------------|
-| Intention     | Garantir que l'atelier se tienne même si le produit n'existe pas ce jour-là      |
+| Intention     | Garantir que rien de ce qui a été produit ne se perde avec le service             |
 | Personas      | P2, responsable de programme                                                     |
 | Jalon         | L1                                                                               |
 | Exigences métier | BR-020, BR-021                                                                |
 | Statut maquette | Hors maquette, porté par le déroulé d'atelier                                  |
+
+**Réduite le 2026-09-23.** La feature promettait « vous pouvez continuer sans nous ». Elle promet désormais « vous ne perdez pas ce qui est produit ». PR-109, la reprise manuelle outillée du contenu exporté, est abandonnée ; PR-108 et PR-110 ne sont pas du produit et reviennent au programme.
+
+Ce que cette réduction coûte est à mettre en regard de la cible de haute disponibilité posée par DP-17 : l'une remplace l'autre, mais le repli existait déjà et la haute disponibilité reste à construire. Voir RP-02.
 
 #### PR-107 Rendre l'export atteignable avant l'incident
 
@@ -1825,11 +1829,13 @@ Le format et la structure de sections sont définis en section 7.7.
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Indispensable | BR-020 | UF-07 | S-18 | Partiel |
+| **Abandonnée le 2026-09-23** | BR-020 | UF-07 | S-18 | Partiel |
 
-- [ ] Le contenu exporté est repris sur un tableau blanc partagé ou un document collaboratif sans transformation
-- [ ] La chronologie exportée conserve l'ordre des moments
-- [ ] Les auteurs et les points chauds restent lisibles dans le fichier
+**Abandonnée.** Le produit ne facilite plus la reprise du contenu sur un support tiers. Le fichier de restitution reste lisible sans outil, ce qui laisse la reprise possible sans l'outiller, voir PR-102 et PR-107.
+
+- [ ] ~~Le contenu exporté est repris sur un tableau blanc partagé ou un document collaboratif sans transformation~~
+- [ ] ~~La chronologie exportée conserve l'ordre des moments~~
+- [ ] ~~Les auteurs et les points chauds restent lisibles dans le fichier~~
 
 #### PR-110 Outiller la décision de bascule
 
@@ -2162,11 +2168,15 @@ La purge à la clôture décidée le 2026-09-21 est le comportement par défaut.
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Optionnelle | Création | — | S-23 | Absent |
+| Souhaitable | Création | — | S-23 | Absent |
 
-- [ ] Les limites applicables à l'organisation sont consultables : participants par séance, séances actives, volumétrie
+**Décision du 2026-09-23 : abonnement par organisation.** Un prix par organisation, assorti de limites, et non un paiement à la séance : la séance reste un acte méthodologique, pas un acte commercial.
+
+- [ ] L'abonnement porte sur l'organisation, et ses limites portent sur les séances actives et les participants
+- [ ] Les limites applicables sont consultables : participants par séance, séances actives, volumétrie
 - [ ] L'atteinte d'une limite est signalée avant qu'elle ne soit bloquante
 - [ ] Aucune limite n'interrompt une séance en cours, voir PP-04
+- [ ] Le dépassement d'une limite n'altère jamais une séance tenue ni sa restitution
 
 #### PR-138 Conserver comme fichiers ce qui doit durer
 
@@ -2290,6 +2300,20 @@ Une organisation qui ne peut pas partir avec ses données n'a jamais vraiment eu
 - [ ] Deux participants d'une même séance lisent l'interface dans deux langues différentes sans effet sur le modèle
 - [ ] Le contenu produit, les modèles et les packs de notation ne sont jamais traduits par le produit
 
+#### PR-144 Anonymiser les contributions d'une personne à sa demande
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Indispensable | BR-007 | — | S-23 | Absent |
+
+**Décision du 2026-09-23.** Une personne peut demander l'effacement de ses données. Le produit retire son identité, jamais ses contributions : un fait métier validé par le groupe appartient au modèle collectif, et le retirer reviendrait à altérer ce que d'autres ont établi.
+
+- [ ] L'identité de l'auteur est remplacée par une mention anonyme, sur toutes ses contributions
+- [ ] Les éléments, leurs liens, leur statut de preuve et leur rattachement à un extrait demeurent
+- [ ] L'anonymisation est irréversible, et sa demande est tracée sans conserver ce qu'elle efface
+- [ ] Une contribution anonymisée reste comptée dans les volumes, jamais dans un décompte par personne
+- [ ] Les indicateurs KPI-03, KPI-04 et KPI-16 deviennent incalculables rétroactivement pour la séance concernée, et le produit le signale plutôt que de produire un chiffre faux
+
 #### PR-135 Journaliser les actions d'administration
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
@@ -2309,7 +2333,7 @@ Une organisation qui ne peut pas partir avec ses données n'a jamais vraiment eu
 | **NFR-03** | Continuité               | Une interruption du service ne détruit aucun contenu déjà produit, et le dernier export reste exploitable  | Indispensable | Essai de coupure pendant une phase de contribution  |
 | **NFR-17** | Disponibilité            | Aucun taux n'est engagé tant que l'intérêt commercial n'est pas établi. Une règle est opposable dès maintenant : **aucun déploiement ni interruption volontaire pendant une séance déclarée**. La haute disponibilité est la cible visée, non engagée. Ce qu'une organisation héberge elle-même sort de cet engagement | Indispensable | Vérification qu'aucun déploiement ne peut viser un créneau déclaré |
 | **NFR-04** | Reprise                  | Un participant qui perd sa connexion retrouve la séance à l'état courant, sa saisie en cours préservée      | Indispensable | Essai de déconnexion et reconnexion                 |
-| **NFR-05** | Accessibilité            | WCAG 2.2 niveau AA, parcours de contribution intégralement utilisable au clavier, cibles d'au moins 24 pixels, fonctionnement préservé à 200 pour cent de zoom | Indispensable | Audit sur le parcours de contribution et d'ordonnancement |
+| **NFR-05** | Accessibilité            | WCAG 2.2 niveau AA, parcours de contribution intégralement utilisable au clavier, cibles d'au moins 24 pixels, fonctionnement préservé à 200 pour cent de zoom | Indispensable | Vérification interne sur le parcours de contribution et d'ordonnancement. **Aucun audit externe tant qu'aucun client ne l'exige**, décision du 2026-09-23 |
 | **NFR-06** | Accessibilité            | Aucune information n'est portée par la seule couleur : type, statut de preuve et origine portent forme, libellé ou bordure | Indispensable | Revue de conception et essai en nuances de gris     |
 | **NFR-07** | Perception               | Étape courante, temps restant et signalements sont annoncés comme régions vivantes aux lecteurs d'écran    | Souhaitable   | Essai avec lecteur d'écran                          |
 | **NFR-08** | Performance d'interface  | Une saisie rend la main en moins de 100 millisecondes, la navigation sur le mur reste fluide à la volumétrie de NFR-02 | Indispensable | Mesure sur poste de référence bas de gamme          |
@@ -2612,11 +2636,11 @@ Aucun jalon n'est rattaché à une date. L1 vise la prochaine session ouverte, q
 | F-15    | Complet                                   | —                                         | PR-142, connecteurs de visioconférence |
 | F-16    | PR-095 sur les éléments produits          | Complet                                   | Historique restitué |
 | F-17    | PR-101 à PR-106                           | Journal des décisions et invariants à valider dans l'export | —  |
-| F-18    | Complet                                   | —                                         | —                |
+| F-18    | PR-107, PR-108 hors produit               | —                                         | —                |
 | F-19    | PR-111, PR-112, PR-113, PR-115            | PR-114, PR-116                            | —                |
 | F-20    | PR-117, PR-118, PR-119                    | PR-120                                    | —                |
 | F-21    | PR-121, PR-122, PR-123, PR-124            | PR-128                                    | PR-125, PR-126, PR-127 |
-| F-22    | PR-129, PR-130, PR-136, PR-138, PR-140, PR-141 | PR-132, PR-133, PR-143               | PR-131, PR-134, PR-135, PR-139 |
+| F-22    | PR-129, PR-130, PR-136, PR-138, PR-140, PR-141, PR-144 | PR-132, PR-133, PR-143      | PR-131, PR-134, PR-135, PR-139 |
 
 ### 9.3 Ordre de réalisation de L1
 
@@ -2682,12 +2706,14 @@ Si le contenu de L1 doit être réduit, les features tombent dans l'ordre invers
 
 **Rien en deçà.** Le retrait d'une feature de rang 8 ou moins empêche une phase de se tenir, ce qui revient à ne pas livrer L1.
 
+**Mis à jour le 2026-09-23.** F-18 ne figure plus dans cet ordre : réduite à PR-107, elle ne représente plus une charge qu'on puisse retirer.
+
 ## 10. Risques produit
 
 | ID         | Risque                                                                                      | Sévérité | Parade portée par le produit                                              | Risque résiduel                                            |
 |------------|---------------------------------------------------------------------------------------------|----------|-----------------------------------------------------------------------------|-------------------------------------------------------------|
 | **RP-01**  | Une seule personne réalise le produit, et la base de code repart de zéro                    | Élevée   | Workflow agentique mis en place en début de phase, voir AP-11. Le repli non logiciel, F-18, protège la séance et non le produit | Atténué sur le volume produit, entier sur la continuité : l'outillage accélère une personne, il ne la remplace pas si elle s'arrête |
-| **RP-02**  | Le produit n'est pas prêt le jour de la séance                                              | Élevée   | F-18, décision de bascule rendue à J-5                                      | La séance se tient sans outil, les objectifs BO-04 et BO-09 sont manqués |
+| **RP-02**  | Le produit n'est pas prêt, ou tombe, le jour de la séance                                   | Élevée   | PR-107, export atteignable avant l'incident ; PR-141, aucun déploiement pendant une séance déclarée | **Aggravé le 2026-09-23** par la réduction de F-18 : la matière est préservée, la conduite de la séance ne l'est plus. La haute disponibilité visée par DP-17 n'est pas encore construite |
 | **RP-03**  | Le mur devient illisible à plusieurs centaines d'éléments en distanciel                     | Élevée   | F-19, divulgation progressive, filtres, vues personnelles, zoom sémantique  | La volumétrie retenue le 2026-09-21, 800 éléments, double la cible initiale et renforce l'exigence sur F-19 |
 | **RP-04**  | La collecte se détourne vers les commandes et les solutions                                 | Élevée   | PR-018, PR-025, mode collecte restreint aux événements                      | Dépend de la tenue du facilitateur autant que du produit    |
 | **RP-05**  | Un signalement de notation fait taire un expert métier pour la journée                      | Élevée   | PR-026, PR-027, signalement privé, muet en collecte, formulé en question    | Non éprouvé auprès d'un expert réel, hypothèse HY-03        |
@@ -2753,6 +2779,10 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | **DP-15** | Trois fournisseurs d'identité sont admis : GitHub, GitHub Enterprise Server et OIDC             | Les praticiens sont sur GitHub, les grandes organisations sur leur propre fournisseur, et certaines sur une instance interne | Prise le 2026-09-22 |
 | **DP-16** | Ce qui dure réside en fichiers versionnés dans le dépôt de l'organisation ; ce qui ne le peut pas réside dans une base, celle du service ou celle que l'organisation installe | Un modèle, un pack et une restitution se relisent, se comparent et se révisent comme du code. L'état vivant d'une séance à vingt-trois contributeurs ne le peut pas | Prise le 2026-09-22 |
 | **DP-17** | Aucun taux de disponibilité n'est engagé tant que l'intérêt commercial n'est pas établi. Une règle l'est : aucun déploiement ni interruption volontaire pendant une séance déclarée. La haute disponibilité est la cible visée | Une moyenne mensuelle ne dit rien à qui mobilise vingt-trois personnes un mardi à 9 h. Rien de chiffré ne se tient sans équipe d'exploitation, et un engagement pris avant la première vente engage sur une demande inconnue | Prise le 2026-09-22 |
+| **DP-18** | Le repli non logiciel est réduit à l'export permanent. La promesse devient « vous ne perdez pas ce qui est produit » et non « vous pouvez continuer sans nous » | Le repli outillé servait un jalon unique. La haute disponibilité visée le remplace, à ceci près qu'elle reste à construire | Prise le 2026-09-23, abandonne PR-109 |
+| **DP-19** | Le service se vend par abonnement d'organisation, avec des limites de séances actives et de participants | La séance reste un acte méthodologique. En faire un acte commercial déformerait la clôture, la purge et la déclaration de créneau | Prise le 2026-09-23 |
+| **DP-20** | L'accessibilité vise WCAG 2.2 AA, vérifiée en interne, sans audit externe tant qu'aucun client ne l'exige | Viser AA relève de la conception, prouver AA relève de la conformité. Le premier est un coût utile, le second une dépense de vente | Prise le 2026-09-23 |
+| **DP-21** | L'effacement des données d'une personne se fait par anonymisation, jamais par suppression de ses contributions | Un fait métier validé par le groupe appartient au modèle collectif. Le retirer altérerait ce que d'autres ont établi et romprait la chaîne de traçabilité | Prise le 2026-09-23 |
 
 ### 11.3 Questions
 
@@ -2786,16 +2816,18 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | **QP-16** | Une organisation peut-elle imposer son propre fournisseur d'identité ?                       | **Oui**, le 2026-09-22. GitHub, GitHub Enterprise Server ou OIDC, au choix de l'organisation. Voir DP-15, PR-001 et PR-136 |
 | **QP-14** | Où les données sont-elles hébergées, et cette localisation est-elle opposable ?              | **En fichiers dans le dépôt de l'organisation pour ce qui dure**, le 2026-09-22 ; en base pour l'état vivant, celle du service ou celle que l'organisation installe. Voir DP-16, PR-138, PR-139 et PR-140 |
 
-| **QP-15** | Quel niveau de service est engagé, et avec quelles conséquences en cas de manquement ?       | **Aucun taux engagé**, le 2026-09-22. Une règle ferme : aucune interruption volontaire pendant une séance déclarée, et des fenêtres de maintenance annoncées. Voir DP-17, NFR-17 et PR-141 |
+| **QP-15** | Quel niveau de service est engagé, et avec quelles conséquences en cas de manquement ?       | **Aucun taux engagé**, le 2026-09-22, tant que l'intérêt commercial n'est pas établi. Une règle ferme : aucun déploiement pendant une séance déclarée. La haute disponibilité est la cible visée. Voir DP-17, NFR-17 et PR-141 |
+| **QP-17** | Le repli non logiciel reste-t-il une capacité du produit ?                                   | **Réduit à l'export permanent**, le 2026-09-23. PR-109 est abandonnée, PR-108 et PR-110 reviennent au programme. Voir DP-18 |
 
-**Deux questions sont ouvertes au 2026-09-22.** Les seize premières sont tranchées, dix-sept décisions produit sont prises, et deux questions nouvelles apparaissent.
+**Une question est ouverte au 2026-09-23.** Les dix-sept premières sont tranchées et vingt et une décisions produit sont prises.
 
 | ID        | Question                                                                                   | Interlocuteur              | Ce qu'elle bloque                                        |
 |-----------|----------------------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------|
-| **QP-17** | Le repli non logiciel reste-t-il une capacité du produit, ou redevient-il un document hors produit ? | Product Owner        | Quatre exigences, PR-107 à PR-110, et un argument de vente rare |
 | **QP-18** | La captation de la parole en séance est-elle engagée, ou seulement visée ?                   | Product Owner              | PR-142, et le dimensionnement de L3                       |
 
-QP-17 a été posée le 2026-09-22 sans recevoir de réponse : la réponse rendue portait sur la disponibilité, et a été versée à QP-15. La question demeure.
+**QP-17, close le 2026-09-23.** Le repli est réduit à l'export permanent : la matière produite est préservée, la conduite de la séance ne l'est plus. Voir DP-18, F-18 et RP-02.
+
+**Trois autres questions ont été tranchées le 2026-09-23** sans avoir jamais été inscrites, parce qu'elles sont nées de mes propres suppositions : le modèle de vente, voir DP-19 ; le niveau de preuve attendu sur l'accessibilité, voir DP-20 ; le droit d'une personne sur ses contributions, voir DP-21 et PR-144.
 
 **Ce que la réponse à QP-15 laisse ouvert, et qui n'est pas une question mais une échéance.** Un engagement chiffré — disponibilité, délai de réaction, perte de données maximale — deviendra exigible le jour où une organisation achètera le service sans être le programme d'origine. Il suppose une équipe d'exploitation, ce que le projet n'a pas. Cette dette est inscrite en RP-20.
 
@@ -2830,7 +2862,7 @@ QP-17 a été posée le 2026-09-22 sans recevoir de réponse : la réponse rendu
 | BR-017          | PR-070, PR-071                                    | Complète   |
 | BR-018          | PR-072, PR-073, PR-074                            | Complète   |
 | BR-019          | PR-070, PR-071                                    | Complète   |
-| BR-020          | PR-107, PR-108, PR-109                            | Complète   |
+| BR-020          | PR-107, PR-140                                    | **Partielle depuis le 2026-09-23.** Deux de ses critères — le déroulé exploitable hors outil et le support de contribution — sont servis hors produit, par le programme. PR-109 est abandonnée |
 | BR-021          | PR-110                                            | Hors produit, action programme |
 | BR-022          | PR-018, PR-037, PR-111                            | Complète   |
 | BR-023          | PR-022, PR-041                                    | Complète   |
