@@ -1,6 +1,6 @@
 ---
 title: "Assistant Event Storming - Document d'exigences produit"
-description: "Exigences produit du service d'assistance aux ateliers de modélisation collaborative : modèles de séquence, notation, features, exigences fonctionnelles et non fonctionnelles, modèle de données, plan de livraison et traçabilité"
+description: "Exigences produit de l'Assistant Event Storming, service d'assistance aux ateliers de modélisation collaborative : modèles de séquence, notation, features, exigences fonctionnelles et non fonctionnelles, modèle de données, plan de livraison et traçabilité"
 author: "Product Manager"
 ms.date: 2026-09-21
 ms.topic: reference
@@ -113,6 +113,8 @@ Le produit n'anime pas, ne tranche pas et ne propose aucun découpage. Il rend p
 **Ce que le produit apporte de spécifique, et qu'un tableau blanc collaboratif n'apporte pas**, tient en une phrase : il connaît la séquence qu'on lui a décrite, il sait dire où en est le groupe par rapport à elle, et il conserve le lien entre ce qui a été dit et ce qui a été modélisé.
 
 **Le premier usage servi** est l'Event Storming, par le modèle de référence livré avec le produit. Ce n'est pas le seul que le produit doit admettre.
+
+**Le nom du produit est « Assistant Event Storming »**, décision du 2026-09-23. Il nomme la méthode de référence, pas la limite du produit : un modèle de séquence dérivé peut conduire un atelier qui n'est pas un Event Storming, voir DP-24.
 
 ### 1.2 Problèmes adressés
 
@@ -680,7 +682,7 @@ La validation d'une phase est refusée tant que son critère n'est pas atteint. 
 - [ ] Vingt-trois personnes contribuent en même temps sans perte d'élément
 - [ ] Le champ de saisie reste disponible en continu, en colonne fixe et jamais en fenêtre modale
 - [ ] Le champ se vide et conserve le focus après validation
-- [ ] Une saisie en cours est préservée localement en cas de perte de connexion
+- [ ] Une saisie en cours est préservée localement en cas de perte de connexion, et la contribution se poursuit hors réseau, voir PR-145
 - [ ] Deux participants saisissant le même élément produisent deux éléments, rapprochés plus tard
 
 #### PR-018 Qualifier un élément par son type
@@ -766,6 +768,25 @@ La double paternité est la règle : l'auteur d'origine est conservé, le dernie
 - [ ] Le participant révèle le mur de sa propre initiative, à tout moment
 - [ ] La révélation est individuelle et n'affecte aucune autre vue
 - [ ] Le masquage cesse à la fermeture de la phase 2
+
+#### PR-145 Contribuer sans réseau, et restaurer sans perturber
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Indispensable | BR-004, BR-009 | UF-01 | S-03, S-06 | Absent |
+
+**Décision du 2026-09-23.** Sans réseau, on garde, et on restaure le moment venu. Mais le groupe a pu avancer pendant la coupure : le facilitateur a pu changer d'étape ou imposer un autre focus. La restauration ne doit jamais faire irruption dans ce que le groupe fait maintenant.
+
+- [ ] Le participant sait qu'il est hors réseau, et voit combien de contributions attendent d'être restaurées
+- [ ] Ce qu'il produit hors réseau est conservé sur son poste, et survit à la fermeture du navigateur
+- [ ] Chaque contribution conserve l'étape pendant laquelle elle a été produite et son horodatage d'origine
+- [ ] À la reconnexion, les contributions sont restaurées sans action du participant
+- [ ] **Si l'étape a changé pendant la coupure**, une contribution restaurée n'est pas injectée dans l'activité en cours : elle rejoint la zone d'attente, marquée comme restaurée et rattachée à son étape d'origine
+- [ ] La restauration ne modifie jamais le critère de sortie d'une étape déjà validée ou dépassée
+- [ ] Le facilitateur est informé du nombre de contributions restaurées, sans que sa vue ni son focus soient déplacés
+- [ ] La vue du participant se réaligne sur l'étape courante et le focus en vigueur, sans perdre sa saisie en cours
+- [ ] Une contribution portant sur un élément modifié ou supprimé pendant la coupure est conservée à côté, jamais fusionnée silencieusement
+- [ ] Une contribution restaurée après la clôture de la séance ne modifie pas la restitution produite : elle est présentée au facilitateur, qui décide de son sort
 
 ### F-05 Grammaire Event Storming et signalement de notation
 
@@ -2328,11 +2349,11 @@ Une organisation qui ne peut pas partir avec ses données n'a jamais vraiment eu
 
 | ID         | Domaine                  | Exigence                                                                                                 | Priorité      | Vérification                                        |
 |------------|--------------------------|------------------------------------------------------------------------------------------------------------|---------------|-----------------------------------------------------|
-| **NFR-01** | Collaboration            | 23 sessions simultanées contribuent sans perte d'élément, propagation d'une contribution visible en moins d'une seconde en conditions nominales | Indispensable | Essai de charge à 23 postes avant la séance         |
+| **NFR-01** | Collaboration            | 23 sessions simultanées contribuent sans perte d'élément. Une contribution humaine est visible des autres participants **en moins de 0,3 seconde** en conditions nominales. Le traitement automatisé n'entre jamais dans ce délai : il est asynchrone, voir DP-23. Une base fournie par l'organisation sort de cet engagement | Indispensable | Essai de charge à 23 postes avant la séance, sur la base du service |
 | **NFR-02** | Volumétrie               | Le produit tient 800 éléments, 20 moments, 3 processus, 80 chaînes, 12 frontières et 24 agrégats sans dégradation perceptible | Indispensable | Jeu d'essai dimensionné à cette volumétrie, décidée le 2026-09-21 |
 | **NFR-03** | Continuité               | Une interruption du service ne détruit aucun contenu déjà produit, et le dernier export reste exploitable  | Indispensable | Essai de coupure pendant une phase de contribution  |
 | **NFR-17** | Disponibilité            | Aucun taux n'est engagé tant que l'intérêt commercial n'est pas établi. Une règle est opposable dès maintenant : **aucun déploiement ni interruption volontaire pendant une séance déclarée**. La haute disponibilité est la cible visée, non engagée. Ce qu'une organisation héberge elle-même sort de cet engagement | Indispensable | Vérification qu'aucun déploiement ne peut viser un créneau déclaré |
-| **NFR-04** | Reprise                  | Un participant qui perd sa connexion retrouve la séance à l'état courant, sa saisie en cours préservée      | Indispensable | Essai de déconnexion et reconnexion                 |
+| **NFR-04** | Reprise                  | Un participant qui perd sa connexion continue de contribuer ; ce qu'il produit est conservé sur son poste et restauré à la reconnexion, sans perturber l'étape en cours, voir PR-145 | Indispensable | Essai de déconnexion prolongée, avec changement d'étape pendant la coupure |
 | **NFR-05** | Accessibilité            | WCAG 2.2 niveau AA, parcours de contribution intégralement utilisable au clavier, cibles d'au moins 24 pixels, fonctionnement préservé à 200 pour cent de zoom | Indispensable | Vérification interne sur le parcours de contribution et d'ordonnancement. **Aucun audit externe tant qu'aucun client ne l'exige**, décision du 2026-09-23 |
 | **NFR-06** | Accessibilité            | Aucune information n'est portée par la seule couleur : type, statut de preuve et origine portent forme, libellé ou bordure | Indispensable | Revue de conception et essai en nuances de gris     |
 | **NFR-07** | Perception               | Étape courante, temps restant et signalements sont annoncés comme régions vivantes aux lecteurs d'écran    | Souhaitable   | Essai avec lecteur d'écran                          |
@@ -2622,7 +2643,7 @@ Aucun jalon n'est rattaché à une date. L1 vise la prochaine session ouverte, q
 | F-01    | Complet, PR-137 comprise                  | —                                         | Administration   |
 | F-02    | Complet sauf PR-012                       | PR-012                                    | —                |
 | F-03    | Complet                                   | —                                         | —                |
-| F-04    | Complet sauf PR-023                       | PR-023                                    | —                |
+| F-04    | Complet sauf PR-023, PR-145 comprise      | PR-023                                    | —                |
 | F-05    | Complet                                   | —                                         | —                |
 | F-06    | Complet sauf PR-036                       | PR-036                                    | —                |
 | F-07    | Complet                                   | —                                         | —                |
@@ -2733,6 +2754,7 @@ Si le contenu de L1 doit être réduit, les features tombent dans l'ordre invers
 | **RP-19**  | Le vocabulaire de règles dérive vers un langage de programmation                            | Moyenne  | Section 7.9, dix prédicats, composition par « et » seulement, aucune négation ni calcul | La pression des cas particuliers poussera à l'étendre. Chaque ajout doit être refusé par défaut |
 | **RP-21**  | Une base fournie par l'organisation brouille la responsabilité en incident : le produit est accusé d'une panne qu'il ne peut ni voir ni corriger | Moyenne  | PR-139, schéma et migrations fournis et versionnés, refus de démarrer sur un schéma inconnu, engagement de disponibilité explicitement exclu | Le diagnostic à distance reste impossible sans accès. Une séance perdue sera imputée au produit quoi qu'il arrive |
 | **RP-23**  | La captation en direct transforme le produit en dispositif d'écoute, et le groupe se tait | Élevée   | PR-142, autorisation individuelle, captation visible en permanence, coupure à tout moment | Aucune parade technique ne répond à la crainte d'être enregistré. Le silence de P3, que le produit existe pour lever, est exactement ce que la captation risque de produire |
+| **RP-24**  | Une contribution restaurée après une longue coupure arrive hors de la conversation qui l'aurait discutée | Moyenne  | PR-145, rattachement à l'étape d'origine, zone d'attente, information du facilitateur | Le contenu est préservé, pas sa valeur : un fait posé hors réseau pendant la collecte n'a pas été lu à voix haute ni rapproché de ses doublons |
 | **RP-22**  | Le dépôt Git est pris pour un magasin de données concurrent et sert l'état vivant d'une séance | Élevée   | DP-16 et PR-138, la frontière est posée : fichiers pour ce qui dure, base pour ce qui vit | Vingt-trois contributeurs simultanés produiraient des conflits que personne ne sait résoudre en séance |
 | **RP-20**  | Le service devient indisponible pendant une séance payée                                    | Élevée   | F-18, repli non logiciel et export permanent ; PR-141, aucune interruption volontaire pendant une séance déclarée | Une panne subie reste possible et sans contrepartie contractuelle. Un engagement chiffré deviendra exigible à la première vente hors du programme d'origine, et suppose une équipe d'exploitation que le projet n'a pas |
 
@@ -2783,6 +2805,9 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | **DP-19** | Le service se vend par abonnement d'organisation, avec des limites de séances actives et de participants | La séance reste un acte méthodologique. En faire un acte commercial déformerait la clôture, la purge et la déclaration de créneau | Prise le 2026-09-23 |
 | **DP-20** | L'accessibilité vise WCAG 2.2 AA, vérifiée en interne, sans audit externe tant qu'aucun client ne l'exige | Viser AA relève de la conception, prouver AA relève de la conformité. Le premier est un coût utile, le second une dépense de vente | Prise le 2026-09-23 |
 | **DP-21** | L'effacement des données d'une personne se fait par anonymisation, jamais par suppression de ses contributions | Un fait métier validé par le groupe appartient au modèle collectif. Le retirer altérerait ce que d'autres ont établi et romprait la chaîne de traçabilité | Prise le 2026-09-23 |
+| **DP-22** | Sans réseau, la contribution se poursuit et se restaure à la reconnexion, sans jamais faire irruption dans l'étape en cours | Un participant qui perd le réseau ne doit perdre ni sa saisie ni sa participation. Le groupe, lui, ne doit pas voir resurgir au milieu de la chronologie ce qui appartenait à la collecte | Prise le 2026-09-23 |
+| **DP-23** | Une contribution humaine se propage en moins de 0,3 seconde. Le traitement automatisé est asynchrone et n'entre jamais dans ce délai | Un modèle de langage n'est pas assez rapide pour tenir dans la boucle de collaboration. Il ne doit pas la ralentir, et ses propositions sont de toute façon retenues jusqu'à la fin de l'étape | Prise le 2026-09-23, révise NFR-01 |
+| **DP-24** | Le produit s'appelle Assistant Event Storming                                                | Le nom désigne la méthode de référence du produit, portée par le modèle livré, sans en limiter l'usage | Prise le 2026-09-23 |
 
 ### 11.3 Questions
 
@@ -2827,7 +2852,7 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 
 **QP-17, close le 2026-09-23.** Le repli est réduit à l'export permanent : la matière produite est préservée, la conduite de la séance ne l'est plus. Voir DP-18, F-18 et RP-02.
 
-**Trois autres questions ont été tranchées le 2026-09-23** sans avoir jamais été inscrites, parce qu'elles sont nées de mes propres suppositions : le modèle de vente, voir DP-19 ; le niveau de preuve attendu sur l'accessibilité, voir DP-20 ; le droit d'une personne sur ses contributions, voir DP-21 et PR-144.
+**Six autres questions ont été tranchées le 2026-09-23** sans avoir jamais été inscrites, parce qu'elles sont nées de suppositions du présent document : le modèle de vente, voir DP-19 ; le niveau de preuve attendu sur l'accessibilité, voir DP-20 ; le droit d'une personne sur ses contributions, voir DP-21 et PR-144 ; le comportement sans réseau, voir DP-22 et PR-145 ; la latence de propagation, fixée par le document à une seconde sans que personne l'ait demandé et ramenée à 0,3 seconde, voir DP-23 ; le nom du produit, voir DP-24.
 
 **Ce que la réponse à QP-15 laisse ouvert, et qui n'est pas une question mais une échéance.** Un engagement chiffré — disponibilité, délai de réaction, perte de données maximale — deviendra exigible le jour où une organisation achètera le service sans être le programme d'origine. Il suppose une équipe d'exploitation, ce que le projet n'a pas. Cette dette est inscrite en RP-20.
 
@@ -2943,6 +2968,7 @@ Toutes les décisions sont rendues. Ce qui suit relève de l'exécution.
 | **AP-01**    | Désigner la prochaine session de référence, sa date et son domaine                        | Product Owner              | Une question| Ancrer le plan de livraison et la préparation de la section 9.5 |
 | **AP-05**    | Chiffrer L1 sur la base de la section 9, pour une personne assistée d'un workflow agentique | Réalisation                | Une journée | Permettre l'arbitrage programme prévu par la règle de réalisation |
 | **AP-11**    | Mettre en place le workflow agentique de réalisation                                       | Réalisation                | Première tâche de la phase | Tenir le périmètre du service à une personne, hypothèse sur laquelle repose tout le chiffrage |
+| **AP-12**    | Concevoir les surfaces S-21, S-22 et S-23 : éditeur de modèles, éditeur de packs, administration | Product Owner, conception | Avant L3    | Ces surfaces sont spécifiées sans aucune intention de conception : ni la maquette ni le document UX ne les couvrent |
 | **AP-06**    | Faire confirmer la couverture des exigences par les six rôles                              | Product Owner              | 6 × 30 min  | Lever les hypothèses HP-01 à HP-05, seule preuve extérieure disponible |
 | **AP-07**    | Éprouver les huit tests de risque méthodologique sur un atelier réduit                     | Product Owner, P1          | Une demi-journée | Vérifier que le parcours produit la découverte attendue    |
 | **AP-10**    | Décrire le modèle de référence dans le format de la feature F-21, comme donnée et non comme code | Réalisation           | Deux jours  | Vérifier que le format tient la séquence la plus complète connue avant d'en dépendre |
