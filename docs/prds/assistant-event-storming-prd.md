@@ -252,7 +252,7 @@ Un administrateur n'a aucun droit sur le contenu d'une séance à laquelle il ne
 | Proposition automatique d'une frontière ou d'un agrégat     | La décision appartient au groupe, règle d'autorité                          |
 | Reformulation automatique d'un élément à la contribution    | Reportée, le contrôle par règles déterministes est retenu                   |
 | Conduite de l'animation par un dispositif automatisé        | La distribution de la parole et la gestion du temps restent humaines        |
-| Captation autonome de la parole en L1 et L2                 | **Révisé le 2026-09-22.** L'import de fichier suffit d'abord. La captation en direct dans le produit est visée en L3, voir PR-142 et QP-18. L'exclusion du document d'exigences métier reste valable pour l'instance qu'il décrit |
+| ~~Captation autonome de la parole~~                         | **Exclusion levée le 2026-09-23.** La captation en direct est visée dès L1, voir PR-142 et DP-25. Le document d'exigences métier l'excluait parce que la visioconférence du programme produisait déjà la transcription : l'organisation du programme peut simplement ne pas l'activer |
 | Production de documents d'exigences ou d'architecture        | Suppose un modèle complet et validé, non attendu à l'issue de l'atelier     |
 | ~~Usage par plusieurs organisations~~                       | **Exclusion levée le 2026-09-21.** Le produit est un service proposé à plusieurs organisations, voir F-22 |
 | Contribution au mur hors d'une phase ouverte                  | **Décision du 2026-09-21.** La consultation du modèle et l'amorçage du glossaire restent possibles hors séance ; aucune contribution au mur ne l'est. Un élément produit hors phase n'aurait ni étape de rattachement ni critère de sortie stable |
@@ -2266,16 +2266,18 @@ Une organisation qui ne peut pas partir avec ses données n'a jamais vraiment eu
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
 |----------|-----------------|------|---------|------------------|
-| Optionnelle | Création | UF-04 | S-17 | Absent |
+| Souhaitable | Création | UF-04 | S-17 | Absent |
 
-**Souhait exprimé le 2026-09-22.** Parler dans le produit plutôt que d'importer un fichier après coup, pour que la couche fantôme vive pendant la séance et non après. Visé en L3, **non engagé**, voir QP-18.
+**Souhait exprimé le 2026-09-22, visé en L1 depuis le 2026-09-23.** Parler dans le produit plutôt que d'importer un fichier après coup, pour que la couche fantôme vive pendant la séance et non après. C'est la capacité la plus coûteuse de L1 : elle est la première retirée si L1 doit être réduit, voir DP-25 et la section 9.6.
 
 - [ ] Le facilitateur ouvre la captation, et chaque participant l'autorise pour lui-même
 - [ ] La captation est visible de tous, en permanence et sans ambiguïté, pendant qu'elle dure
 - [ ] Un participant coupe sa captation à tout moment, sans quitter la séance ni perdre ses contributions
 - [ ] Les propositions issues de la captation restent retenues jusqu'à la fin de la production humaine de l'étape, conformément à BR-014
 - [ ] Une captation interrompue ne perd pas ce qui a déjà été transcrit
-- [ ] La captation est indisponible lorsque le traitement tiers est refusé par l'organisation, voir PR-143
+- [ ] **Le son n'est jamais conservé** : seule la transcription l'est, soumise à la purge de PR-132
+- [ ] La captation n'est disponible que si un traitement est activé, celui du service ou celui de l'organisation, voir PR-143
+- [ ] L'import de fichier de PR-089 reste disponible, que la captation soit active ou non
 
 #### PR-143 Refuser le traitement tiers ou fournir le sien
 
@@ -2359,7 +2361,7 @@ Une organisation qui ne peut pas partir avec ses données n'a jamais vraiment eu
 | **NFR-07** | Perception               | Étape courante, temps restant et signalements sont annoncés comme régions vivantes aux lecteurs d'écran    | Souhaitable   | Essai avec lecteur d'écran                          |
 | **NFR-08** | Performance d'interface  | Une contribution apparaît sur l'écran de son auteur **en moins de 0,1 seconde**, sans attendre le réseau. La navigation sur le mur reste fluide à la volumétrie de NFR-02 | Indispensable | Mesure sur poste de référence bas de gamme, réseau coupé compris. Confirmée le 2026-09-23 |
 | **NFR-09** | Sécurité                 | L'accès conduisant la séance passe par GitHub ou OIDC ; le code de séance est limité à la durée de la séance et révocable | Indispensable | Revue de conception                                 |
-| **NFR-10** | Confidentialité          | La transcription est purgée à la clôture de la séance par défaut, une fois la restitution produite. Les extraits déjà rattachés à un élément demeurent. La durée est paramétrable par organisation, voir PR-132 | Indispensable | Essai de purge, et vérification que la traçabilité survit |
+| **NFR-10** | Confidentialité          | La transcription est purgée à la clôture de la séance par défaut, une fois la restitution produite. Les extraits déjà rattachés à un élément demeurent. La durée est paramétrable par organisation, voir PR-132. **Le son capté n'est jamais conservé**, voir PR-142 | Indispensable | Essai de purge, vérification que la traçabilité survit, et qu'aucun son ne subsiste après transcription |
 | **NFR-18** | Isolation                | Aucune donnée d'une organisation n'est atteignable depuis une autre, quel que soit le chemin d'accès. Une base fournie par l'organisation rend l'isolation structurelle ; la base du service la rend logique, et c'est là qu'elle doit être éprouvée | Indispensable | Essais automatisés d'isolation, voir PR-130          |
 | **NFR-19** | Souveraineté             | Ce qui dure réside en fichiers versionnés dans le dépôt de l'organisation quand elle en connecte un ; l'état vivant réside dans la base du service ou dans celle qu'elle fournit. La résidence est connue et opposable | Indispensable | Essai avec dépôt connecté et base fournie, voir PR-138 et PR-139 |
 | **NFR-11** | Traitement automatisé    | Le traitement du contenu par un service tiers est limité à la transcription et à la production de propositions ; il ne produit jamais une décision, une frontière ni un agrégat. Il est **refusable par l'organisation**, qui peut aussi fournir son propre point d'accès, voir PR-143 | Indispensable | Revue de conception, PP-08, et essai avec traitement désactivé |
@@ -2654,14 +2656,14 @@ Aucun jalon n'est rattaché à une date. L1 vise la prochaine session ouverte, q
 | F-12    | PR-065, PR-066                            | PR-067, PR-068, PR-069                    | —                |
 | F-13    | —                                         | Complet                                   | —                |
 | F-14    | —                                         | Complet                                   | —                |
-| F-15    | Complet                                   | —                                         | PR-142, connecteurs de visioconférence |
+| F-15    | Complet, PR-142 comprise                  | —                                         | Connecteurs de visioconférence |
 | F-16    | PR-095 sur les éléments produits          | Complet                                   | Historique restitué |
 | F-17    | PR-101 à PR-106                           | Journal des décisions et invariants à valider dans l'export | —  |
 | F-18    | PR-107, PR-108 hors produit               | —                                         | —                |
 | F-19    | PR-111, PR-112, PR-113, PR-115            | PR-114, PR-116                            | —                |
 | F-20    | PR-117, PR-118, PR-119                    | PR-120                                    | —                |
 | F-21    | PR-121, PR-122, PR-123, PR-124            | PR-128                                    | PR-125, PR-126, PR-127 |
-| F-22    | PR-129, PR-130, PR-136, PR-138, PR-140, PR-141, PR-144 | PR-132, PR-133, PR-143      | PR-131, PR-134, PR-135, PR-139 |
+| F-22    | PR-129, PR-130, PR-136, PR-138, PR-140, PR-141, PR-143, PR-144 | PR-132, PR-133      | PR-131, PR-134, PR-135, PR-139 |
 
 ### 9.3 Ordre de réalisation de L1
 
@@ -2680,7 +2682,7 @@ Aucun jalon n'est rattaché à une date. L1 vise la prochaine session ouverte, q
 | 9    | F-12               | Un changement de sens non capté ne se retrouve pas                                      | 4                            |
 | 10   | F-19               | Sans stratégie de densité, le mur devient inutilisable à la volumétrie réelle           | Absent                       |
 | 11   | F-20               | Les indicateurs ne se reconstituent pas après coup                                      | 7                            |
-| 12   | F-15               | L'enrichissement assisté ne conditionne aucune autre capacité                           | 9                            |
+| 12   | F-15, avec PR-143, puis PR-142 | L'enrichissement assisté ne conditionne aucune autre capacité. La possibilité de refuser le traitement tiers précède la captation : aucune voix ne doit partir chez un tiers avant qu'une organisation puisse s'y opposer | 9 |
 | 13   | F-09               | Le vote est un confort de priorisation, aucune phase n'en dépend                        | 4                            |
 
 **Ajout du 2026-09-21.** La feature F-21 ne tient pas un rang : elle traverse la réalisation. Le modèle de référence doit exister comme **donnée** dès le rang 2, sans quoi le produit reprend des phases écrites en dur et le travail est à refaire. L'éditeur, lui, vient en L3. C'est l'inversion qui compte : construire le moteur qui lit un modèle, puis livrer le modèle de référence comme premier contenu.
@@ -2720,10 +2722,11 @@ Si le contenu de L1 doit être réduit, les features tombent dans l'ordre invers
 
 | Ordre de retrait | Feature | Ce que le retrait coûte                                                              |
 |------------------|---------|-----------------------------------------------------------------------------------------|
-| 1                | F-09    | La priorisation des sujets se fait à la voix, comme aujourd'hui                        |
-| 2                | F-15    | L'objectif BO-04 n'est plus servi qu'à moitié, la transcription reste conservée mais n'alimente rien |
-| 3                | F-20    | Les indicateurs KPI-03, KPI-04 et KPI-06 ne sont pas renseignables                     |
-| 4                | F-12    | L'indice de frontière le plus fiable est perdu pour la séance de conception            |
+| 1                | PR-142  | La couche fantôme est alimentée par l'import de fichier après la séance, et non pendant. Rien d'autre ne change |
+| 2                | F-09    | La priorisation des sujets se fait à la voix, comme aujourd'hui                        |
+| 3                | F-15    | L'objectif BO-04 n'est plus servi qu'à moitié, la transcription reste conservée mais n'alimente rien |
+| 4                | F-20    | Les indicateurs KPI-03, KPI-04 et KPI-06 ne sont pas renseignables                     |
+| 5                | F-12    | L'indice de frontière le plus fiable est perdu pour la séance de conception            |
 
 **Rien en deçà.** Le retrait d'une feature de rang 8 ou moins empêche une phase de se tenir, ce qui revient à ne pas livrer L1.
 
@@ -2753,7 +2756,7 @@ Si le contenu de L1 doit être réduit, les features tombent dans l'ordre invers
 | **RP-18**  | Une donnée d'une organisation devient atteignable depuis une autre                          | Élevée   | PR-130, isolation vérifiée par essais automatisés, réalisée au premier rang | Un défaut d'isolation dans un service assurantiel n'est pas un incident produit, c'est une rupture de contrat |
 | **RP-19**  | Le vocabulaire de règles dérive vers un langage de programmation                            | Moyenne  | Section 7.9, dix prédicats, composition par « et » seulement, aucune négation ni calcul | La pression des cas particuliers poussera à l'étendre. Chaque ajout doit être refusé par défaut |
 | **RP-21**  | Une base fournie par l'organisation brouille la responsabilité en incident : le produit est accusé d'une panne qu'il ne peut ni voir ni corriger | Moyenne  | PR-139, schéma et migrations fournis et versionnés, refus de démarrer sur un schéma inconnu, engagement de disponibilité explicitement exclu | Le diagnostic à distance reste impossible sans accès. Une séance perdue sera imputée au produit quoi qu'il arrive |
-| **RP-23**  | La captation en direct transforme le produit en dispositif d'écoute, et le groupe se tait | Élevée   | PR-142, autorisation individuelle, captation visible en permanence, coupure à tout moment | Aucune parade technique ne répond à la crainte d'être enregistré. Le silence de P3, que le produit existe pour lever, est exactement ce que la captation risque de produire |
+| **RP-23**  | La captation en direct transforme le produit en dispositif d'écoute, et le groupe se tait | Élevée   | PR-142, autorisation individuelle, captation visible en permanence, coupure à tout moment, son jamais conservé ; neuvième test de l'action AP-07 | Aucune parade technique ne répond à la crainte d'être enregistré. Le silence de P3, que le produit existe pour lever, est exactement ce que la captation risque de produire. **Exposé dès les premières séances depuis le 2026-09-23** |
 | **RP-24**  | Une contribution restaurée après une longue coupure arrive hors de la conversation qui l'aurait discutée | Moyenne  | PR-145, rattachement à l'étape d'origine, zone d'attente, information du facilitateur | Le contenu est préservé, pas sa valeur : un fait posé hors réseau pendant la collecte n'a pas été lu à voix haute ni rapproché de ses doublons |
 | **RP-22**  | Le dépôt Git est pris pour un magasin de données concurrent et sert l'état vivant d'une séance | Élevée   | DP-16 et PR-138, la frontière est posée : fichiers pour ce qui dure, base pour ce qui vit | Vingt-trois contributeurs simultanés produiraient des conflits que personne ne sait résoudre en séance |
 | **RP-20**  | Le service devient indisponible pendant une séance payée                                    | Élevée   | F-18, repli non logiciel et export permanent ; PR-141, aucune interruption volontaire pendant une séance déclarée | Une panne subie reste possible et sans contrepartie contractuelle. Un engagement chiffré deviendra exigible à la première vente hors du programme d'origine, et suppose une équipe d'exploitation que le projet n'a pas |
@@ -2808,6 +2811,7 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | **DP-22** | Sans réseau, la contribution se poursuit et se restaure à la reconnexion, sans jamais faire irruption dans l'étape en cours | Un participant qui perd le réseau ne doit perdre ni sa saisie ni sa participation. Le groupe, lui, ne doit pas voir resurgir au milieu de la chronologie ce qui appartenait à la collecte | Prise le 2026-09-23 |
 | **DP-23** | Une contribution apparaît chez son auteur en moins de 0,1 seconde, et chez les autres participants en moins de 0,3 seconde. Le traitement automatisé est asynchrone et n'entre jamais dans ces délais | L'écart entre les deux est celui qui sépare l'affichage local du passage par le réseau. Un modèle de langage n'est pas assez rapide pour tenir dans la boucle de collaboration, et ses propositions sont de toute façon retenues jusqu'à la fin de l'étape | Prise le 2026-09-23, révise NFR-01 et confirme NFR-08 |
 | **DP-24** | Le produit s'appelle Assistant Event Storming                                                | Le nom désigne la méthode de référence du produit, portée par le modèle livré, sans en limiter l'usage | Prise le 2026-09-23 |
+| **DP-25** | La captation de la parole est visée dès L1, comme première capacité retirée si L1 doit être réduit. Le refus du traitement tiers, PR-143, l'accompagne en L1 | La couche fantôme vaut surtout pendant la séance. Mais c'est la capacité la plus coûteuse d'un jalon réalisé par une personne, et aucune voix ne doit partir chez un tiers avant qu'une organisation puisse s'y opposer | Prise le 2026-09-23 |
 
 ### 11.3 Questions
 
@@ -2844,11 +2848,11 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | **QP-15** | Quel niveau de service est engagé, et avec quelles conséquences en cas de manquement ?       | **Aucun taux engagé**, le 2026-09-22, tant que l'intérêt commercial n'est pas établi. Une règle ferme : aucun déploiement pendant une séance déclarée. La haute disponibilité est la cible visée. Voir DP-17, NFR-17 et PR-141 |
 | **QP-17** | Le repli non logiciel reste-t-il une capacité du produit ?                                   | **Réduit à l'export permanent**, le 2026-09-23. PR-109 est abandonnée, PR-108 et PR-110 reviennent au programme. Voir DP-18 |
 
-**Une question est ouverte au 2026-09-23.** Les dix-sept premières sont tranchées et vingt et une décisions produit sont prises.
+**Aucune question n'est ouverte au 2026-09-23.** Les dix-huit questions du document sont tranchées, et vingt-cinq décisions produit sont prises.
 
-| ID        | Question                                                                                   | Interlocuteur              | Ce qu'elle bloque                                        |
-|-----------|----------------------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------|
-| **QP-18** | La captation de la parole en séance est-elle engagée, ou seulement visée ?                   | Product Owner              | PR-142, et le dimensionnement de L3                       |
+| ID        | Question                                                                                   | Réponse                                                                     |
+|-----------|----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| **QP-18** | La captation de la parole en séance est-elle engagée, ou seulement visée ?                   | **Visée dès L1**, le 2026-09-23, comme première capacité retirée si L1 doit être réduit. PR-143 passe en L1 avec elle. Voir DP-25 |
 
 **QP-17, close le 2026-09-23.** Le repli est réduit à l'export permanent : la matière produite est préservée, la conduite de la séance ne l'est plus. Voir DP-18, F-18 et RP-02.
 
@@ -2970,7 +2974,7 @@ Toutes les décisions sont rendues. Ce qui suit relève de l'exécution.
 | **AP-11**    | Mettre en place le workflow agentique de réalisation                                       | Réalisation                | Première tâche de la phase | Tenir le périmètre du service à une personne, hypothèse sur laquelle repose tout le chiffrage |
 | **AP-12**    | Concevoir les surfaces S-21, S-22 et S-23 : éditeur de modèles, éditeur de packs, administration | Product Owner, conception | Avant L3    | Ces surfaces sont spécifiées sans aucune intention de conception : ni la maquette ni le document UX ne les couvrent |
 | **AP-06**    | Faire confirmer la couverture des exigences par les six rôles                              | Product Owner              | 6 × 30 min  | Lever les hypothèses HP-01 à HP-05, seule preuve extérieure disponible |
-| **AP-07**    | Éprouver les huit tests de risque méthodologique sur un atelier réduit                     | Product Owner, P1          | Une demi-journée | Vérifier que le parcours produit la découverte attendue    |
+| **AP-07**    | Éprouver les huit tests de risque méthodologique sur un atelier réduit, et un neuvième : conduire une collecte avec captation active et comparer la participation des experts métier à une collecte sans | Product Owner, P1 | Une demi-journée | Vérifier que le parcours produit la découverte attendue, et que la captation ne fait pas taire ceux qu'elle doit entendre |
 | **AP-10**    | Décrire le modèle de référence dans le format de la feature F-21, comme donnée et non comme code | Réalisation           | Deux jours  | Vérifier que le format tient la séquence la plus complète connue avant d'en dépendre |
 
 **Actions closes le 2026-09-21.** AP-02, arbitrage des douze écarts. AP-03, confirmation des décisions produit. AP-04, amendement du document d'exigences métier et report des quatorze capacités. AP-08, arrêt de la notation de référence. **Close le 2026-09-22 :** AP-09, questions ouvertes par le passage en service.
