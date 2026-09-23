@@ -2,7 +2,7 @@
 title: "Assistant Event Storming - Document d'exigences métier"
 description: "Exigences métier de l'assistant d'atelier Event Storming destiné au cadrage du domaine dommage aux biens"
 author: "Product Owner"
-ms.date: 2026-08-11
+ms.date: 2026-09-21
 ms.topic: reference
 keywords:
   - event storming
@@ -19,7 +19,7 @@ Ce document traduit en exigences métier le cadrage produit V0 de l'assistant Ev
 | Élément            | Valeur                                                  |
 |--------------------|---------------------------------------------------------|
 | Source unique      | Cadrage produit V0, Product Manager Advisor, 2026-08-05 |
-| Statut             | Version 2, réécrite le 2026-08-11                       |
+| Statut             | Version 3, amendée le 2026-09-21                        |
 | Neutralité         | Aucune solution technique n'est prescrite               |
 | Périmètre          | Étendu au parcours complet, voir section 6.3            |
 
@@ -29,7 +29,11 @@ Les sections 3, 4, 5.2, 6, 7 et 8 ont été réécrites en conséquence. Les exi
 
 Le cadrage source fait autorité. Les points où il se contredit lui-même sont signalés en section 10 et n'ont pas été arbitrés dans ce document.
 
-Aucune exigence de ce document n'introduit de fonctionnalité absente du cadrage source.
+Aucune exigence issue des versions 1 et 2 n'introduit de fonctionnalité absente du cadrage source. **Les exigences BR-037 à BR-040, créées le 2026-09-21, font exception** : elles proviennent de la maquette et du document d'exigences produit, et sont signalées comme telles.
+
+**Précision du 2026-09-21, sur la nature de l'outil.** L'outil qui servira cet atelier est un service proposé à plusieurs organisations, qui permet de conduire n'importe quelle séquence d'atelier. **Le présent document ne s'en trouve pas élargi** : il reste les exigences métier de ce programme, pour ce domaine et ces participants. Le parcours en neuf phases y devient le modèle de référence livré avec le service. Les capacités propres au service — organisations, modèles de séquence, packs de notation, abonnement — sont spécifiées dans le document d'exigences produit et n'ont pas à figurer ici : elles n'appartiennent pas à ce client.
+
+**Amendement du 2026-09-21.** Le document d'exigences produit, rédigé à partir de la maquette du 2026-08-15, a relevé douze écarts entre le comportement démontré et le présent document. Le Product Owner les a arbitrés le 2026-09-21. Quatre exigences sont amendées, une est durcie, quatorze capacités de la maquette sont reportées en quatre exigences nouvelles, et trois informations manquantes sont closes. Le détail figure en section 9.5.
 
 ## 1. Contexte métier
 
@@ -392,10 +396,10 @@ L'ordre de priorité de la section 6.5 conserve sa fonction : il indique dans qu
 | 2    | D10 Continuité de l'atelier          | BR-020, BR-021                                   | BO-07                     |
 | 3    | D3 Chronologie et scénarios          | BR-024                                           | BO-01                     |
 | 4    | D5 Clarification, tensions, décisions| BR-006, BR-008, BR-010, BR-026, BR-027           | BO-01, BO-02, BO-03, BO-08 |
-| 5    | D4 Enrichissement du Big Picture     | BR-025                                           | BO-01                     |
+| 5    | D4 Enrichissement du Big Picture     | BR-025, BR-039                                   | BO-01                     |
 | 6    | D6 Frontières de contexte            | BR-017, BR-018, BR-019, BR-028, BR-029, BR-030   | BO-06, BO-08              |
 | 7    | D9 Restitution et traçabilité        | BR-007, BR-011, BR-012, BR-013, BR-034, BR-035   | BO-04, BO-09, BO-10       |
-| 8    | D1 Cadrage et conduite               | BR-001, BR-002, BR-003, BR-036                   | BO-05, BO-10              |
+| 8    | D1 Cadrage et conduite               | BR-001, BR-002, BR-003, BR-036, BR-037, BR-038, BR-040 | BO-05, BO-10        |
 | 9    | DT Enrichissement assisté            | BR-014, BR-015, BR-016                           | BO-02, BO-04              |
 | 10   | D7 Process Modelling                 | BR-031                                           | BO-01                     |
 | 11   | D8 Design Level et agrégats          | BR-032, BR-033                                   | BO-01, BO-09              |
@@ -410,6 +414,8 @@ Justification des rangs sensibles :
 | 6    | Rang relevé de 7 à 6 par rapport à l'ordre du 2026-08-10. La décision D-01 place les frontières candidates dans le résultat attendu de l'atelier, elles ne peuvent plus figurer en dernier |
 | 8    | Rang minoré par l'existence du mode de conduite indépendant, qui couvre le même besoin sans développement                             |
 | 10 et 11 | Seuls domaines dont l'usage intervient après l'atelier, dans la séance conduite par P6                                            |
+
+**Révision du 2026-09-21.** L'ordre ci-dessus conserve sa valeur d'ordre de priorité métier des domaines. **Il ne gouverne plus l'ordre de réalisation**, que le document d'exigences produit fixe dans sa section 9.3 : le produit étant construit autour du déroulé, la conduite de l'atelier y passe du huitième au deuxième rang, et l'accès aux séances la précède. Le rang 8 de D1 reposait sur l'existence du mode de conduite indépendant, qui couvre le besoin de l'atelier mais ne construit pas le produit.
 
 **Point de vigilance sur les rangs 10 et 11.** Le Process Modelling et le Design Level ne servent pas l'atelier des 15 et 16 septembre. Leur absence n'affecte pas le jalon mais reporte la séance agrégats. Ce point remplace le point de vigilance du 2026-08-10, qui portait sur les mesures de découpage et devient sans objet, celles-ci passant au rang 6.
 
@@ -451,6 +457,13 @@ Critères d'acceptation :
 - [ ] Le critère de sortie de l'étape est consultable
 - [ ] Le temps restant sur l'étape en cours est visible
 - [ ] Un participant rejoignant la séance en cours accède immédiatement à ces informations
+
+**Amendée le 2026-09-21.** Quatre critères sont ajoutés, reportés de la maquette.
+
+- [ ] Le déroulé est instancié depuis un modèle nommé, applicable à toute séance
+- [ ] Une étape d'échauffement sur un domaine sans enjeu précède l'exploration du domaine réel
+- [ ] Le facilitateur dispose d'une formulation prête à énoncer pour chaque étape, visible de lui seul
+- [ ] Les pièges connus de l'étape et leur parade sont consultables par le seul facilitateur
 
 #### BR-002 Permettre le pilotage de la progression
 
@@ -503,6 +516,73 @@ Critères d'acceptation :
 - [ ] Le passage à l'étape suivante résulte d'une action explicite du facilitateur
 - [ ] La fin du temps imparti ne déclenche jamais seule le passage à l'étape suivante
 
+**Amendée le 2026-09-21.** Le critère de sortie devient opposant : il retient le passage tant qu'il n'est pas atteint. La décision reste humaine, mais elle doit être prise, et elle laisse une trace.
+
+- [ ] La validation d'une étape est refusée tant que son critère n'est pas atteint, et le motif du refus est énoncé
+- [ ] Le facilitateur passe outre par une action explicite, distincte de la validation ordinaire
+- [ ] Un passage forcé enregistre le critère non atteint, son état chiffré, son auteur et son horodatage, et figure dans la restitution
+- [ ] Un moment du domaine sans acteur ni système est déclaré vide de façon explicite, ce qui le distingue d'un moment non revu
+
+#### BR-037 Identifier les participants et contrôler l'accès à la séance
+
+| Attribut         | Valeur              |
+|------------------|----------------------|
+| Objectif lié     | BO-03, BO-05        |
+| Parties prenantes| Tous                |
+| Priorité         | Indispensable       |
+| Révision         | Créée le 2026-09-21, reportée de la maquette |
+
+Chacun entre dans la séance avec une identité, sans que l'entrée coûte plus que quelques secondes. L'identité sert d'auteur aux contributions et fonde les indicateurs de participation.
+
+Critères d'acceptation :
+
+- [ ] Les rôles qui conduisent la séance s'authentifient auprès d'un fournisseur d'identité
+- [ ] Un participant rejoint la séance au moyen d'un code diffusé en séance et de son prénom, sans compte
+- [ ] L'identité obtenue devient l'auteur des contributions
+- [ ] Un code inconnu produit un message explicite, sans blocage
+- [ ] Le code est limité à la durée de la séance et révocable
+- [ ] Le participant accède immédiatement à l'étape en cours et à sa consigne
+
+#### BR-038 Administrer des séances successives à partir d'un modèle de déroulé
+
+| Attribut         | Valeur              |
+|------------------|----------------------|
+| Objectif lié     | BO-05, BO-01        |
+| Parties prenantes| P2, Product Owner   |
+| Priorité         | Indispensable       |
+| Révision         | Créée le 2026-09-21, reportée de la maquette |
+
+L'atelier de cadrage n'est pas le seul usage attendu. D'autres séquences et d'autres sessions suivront, sur d'autres domaines, dans d'autres formats.
+
+Critères d'acceptation :
+
+- [ ] Une séance se crée en nommant le domaine exploré, ses dates et le modèle de déroulé appliqué
+- [ ] Le modèle instancie les étapes, leurs durées et leurs contenus
+- [ ] L'intention et le périmètre du domaine sont saisis à la création et restent affichés
+- [ ] Les séances d'un utilisateur sont listées avec leur domaine, leurs dates, leur état et son rôle
+- [ ] L'état distingue une séance programmée, en cours, suspendue et terminée
+- [ ] Une séance terminée reste consultable en lecture
+
+#### BR-040 Disposer d'une vue individuelle et d'un repère collectif
+
+| Attribut         | Valeur              |
+|------------------|----------------------|
+| Objectif lié     | BO-01, BO-03, BO-05 |
+| Parties prenantes| Tous                |
+| Priorité         | Indispensable       |
+| Révision         | Créée le 2026-09-21, reportée de la maquette |
+
+Chacun dispose de sa propre vue du modèle, décision du 2026-08-12. Il en découle un besoin que le présent document ne portait pas : que le groupe puisse continuer de regarder la même chose.
+
+Critères d'acceptation :
+
+- [ ] Chaque participant dispose de sa propre vue, et sa navigation n'affecte pas celle des autres
+- [ ] Un filtre appliqué par un participant ne modifie ni le modèle ni l'affichage des autres
+- [ ] Un filtre individuel masque les éléments supprimés, sans effet collectif
+- [ ] Le facilitateur repositionne les vues individuelles sur un point du modèle
+- [ ] Ce repositionnement n'interrompt jamais une saisie en cours
+- [ ] Un repère indique en permanence ce que le groupe regarde
+
 ### 7.3 D2, collecte des événements
 
 #### BR-022 Collecter des faits métier formulés au passé
@@ -530,16 +610,20 @@ Critères d'acceptation :
 | Objectif lié     | BO-03, BO-02, BO-01 |
 | Parties prenantes| P1 à P5             |
 | Priorité         | Indispensable       |
-| Révision         | Amendée le 2026-08-11 |
+| Révision         | Amendée le 2026-08-11, puis le 2026-09-21 |
 
 L'ensemble des participants produit des éléments en même temps, sans prise de parole. Les types d'éléments disponibles suivent l'étape en cours, sans qu'aucun type ne soit interdit.
+
+**Amendement du 2026-09-21.** Le critère de visibilité générale est restreint. Pendant l'exploration chaotique, chacun écrit sans voir ce que les autres produisent : l'indépendance des contributions prime sur la visibilité immédiate, et le mur se révèle ensuite.
 
 Critères d'acceptation :
 
 - [ ] 23 participants contribuent simultanément sans perte d'élément
 - [ ] Les types d'éléments recommandés à l'étape en cours sont mis en avant
 - [ ] Aucun type d'élément n'est rendu inaccessible
-- [ ] Les éléments produits sont visibles de tous
+- [ ] Les éléments produits sont visibles de tous, hors étape de collecte
+- [ ] Pendant la collecte, un participant ne voit d'abord que ses propres éléments, et révèle le mur de sa propre initiative
+- [ ] Le nombre d'éléments produits par les autres reste visible pendant la collecte, sans leur contenu
 - [ ] La contribution ne requiert aucune prise de parole
 
 #### BR-023 Reformuler un élément sans perdre la formulation d'origine
@@ -616,6 +700,7 @@ Critères d'acceptation :
 - [ ] Un fait répétitif est identifiable comme tel
 - [ ] Un fait dont la position est incertaine reste représentable sans position fixée
 - [ ] Un fait pivot, qui conditionne la suite du déroulement, est distinguable
+- [ ] **Ajouté le 2026-09-21.** Le placement d'un fait est possible sans glisser-déposer, par les actions placer avant, placer après et remettre en attente, accessibles au clavier
 
 ### 7.5 D4, enrichissement du Big Picture
 
@@ -638,6 +723,24 @@ Critères d'acceptation :
 - [ ] Une commande est reliée à l'acteur ou à la politique qui la déclenche
 - [ ] Une politique est reliée au fait métier qui la déclenche
 - [ ] Une information consultée pour décider est rattachable à la commande concernée
+
+#### BR-039 Recueillir les améliorations entrevues
+
+| Attribut         | Valeur              |
+|------------------|----------------------|
+| Objectif lié     | BO-01, BO-03        |
+| Parties prenantes| P1 à P5             |
+| Priorité         | Souhaitable         |
+| Révision         | Créée le 2026-09-21, reportée de la maquette |
+
+Un participant qui voit comment le métier pourrait mieux fonctionner ne doit pas avoir à déguiser cette observation en point chaud. Ce qui est entrevu se recueille séparément de ce qui fait mal.
+
+Critères d'acceptation :
+
+- [ ] Une amélioration entrevue est enregistrée comme un élément distinct du point chaud
+- [ ] Elle est rattachable au moment ou à l'élément concerné
+- [ ] Elle figure dans la restitution, séparée des faits établis
+- [ ] Rien n'oblige à la traiter pendant l'atelier
 
 ### 7.6 D5, clarification, tensions et décisions
 
@@ -722,6 +825,8 @@ Critères d'acceptation :
 - [ ] La divergence est signalée visuellement comme point à traiter
 - [ ] Une divergence traitée conserve la trace des deux versions et de la décision rendue
 - [ ] Une divergence non traitée en fin d'atelier figure dans la restitution
+- [ ] **Ajouté le 2026-09-21.** Un narrateur désigné parcourt la chronologie de bout en bout, et les autres l'interrompent dès qu'un écart apparaît
+- [ ] **Ajouté le 2026-09-21.** Plusieurs passes de récit, conduites par des narrateurs différents, sont possibles, et chaque écart porte la passe où il est apparu
 
 #### BR-006 Prioriser les sujets à approfondir par un vote indicatif
 
@@ -858,6 +963,9 @@ Critères d'acceptation :
 - [ ] Les éléments sans relation sont signalés
 - [ ] Aucun découpage n'est proposé par le dispositif
 - [ ] Une mesure est présentée comme un indice parmi d'autres et non comme une conclusion
+- [ ] **Ajouté le 2026-09-21.** La cohésion interne de la zone est fournie
+- [ ] **Ajouté le 2026-09-21.** La part du modèle affectée à une zone est fournie
+- [ ] **Ajouté le 2026-09-21.** Les acteurs intervenant dans plusieurs zones sont nommés
 
 #### BR-019 Préserver l'intégrité du modèle
 
@@ -937,7 +1045,7 @@ Critères d'acceptation :
 - [ ] Les invariants protégés par l'agrégat sont listés
 - [ ] Les faits métier émis par l'agrégat sont listés
 - [ ] Les informations consultées pour décider sont listées
-- [ ] Un agrégat sans invariant explicite est refusé ou marqué comme incomplet
+- [ ] **Durci le 2026-09-21.** La création d'un agrégat sans invariant explicite est refusée. L'option du marquage incomplet n'est pas retenue, et le retrait du dernier invariant rattaché est refusé de la même manière
 - [ ] Le nom de l'agrégat n'est arrêté qu'après formulation de ses invariants
 - [ ] Aucun agrégat n'est déduit d'un regroupement visuel d'éléments
 - [ ] La donnée permet de renseigner KPI-14
@@ -951,14 +1059,20 @@ Critères d'acceptation :
 | Objectif lié     | BO-04               |
 | Parties prenantes| P1, Product Owner   |
 | Priorité         | Indispensable       |
+| Révision         | Amendée le 2026-09-21 |
 
-La transcription de la séance est conservée et associée à l'atelier.
+La transcription de la séance est conservée pendant la séance, associée à l'atelier, puis purgée à sa clôture.
+
+**Amendement du 2026-09-21.** La version précédente imposait une conservation sans terme, ce que MQ-04 signalait comme incomplet. La durée est arrêtée : la transcription ne survit pas à la séance. Ce que le modèle conserve, ce sont les extraits déjà rattachés à un élément, qui suffisent à la traçabilité vers la parole métier.
 
 Critères d'acceptation :
 
-- [ ] La transcription est conservée à l'issue de la séance
-- [ ] La transcription est associée à l'atelier auquel elle se rapporte
-- [ ] La transcription reste consultable après l'atelier
+- [ ] La transcription est conservée pendant la séance et associée à l'atelier auquel elle se rapporte
+- [ ] Elle reste consultable tant que la séance n'est pas close
+- [ ] La clôture de la séance purge la transcription, après production de la restitution
+- [ ] Les extraits déjà rattachés à un élément survivent à la purge, avec leur locuteur et leur horodatage
+- [ ] La purge est annoncée avant d'être exécutée, et son exécution est tracée
+- [ ] KPI-06 et la traçabilité vers la parole restent renseignables après la purge
 
 #### BR-012 Rattacher tout élément dérivé à son origine
 
@@ -1039,6 +1153,8 @@ Critères d'acceptation :
 - [ ] Le décompte par participant est consultable après la séance
 - [ ] Le nombre de rôles distincts ayant contribué à une zone est mesurable
 - [ ] La donnée permet de renseigner KPI-03, KPI-04 et KPI-16
+- [ ] **Ajouté le 2026-09-21.** Le facilitateur relance un participant silencieux de façon individuelle et privée, sans notification publique
+- [ ] **Ajouté le 2026-09-21.** Le nombre de contributeurs possibles est renseigné à l'ouverture de la séance et sert de dénominateur aux indicateurs
 
 #### BR-013 Restituer le modèle, la transcription et les décisions
 
@@ -1061,6 +1177,8 @@ Critères d'acceptation :
 - [ ] Les liens entre faits métier, frontières, scénarios, invariants et agrégats figurent dans la restitution
 - [ ] Le journal des décisions figure dans la restitution
 - [ ] Deux restitutions successives d'un modèle inchangé sont identiques
+- [ ] **Ajouté le 2026-09-21.** La restitution est versée dans un dépôt versionné, par une action manuelle, jamais automatique
+- [ ] **Ajouté le 2026-09-21.** L'échec du versement n'empêche pas de récupérer le fichier
 
 ### 7.11 DT, enrichissement assisté
 
@@ -1156,15 +1274,15 @@ Critères d'acceptation :
 
 ## 8. Matrice de traçabilité
 
-Mise à jour le 2026-08-11. Trente-six exigences, dix objectifs, seize indicateurs.
+Mise à jour le 2026-09-21. Quarante exigences, dix objectifs, seize indicateurs.
 
 | Objectif | Exigences rattachées                                                                                            | Indicateurs            |
 |----------|-------------------------------------------------------------------------------------------------------------------|------------------------|
-| BO-01    | BR-001, BR-004, BR-013, BR-014, BR-015, BR-016, BR-019, BR-022, BR-023, BR-024, BR-025, BR-026, BR-031, BR-032, BR-033 | KPI-01, KPI-02, KPI-09, KPI-14 |
+| BO-01    | BR-001, BR-004, BR-013, BR-014, BR-015, BR-016, BR-019, BR-022, BR-023, BR-024, BR-025, BR-026, BR-031, BR-032, BR-033, BR-038, BR-039, BR-040 | KPI-01, KPI-02, KPI-09, KPI-14 |
 | BO-02    | BR-004, BR-007, BR-008, BR-014, BR-022                                                                            | KPI-03                 |
-| BO-03    | BR-004, BR-005, BR-006, BR-007, BR-009, BR-010, BR-015, BR-022                                                    | KPI-04                 |
+| BO-03    | BR-004, BR-005, BR-006, BR-007, BR-009, BR-010, BR-015, BR-022, BR-037, BR-039, BR-040                            | KPI-04                 |
 | BO-04    | BR-011, BR-012, BR-013, BR-014, BR-016                                                                            | KPI-06                 |
-| BO-05    | BR-001, BR-002, BR-003, BR-005, BR-010, BR-036                                                                    | KPI-05                 |
+| BO-05    | BR-001, BR-002, BR-003, BR-005, BR-010, BR-036, BR-037, BR-038, BR-040                                            | KPI-05                 |
 | BO-06    | BR-017, BR-018, BR-019, BR-026, BR-028, BR-029, BR-030                                                            | KPI-08, KPI-12, KPI-13 |
 | BO-07    | BR-020, BR-021                                                                                                    | KPI-07                 |
 | BO-08    | BR-006, BR-009, BR-026, BR-027, BR-028, BR-035                                                                    | KPI-11                 |
@@ -1209,18 +1327,15 @@ Le cadrage source indique que des travaux de validation auraient été menés ma
 
 ### 9.2 Informations manquantes
 
-Informations encore absentes à la date du 2026-08-11.
+Informations encore absentes à la date du 2026-09-21.
 
 | ID       | Information absente du cadrage source                                                    | Conséquence                                                    |
 |----------|-------------------------------------------------------------------------------------------|-----------------------------------------------------------------|
-| **MQ-03**| Volumétrie attendue du modèle produit                                                     | Aucune exigence de tenue à la charge n'est formulable           |
-| **MQ-04**| Durée de conservation des transcriptions                                                  | BR-011 est incomplète sur la dimension rétention                |
 | **MQ-05**| Seuils d'alerte pour KPI-06, KPI-07 et KPI-08                                             | Trois indicateurs sur huit sont sans seuil de déclenchement     |
-| **MQ-06**| Exigences d'accessibilité pour des participants non techniques                            | Aucune exigence correspondante                                  |
-| **MQ-08**| Modalités de restitution attendues par les architectes en séance de découpage             | BR-017 et BR-018 sont formulées sans besoin exprimé             |
-| **MQ-10**| Description de la notation retenue, et notamment du moyen d'exprimer une question         | Il n'est pas établi que BR-004 couvre l'attente de questionnement du rôle P5, voir AC-12. **2026-08-12** : le déroulé se réfère à la méthode d'Alberto Brandolini, reste à confirmer que la notation en provient également |
 
-MQ-10 était cité en section 4.1 et dans AC-12 sans figurer dans ce tableau. L'omission est corrigée le 2026-08-11.
+MQ-10 était cité en section 4.1 et dans AC-12 sans figurer dans ce tableau. L'omission a été corrigée le 2026-08-11, la question close le 2026-09-21.
+
+**MQ-05 est la seule information manquante au 2026-09-21, et elle le demeure par décision** : les trois indicateurs restent sans seuil d'alerte, décision du 2026-08-08 reconduite. Cinq autres ont été closes le 2026-09-21 par les arbitrages du document d'exigences produit.
 
 Informations closes, conservées pour mémoire.
 
@@ -1230,6 +1345,11 @@ Informations closes, conservées pour mémoire.
 | MQ-02    | Définition du processus principal du domaine                              | Close le 2026-08-07, aucun processus partagé n'existe            |
 | MQ-07    | Description quantifiée d'un atelier de référence                          | Close le 2026-08-08, renoncement acté, voir Q-01                |
 | MQ-09    | Traitement des divergences entre récits d'acteurs différents              | Close le 2026-08-08 par un traitement hors outil, résolution contestée par la revue du 2026-08-10. **Reprise le 2026-08-11 par BR-027**, qui impose la conservation des récits divergents sans fusion |
+| MQ-03    | Volumétrie attendue du modèle produit                                     | Close le 2026-09-21. 800 éléments, 20 moments, 3 processus, 80 chaînes, 12 frontières et 24 agrégats |
+| MQ-04    | Durée de conservation des transcriptions                                  | Close le 2026-09-21. Purge à la clôture de la séance, les extraits rattachés demeurant. BR-011 amendée |
+| MQ-06    | Exigences d'accessibilité pour des participants non techniques            | Close le 2026-09-21. Traitée par les exigences non fonctionnelles du document d'exigences produit, niveau AA et clavier en mode nominal |
+| MQ-08    | Modalités de restitution attendues par les architectes                    | Close le 2026-09-21. La fiche de contexte candidat, ses indices et ses mesures tiennent lieu de réponse, voir BR-029 et BR-018 |
+| MQ-10    | Description de la notation retenue                                        | Close le 2026-09-21. Huit types arrêtés : événement, commande, acteur, règle, information, système, point chaud, amélioration entrevue. Le point chaud porte la question et le désaccord, ce qui clôt AC-12 |
 
 ### 9.3 Questions à traiter
 
@@ -1238,7 +1358,7 @@ Informations closes, conservées pour mémoire.
 | **Q-01**| Une référence de comparaison sera-t-elle constituée avant l'atelier ?                                  | **Non.** Renoncement explicite à la démonstration du gain                              |
 | **Q-02**| Les reformulations de KPI-01 et l'ajout de KPI-09 sont-elles validées ?                                | **Oui.** Les deux indicateurs sont actés                                               |
 | **Q-03**| Quels sont les rôles et attentes des 12 participants non caractérisés ?                               | **Répondu.** Compléments d'information, questions, recueil d'information, alignement sur la vision produit. Rôle P5 créé |
-| **Q-04**| Quelle durée de conservation s'applique aux transcriptions ?                                           | **Reportée après septembre**                                                           |
+| **Q-04**| Quelle durée de conservation s'applique aux transcriptions ?                                           | **Répondue le 2026-09-21.** Purge à la clôture de chaque séance, les extraits rattachés aux éléments demeurant |
 | **Q-05**| Quel est le devenir de l'outil après l'atelier ?                                                       | **Reportée après septembre**                                                           |
 | **Q-06**| Les seuils d'alerte manquants doivent-ils être fixés avant l'atelier ?                                 | **Non.** KPI-06, KPI-07 et KPI-08 restent sans seuil                                   |
 | **Q-07**| Comment les divergences entre récits d'acteurs sont-elles capturées ?                                  | **Révisée le 2026-08-11.** La réponse du 2026-08-08 renvoyait au facilitateur, sans trace vérifiable. BR-027 impose désormais la conservation des récits divergents |
@@ -1260,7 +1380,30 @@ Arbitrage rendu par le Product Owner à la suite de la revue critique du 2026-08
 | **D-07** | Qui valide une frontière, une règle, un invariant, un agrégat ?    | Le groupe réuni en séance, voir la règle d'autorité en section 4.1                            |
 | **D-08** | Quand et avec qui le niveau agrégat est-il traité ?                | Séance ultérieure avec les équipes de développement produit, rôle P6, avec représentant métier |
 
-Restent à confirmer : la priorité Haute de BO-06, les objectifs BO-08 à BO-10, les cibles de la famille C d'indicateurs, l'effectif du rôle P6 et l'ordre de priorité de la section 6.5.
+Restent à confirmer : la priorité Haute de BO-06, les objectifs BO-08 à BO-10, les cibles de la famille C d'indicateurs, l'effectif du rôle P6 et l'ordre de priorité de la section 6.5. **Tous ces points ont été confirmés le 2026-09-21, voir section 9.5.**
+
+### 9.5 Décisions d'arbitrage du 2026-09-21
+
+Arbitrage rendu par le Product Owner à la suite du document d'exigences produit, rédigé à partir de la maquette du 2026-08-15. Douze écarts entre le comportement démontré et le présent document y étaient relevés.
+
+| ID       | Question                                                              | Décision                                                                                     |
+|----------|-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| **D-09** | Quelle source fait autorité, la maquette ou le présent document ?       | La maquette, sauf là où elle contredit une exigence opposable. Trois écarts sont tranchés en faveur du présent document, voir D-12 à D-14 |
+| **D-10** | Le jalon des 15 et 16 septembre gouverne-t-il encore le produit ?       | Non. D'autres séquences et sessions suivront. Le produit est spécifié pour une pratique répétée, voir BR-038 |
+| **D-11** | Le passage d'une étape est-il retenu tant que son critère n'est pas atteint ? | Oui, avec dépassement explicite et tracé par le facilitateur, voir BR-036 amendée         |
+| **D-12** | Un agrégat peut-il exister sans invariant ?                             | Non, refus strict. L'option du marquage incomplet n'est pas retenue, voir BR-033 durcie      |
+| **D-13** | Le vote est-il secret jusqu'à la clôture ?                              | Oui, conformément à BR-006 inchangée. Le comportement de la maquette est corrigé             |
+| **D-14** | Qui conduit la séance Design Level, et quand ?                          | L'équipe de développement produit avec un représentant métier, dans les deux semaines suivant l'atelier |
+| **D-15** | Le mur est-il visible de tous pendant la collecte ?                     | Non. Chacun ne voit d'abord que ses propres éléments et révèle le mur de sa propre initiative, voir BR-004 amendée |
+| **D-16** | Quelle durée de conservation pour les transcriptions ?                  | Purge à la clôture de la séance, les extraits rattachés demeurant, voir BR-011 amendée       |
+| **D-17** | Quelle volumétrie le produit doit-il tenir ?                            | 800 éléments, 20 moments, 3 processus, 80 chaînes, 12 frontières, 24 agrégats                |
+| **D-18** | Quelle est la notation retenue ?                                        | Huit types : événement, commande, acteur, règle, information, système, point chaud, amélioration entrevue. Clôt MQ-10 |
+| **D-19** | Le produit sert-il hors d'une séance conduite ?                         | Consultation du modèle et amorçage du glossaire seulement. Aucune contribution au mur hors d'une étape ouverte |
+| **D-20** | Les capacités de la maquette sans exigence métier sont-elles reportées ? | Oui, les quatorze. Elles deviennent BR-037 à BR-040, ou des critères ajoutés à sept exigences existantes |
+
+**Points confirmés le 2026-09-21**, restés en suspens depuis l'arbitrage du 2026-08-11 : la priorité Haute de BO-06, les objectifs BO-08 à BO-10, les cibles de la famille C, l'effectif du rôle P6, le dénominateur de KPI-04 à 22 contributeurs, et l'ordre de priorité de la section 6.5. L'ordre de réalisation, lui, est désormais fixé par le document d'exigences produit.
+
+**Effet sur le présent document.** Quatre exigences sont amendées, BR-004, BR-011, BR-013 et BR-036. Une est durcie, BR-033. Sept reçoivent des critères ajoutés, BR-001, BR-007, BR-018, BR-024, BR-027 et les deux précédentes. Quatre sont créées, BR-037 à BR-040. Le nombre total passe de trente-six à quarante.
 
 ## 10. Divergences relevées dans le cadrage source
 
@@ -1465,21 +1608,19 @@ Volumétrie attendue du modèle, exigences d'accessibilité, modalités de resti
 | AC-09  | Caractériser les participants non couverts           | PO          | 30 min      | Avant l'atelier  | Close, rôle P5 créé             |
 | AC-10  | Statuer sur le devenir de l'outil                    | Programme   | Une décision| Après l'atelier  | Reportée                        |
 | AC-11  | Compléter les informations résiduelles               | PO          | Variable    | Après l'atelier  | Ouverte, MQ-03, MQ-06, MQ-08    |
-| AC-12  | Vérifier la couverture du besoin de questionnement   | PO, P1      | 15 min      | Avant le dev     | **À mener**                     |
+| AC-12  | Vérifier la couverture du besoin de questionnement   | PO, P1      | 15 min      | Avant le dev     | Close le 2026-09-21, voir D-18   |
 | AC-13  | Arbitrer les suites de la revue critique             | PO          | Variable    | Avant le dev     | Close le 2026-08-11, voir section 9.4 |
-| AC-14  | Confirmer les points dérivés de l'arbitrage          | PO          | 30 min      | Avant le dev     | **Nouvelle, à mener**           |
+| AC-14  | Confirmer les points dérivés de l'arbitrage          | PO          | 30 min      | Avant le dev     | Close le 2026-09-21, voir 9.5    |
 
 ### 12.5 Ce qui reste à faire
 
 | Action | Objet                                                        | Charge     | Pourquoi elle compte                                                                  |
 |--------|--------------------------------------------------------------|------------|----------------------------------------------------------------------------------------|
-| AC-14  | Confirmer les points dérivés de l'arbitrage                  | 30 min     | Cinq éléments découlent mécaniquement des décisions du 2026-08-11 sans avoir été validés |
-| AC-12  | Vérifier la couverture du besoin de questionnement           | 15 min     | Le rôle P5, le plus nombreux, a une attente dont la couverture reste à établir         |
 | AC-05  | Faire confirmer la couverture par les six rôles               | 6 x 30 min | Seule action apportant une preuve extérieure aux convictions du Product Owner          |
 
-**État du document au 2026-08-11.** Le parcours de découverte, la méthode d'identification des frontières et le niveau des agrégats sont désormais couverts par trente-six exigences. La chaîne reliant la parole métier à l'agrégat est complète, voir section 8.1.
+**État du document au 2026-09-21.** Le parcours de découverte, la méthode d'identification des frontières et le niveau des agrégats sont couverts par quarante exigences. La chaîne reliant la parole métier à l'agrégat est complète, voir section 8.1. Les douze écarts relevés par le document d'exigences produit sont arbitrés, et toutes les informations manquantes sont closes sauf MQ-05, qui le demeure par décision.
 
-Deux réserves subsistent. Les points listés dans AC-14 découlent des décisions d'arbitrage mais n'ont pas été validés explicitement. Les cinq hypothèses de la section 9.1 restent non vérifiées auprès des utilisateurs, ce que seule AC-05 peut lever.
+**Une seule réserve subsiste, et c'est la même depuis le 2026-08-11.** Les cinq hypothèses de la section 9.1 n'ont jamais été confrontées aux personnes concernées. Aucune décision ne les lève : seule AC-05 le peut. Quarante exigences reposent aujourd'hui sur la conviction du Product Owner et sur une maquette que personne n'a essayée en séance.
 
 #### AC-14 Confirmer les points dérivés de l'arbitrage
 
