@@ -1,8 +1,11 @@
 ---
+id: PRD-ASSISTANT-EVENT-STORMING
+version: 1.0.0
+status: approved
 title: "Assistant Event Storming - Document d'exigences produit"
 description: "Exigences produit de l'Assistant Event Storming, service d'assistance aux ateliers de modélisation collaborative : modèles de séquence, notation, features, exigences fonctionnelles et non fonctionnelles, modèle de données, plan de livraison et traçabilité"
 author: "Product Manager"
-ms.date: 2026-09-21
+ms.date: 2026-10-19
 ms.topic: reference
 keywords:
   - event storming
@@ -21,7 +24,7 @@ Ce document traduit en exigences produit le document d'exigences métier, l'inte
 | Élément            | Valeur                                                                 |
 |--------------------|------------------------------------------------------------------------|
 | Référence produit  | Maquette interactive du 2026-08-15                                     |
-| Statut             | Version 1, rédigée le 2026-09-21                                       |
+| Statut             | Version 1.0.0, approuvée avec commentaires le 2026-10-18, finalisée le 2026-10-19 |
 | Périmètre          | Produit complet, du cadrage de l'atelier aux agrégats candidats        |
 | Neutralité         | Levée. Le document décrit le produit, pas son architecture technique   |
 
@@ -76,6 +79,8 @@ Cette précision déplace la nature du document.
 | Statut maquette     | Démontré, Partiel, Absent                                                            |
 
 Chaque exigence produit est rattachée à au moins une exigence métier, ou signalée comme création de ce document.
+
+Les listes à cocher sous chaque exigence sont ses critères d'acceptation, pas un relevé de fonctionnalités réalisées. Leur format décrit des comportements et des états observables; l'approbation du PRD ne coche aucun de ces critères. PR-108 et PR-110 restent des obligations du programme hors produit, et PR-109 est conservée comme exigence abandonnée, sans réattribution de son identifiant.
 
 ### Statut calendaire
 
@@ -1654,6 +1659,23 @@ Les huit indices recevables sont ceux du document d'exigences métier, rappelés
 - [ ] Aucune validation collective n'est requise pour écarter une proposition
 - [ ] L'échéance de péremption est annoncée et consultable, jamais silencieuse
 
+#### PR-142 Capter la parole en séance
+
+| Priorité | Exigence métier | Flux | Surface | Statut maquette |
+|----------|-----------------|------|---------|------------------|
+| Souhaitable | BR-007, création | UF-04 | S-17 | Absent |
+
+**Souhait exprimé le 2026-09-22, visé en L1 depuis le 2026-09-23.** Parler dans le produit plutôt que d'importer un fichier après coup, pour que la couche fantôme vive pendant la séance et non après. C'est la capacité la plus coûteuse de L1 : elle est la première retirée si L1 doit être réduit, voir DP-25 et la section 9.6.
+
+- [ ] Le facilitateur ouvre la captation, et chaque participant l'autorise pour lui-même
+- [ ] La captation est visible de tous, en permanence et sans ambiguïté, pendant qu'elle dure
+- [ ] Un participant coupe sa captation à tout moment, sans quitter la séance ni perdre ses contributions
+- [ ] Les propositions issues de la captation restent retenues jusqu'à la fin de la production humaine de l'étape, conformément à BR-014
+- [ ] Une captation interrompue ne perd pas ce qui a déjà été transcrit
+- [ ] **Le son n'est jamais conservé** : seule la transcription l'est, soumise à la purge de PR-132
+- [ ] La captation n'est disponible que si un traitement est activé, celui du service ou celui de l'organisation, voir PR-143
+- [ ] L'import de fichier de PR-089 reste disponible, que la captation soit active ou non
+
 ### F-16 Statuts de preuve, décisions et traçabilité
 
 | Attribut      | Valeur                                                                         |
@@ -2262,23 +2284,6 @@ Une organisation qui ne peut pas partir avec ses données n'a jamais vraiment eu
 - [ ] Une organisation consulte les fenêtres à venir avant de programmer ses séances
 - [ ] Un créneau déclaré qui se prolonge reste protégé jusqu'à la clôture de la séance
 
-#### PR-142 Capter la parole en séance
-
-| Priorité | Exigence métier | Flux | Surface | Statut maquette |
-|----------|-----------------|------|---------|------------------|
-| Souhaitable | Création | UF-04 | S-17 | Absent |
-
-**Souhait exprimé le 2026-09-22, visé en L1 depuis le 2026-09-23.** Parler dans le produit plutôt que d'importer un fichier après coup, pour que la couche fantôme vive pendant la séance et non après. C'est la capacité la plus coûteuse de L1 : elle est la première retirée si L1 doit être réduit, voir DP-25 et la section 9.6.
-
-- [ ] Le facilitateur ouvre la captation, et chaque participant l'autorise pour lui-même
-- [ ] La captation est visible de tous, en permanence et sans ambiguïté, pendant qu'elle dure
-- [ ] Un participant coupe sa captation à tout moment, sans quitter la séance ni perdre ses contributions
-- [ ] Les propositions issues de la captation restent retenues jusqu'à la fin de la production humaine de l'étape, conformément à BR-014
-- [ ] Une captation interrompue ne perd pas ce qui a déjà été transcrit
-- [ ] **Le son n'est jamais conservé** : seule la transcription l'est, soumise à la purge de PR-132
-- [ ] La captation n'est disponible que si un traitement est activé, celui du service ou celui de l'organisation, voir PR-143
-- [ ] L'import de fichier de PR-089 reste disponible, que la captation soit active ou non
-
 #### PR-143 Refuser le traitement tiers ou fournir le sien
 
 | Priorité | Exigence métier | Flux | Surface | Statut maquette |
@@ -2521,7 +2526,7 @@ Deux versements successifs d'un modèle inchangé produisent deux fichiers ident
 | Règle                                                                                    | Exigences concernées   |
 |--------------------------------------------------------------------------------------------|------------------------|
 | Une frontière, une zone ou une hypothèse n'altère jamais le modèle                          | PR-070, PR-071, PR-079 |
-| Un agrégat sans invariant n'existe pas, ou existe marqué incomplet                          | PR-085                 |
+| Un agrégat n'existe pas sans invariant                                                       | PR-085                 |
 | Un élément adopté depuis une proposition conserve son extrait source, y compris après modification | PR-093            |
 | Une suppression est réversible et tracée                                                     | PR-021                 |
 | Un élément regroupé comme doublon conserve ses deux auteurs                                  | PR-037                 |
@@ -2605,7 +2610,7 @@ Les indicateurs de qualité du résultat, famille C, sont au contraire affichés
 
 | Absence                                                           | Motif                                                                   |
 |--------------------------------------------------------------------|--------------------------------------------------------------------------|
-| Aucun gain par rapport à un atelier sans outil                     | Renoncement acté à constituer une référence de comparaison               |
+| Aucun calcul de gain par rapport à un atelier sans outil dans le produit | La comparaison des résultats relève d'un plan de mesure externe, pas de l'instrumentation du produit |
 | Aucune couverture d'un processus de référence                      | Aucun processus partagé du domaine ne préexiste à l'atelier              |
 | Aucun seuil d'alerte pour KPI-06, KPI-07 et KPI-08                 | Décision du 2026-08-08, reconduite                                       |
 | Aucune mesure de qualité du modèle produit par le produit lui-même | Le jugement de qualité appartient au groupe, PP-07                       |
@@ -2687,7 +2692,7 @@ Aucun jalon n'est rattaché à une date. L1 vise la prochaine session ouverte, q
 
 **Ajout du 2026-09-21.** La feature F-21 ne tient pas un rang : elle traverse la réalisation. Le modèle de référence doit exister comme **donnée** dès le rang 2, sans quoi le produit reprend des phases écrites en dur et le travail est à refaire. L'éditeur, lui, vient en L3. C'est l'inversion qui compte : construire le moteur qui lit un modèle, puis livrer le modèle de référence comme premier contenu.
 
-Cette révision est à confirmer par le Product Owner, elle modifie un ordre validé le 2026-08-10 puis révisé le 2026-08-11.
+Cette révision, qui modifie un ordre validé le 2026-08-10 puis révisé le 2026-08-11, est confirmée par DP-06 et QP-11.
 
 ### 9.4 Chemin critique
 
@@ -2815,7 +2820,7 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 
 ### 11.3 Questions
 
-**Les douze premières questions sont closes**, treize décisions produit sont prises, et les treize écarts de l'annexe A sont arbitrés. **Quatre questions nouvelles sont ouvertes le même jour** par le passage en service : elles figurent après le tableau des réponses.
+**Historique au 2026-09-21.** Les douze premières questions sont closes, treize décisions produit sont prises, et les treize écarts de l'annexe A sont arbitrés. Quatre questions nouvelles sont alors ouvertes par le passage en service; leurs réponses des 2026-09-22 et 2026-09-23 figurent ci-dessous.
 
 | ID        | Question                                                                                   | Réponse                                                                     |
 |-----------|----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
@@ -2832,19 +2837,13 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | **QP-11** | L'ordre de réalisation révisé est-il validé ?                                                | **Oui**, le 2026-09-21. Voir DP-06 et la section 9.3                        |
 | **QP-12** | Les objectifs BO-08 à BO-10 et les cibles de la famille C sont-ils confirmés ?               | **Confirmés tels quels**, le 2026-09-21. Clôt l'action AC-14 du document d'exigences métier |
 
-**Questions ouvertes par le passage en service, le 2026-09-21.**
-
-| ID        | Question                                                                                   | Interlocuteur              | Ce qu'elle bloque                                        |
-|-----------|----------------------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------|
-
-**QP-13 et QP-16 ont été tranchées le 2026-09-22.**
+**Questions issues du passage en service, désormais tranchées.**
 
 | ID        | Question                                                                                   | Réponse                                                                     |
 |-----------|----------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
 | **QP-13** | L'interface doit-elle exister dans d'autres langues que le français ?                        | **Français et anglais**, le 2026-09-22. Le contenu n'est jamais traduit. Voir DP-14, NFR-15 et PR-137 |
 | **QP-16** | Une organisation peut-elle imposer son propre fournisseur d'identité ?                       | **Oui**, le 2026-09-22. GitHub, GitHub Enterprise Server ou OIDC, au choix de l'organisation. Voir DP-15, PR-001 et PR-136 |
 | **QP-14** | Où les données sont-elles hébergées, et cette localisation est-elle opposable ?              | **En fichiers dans le dépôt de l'organisation pour ce qui dure**, le 2026-09-22 ; en base pour l'état vivant, celle du service ou celle que l'organisation installe. Voir DP-16, PR-138, PR-139 et PR-140 |
-
 | **QP-15** | Quel niveau de service est engagé, et avec quelles conséquences en cas de manquement ?       | **Aucun taux engagé**, le 2026-09-22, tant que l'intérêt commercial n'est pas établi. Une règle ferme : aucun déploiement pendant une séance déclarée. La haute disponibilité est la cible visée. Voir DP-17, NFR-17 et PR-141 |
 | **QP-17** | Le repli non logiciel reste-t-il une capacité du produit ?                                   | **Réduit à l'export permanent**, le 2026-09-23. PR-109 est abandonnée, PR-108 et PR-110 reviennent au programme. Voir DP-18 |
 
@@ -2913,11 +2912,9 @@ Ces hypothèses portent le document. Aucune n'a été confrontée à un utilisat
 | BR-039          | PR-047                                            | Complète, créée le 2026-09-21 |
 | BR-040          | PR-021, PR-112, PR-113, PR-114, PR-116            | Complète, créée le 2026-09-21, PR-114 en L2 |
 
-Les quarante exigences métier sont couvertes.
+Les quarante exigences métier sont prises en compte : BR-020 n'est que partiellement servie par le produit, et BR-021 relève du programme hors produit, comme indiqué dans le tableau. Une couverture documentaire ne signifie pas que les capacités sont réalisées.
 
-**Ce qui n'y figure pas, et n'a pas à y figurer.** Les features F-21 et F-22, ajoutées le 2026-09-21, servent le service et non le programme décrit par le document d'exigences métier : modèles de séquence, packs de notation, organisations, isolation, abonnement. Quinze exigences produit, PR-121 à PR-135, n'ont donc aucun rattachement métier et ne doivent pas en recevoir, conformément à la règle révisée de la section 3.4. Trois d'entre elles servent malgré tout une exigence existante : PR-123 et PR-124 pour BR-001 et BR-036, PR-132 pour BR-011, PR-133 pour BR-013.
-
-Hors ces quinze, il ne reste que deux exigences produit marquées Création : PR-063, rappel d'exhaustivité des variantes, Optionnelle, et PR-115, position stable sans animation, qui traduit une orientation UX et non un besoin métier.
+**Ce qui n'y figure pas, et n'a pas à y figurer.** Les features F-21 et F-22, ajoutées le 2026-09-21, servent le service et non le programme décrit par le document d'exigences métier : modèles de séquence, packs de notation, organisations, isolation et abonnement. Leurs exigences ne sont donc pas à rattacher artificiellement aux exigences métier. Lorsqu'une capacité du service répond aussi à un besoin du programme, son rattachement figure dans sa fiche d'exigence. PR-142, rattachée à BR-007, appartient à F-15. PR-137 se rattache à NFR-15. Les exigences sans rattachement métier restent des créations propres au produit.
 
 ### 12.2 Objectifs métier vers features
 
@@ -2934,7 +2931,9 @@ Hors ces quinze, il ne reste que deux exigences produit marquées Création : PR
 | BO-09    | F-14, F-16, F-17                                      | L2                           |
 | BO-10    | F-03, F-07, F-16                                      | L2                           |
 
-**Quatre objectifs ne sont pleinement servis qu'en L2.** Si L2 n'est pas engagé, BO-01, BO-06, BO-08, BO-09 et BO-10 restent partiellement couverts, ce qui revient à livrer un outil d'atelier et non la chaîne complète jusqu'aux agrégats.
+**Cinq objectifs ne sont pleinement servis qu'en L2.** Si L2 n'est pas engagé, BO-01, BO-06, BO-08, BO-09 et BO-10 restent partiellement couverts, ce qui revient à livrer un outil d'atelier et non la chaîne complète jusqu'aux agrégats.
+
+**Couverture de finalisation.** Parmi les 145 identifiants PR conservés, 142 sont des exigences produit actives; PR-108 et PR-110 sont hors produit, PR-109 est abandonnée. Les 142 portent au moins un critère d'acceptation (553 critères au total). Le tableau ci-dessus rattache les features F-01 à F-20 à dix objectifs métier : 119 exigences actives sur 142, soit **83,80 %**. Les 23 autres appartiennent à F-21 et F-22. Ce calcul par feature ne crée aucun lien implicite via une exigence métier. La cible de 100 % n'est pas déclarée atteinte : l'écart est explicitement accepté en section 14.
 
 ### 12.3 Flux UX vers exigences produit
 
@@ -2981,11 +2980,29 @@ Toutes les décisions sont rendues. Ce qui suit relève de l'exécution.
 
 **AP-10 est la première à mener.** Elle éprouve, à coût faible, la décision la plus structurante du 2026-09-21 : si le modèle de référence ne s'exprime pas entièrement dans le format de F-21 — ses neuf critères compris — alors le vocabulaire de la section 7.9 est trop pauvre, et il vaut mieux le découvrir avant d'avoir écrit le moteur.
 
-**AP-06 est la seule action qui apporte une preuve extérieure.** Toutes les autres reposent sur la conviction du Product Owner et sur la maquette. Elle reste à mener depuis le document d'exigences métier du 2026-08-11.
+**AP-06 est la seule action qui apporte une preuve extérieure.** Toutes les autres reposent sur la conviction du Product Owner et sur la maquette. Le Product Owner accepte qu'elle reste une réserve après approbation; elle demeure à mener depuis le document d'exigences métier du 2026-08-11.
 
 **Le document d'exigences métier a été mis en concordance le 2026-09-21.** Quatre exigences sont amendées — BR-004 sur la visibilité en collecte, BR-011 sur la conservation de la transcription, BR-013 sur le versement, BR-036 sur le blocage d'étape. BR-033 est durcie, le marquage incomplet d'un agrégat n'étant plus admis. Quatre exigences sont créées, BR-037 à BR-040, et sept reçoivent des critères ajoutés. BR-006 n'appelait aucun amendement : elle exigeait déjà le vote secret, et c'est le comportement de la maquette qui est corrigé.
 
-Les deux documents disent désormais la même chose sur les mêmes comportements. **Il reste que quarante exigences reposent sur la conviction du Product Owner et sur une maquette que personne n'a essayée en séance.** Seule AP-06 peut lever cette réserve.
+Les deux documents disent désormais la même chose sur les mêmes comportements. **Il reste que quarante exigences reposent sur la conviction du Product Owner et sur une maquette que personne n'a essayée en séance.** AP-06 est la réserve d'exécution acceptée à la finalisation.
+
+## 14. Décision de finalisation
+
+| Élément | Décision |
+|---------|----------|
+| Identifiant et version | PRD-ASSISTANT-EVENT-STORMING, 1.0.0 |
+| Approbateur | Sébastien DEGODEZ, Product Owner |
+| Décision | Approuvé avec commentaires, le 2026-10-18 |
+| Réserve AP-06 | Acceptée comme action d'exécution après approbation; la confirmation externe des six rôles reste à obtenir |
+| Dérogation de traçabilité | Le gap de couverture objectifs/traçabilité signalé en Validate est accepté. F-21 et F-22 restent des capacités propres au service et ne sont pas rattachées artificiellement aux objectifs du programme; leur justification est consignée en section 12.1 |
+| Mesures opérationnelles | Les objectifs de préparation et de qualité des cartes relèvent d'un plan de mesure externe à établir, hors produit et hors du présent PRD; aucun résultat mesuré n'est déclaré ici |
+| Gate qualité Finalize | `APPROVED_WITH_COMMENTS`, contrôle du 2026-10-19, voir le [rapport qualité](assistant-event-storming-prd.quality-report.yml) et les [constats associés](assistant-event-storming-prd.quality-findings.yml) |
+| Relectures | Revue documentaire par l'assistant; approbation métier par le Product Owner. Les six rôles n'ont pas encore validé le besoin : AP-06 n'est pas déclarée accomplie |
+| Portée de l'approbation | Référence d'exigences pour la conception et la réalisation, pas autorisation de mise en service ni preuve de validation utilisateur |
+
+Le PRD 1.0.0 est finalisé avec commentaires. L'approbation métier du 2026-10-18 et le contrôle documentaire du 2026-10-19 sont distincts. Le rapport conserve le statut qualité `NEEDS_REVIEW` pour rendre visibles les réserves; ce statut n'annule pas la sortie Finalize `APPROVED_WITH_COMMENTS`, autorisée par les décisions ci-dessus.
+
+Les actions de la section 13 demeurent ouvertes pour la réalisation, les essais et la validation externe. Les conditions de mise en service de la section 9.5 restent à satisfaire. L'engagement de service chiffré reste à établir avant la première vente hors du programme d'origine, conformément à QP-15 et RP-20. Toute modification ultérieure des exigences ou de ces arbitrages nécessite une nouvelle version et une nouvelle décision d'approbation.
 
 ## Annexe A — Écarts entre la maquette, les exigences métier et l'intention UX
 
